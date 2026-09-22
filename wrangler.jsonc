@@ -1,0 +1,36 @@
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "prompt-vault",
+	"compatibility_date": "2026-09-22",
+	"main": "./workers/app.ts",
+	"workers_dev": false,
+	"routes": [
+		{
+			"pattern": "vault.disign.me",
+			"custom_domain": true
+		}
+	],
+	"observability": {
+		"enabled": true
+	},
+	"cache": {
+		"enabled": true
+	},
+	"vars": {
+		"IMAGE_BASE_URL": "https://vault-pic.disign.me"
+	},
+	"d1_databases": [
+		{
+			"binding": "DB",
+			"database_name": "prompt-vault-db",
+			"database_id": "00000000-0000-0000-0000-000000000000",
+			"migrations_dir": "migrations"
+		}
+	],
+	"r2_buckets": [
+		{
+			"binding": "IMAGES",
+			"bucket_name": "prompt-vault-images"
+		}
+	]
+}

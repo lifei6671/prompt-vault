@@ -141,3 +141,16 @@ dist
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 .vite/
+.codegraph/
+.idea/
+.vscode/
+
+# React Router / Cloudflare build output
+build/
+.react-router/
+.wrangler/
+worker-configuration.d.ts
+
+# Task-local scaffolding and package-manager caches
+phase1-scaffold/
+.tmp-*/
