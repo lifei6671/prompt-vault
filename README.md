@@ -24,7 +24,7 @@ pnpm dev
 1. 执行 `wrangler d1 create prompt-vault-db`，将返回的真实 `database_id` 替换 `wrangler.jsonc` 中的全零占位符 `00000000-0000-0000-0000-000000000000`。
 2. 执行 `wrangler r2 bucket create prompt-vault-images`。
 3. 为 Worker 配置 Custom Domain `vault.disign.me`，并为 R2 配置公开读取 Custom Domain `vault-pic.disign.me`；保持 `IMAGE_BASE_URL=https://vault-pic.disign.me`。
-4. 在确认 D1 备份/Time Travel 与回滚方案后，执行 `pnpm db:migrate:remote`，再执行 `pnpm deploy`。
+4. 在确认 D1 备份/Time Travel 与回滚方案后，执行 `pnpm db:migrate:remote`，再执行 `pnpm run deploy`。
 
 ## Phase 4A 后台安全配置
 

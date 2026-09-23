@@ -18,7 +18,9 @@ test("JSONC comments and trailing commas parse", () => {
   assert.deepEqual(parseJsonc('{ // comment\n "value": 1, }', "fixture.jsonc"), { value: 1 });
 });
 test("placeholder fails and valid local fixture passes", () => {
-  assert.match(checkReleaseConfig(config, schema, hasFile).join(" "), /database_id/);
+  const placeholder = clone();
+  placeholder.d1_databases[0].database_id = "00000000-0000-0000-0000-000000000000";
+  assert.match(checkReleaseConfig(placeholder, schema, hasFile).join(" "), /database_id/);
   assert.deepEqual(checkReleaseConfig(valid(), schema, hasFile), []);
 });
 test("wrong domain, binding and missing migration fail", () => {

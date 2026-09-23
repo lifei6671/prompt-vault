@@ -18,13 +18,13 @@ pnpm release:check
 pnpm verify:release
 ```
 
-`release:check` 只读本地配置、Wrangler schema 和 migration 文件；全零 D1 ID 会让它失败。`verify:release` 顺序执行 typecheck、test、build。失败时停止。`pnpm deploy` 也串联这两项检查后才执行 `wrangler deploy --experimental-auto-create=false`，不会运行 migration。
+`release:check` 只读本地配置、Wrangler schema 和 migration 文件；全零 D1 ID 会让它失败。`verify:release` 顺序执行 typecheck、test、build。失败时停止。`pnpm run deploy` 也串联这两项检查后才执行 `wrangler deploy --experimental-auto-create=false`，不会运行 migration。
 
 部署顺序：
 
 1. **数据库安全点。** 记录当前 Worker version ID、D1 Time Travel bookmark/时间点、当前 schema 和图片引用。Wrangler 4.133.0 支持 `wrangler d1 time-travel info prompt-vault-db --timestamp <RFC3339>` 查询历史点，命令作用于远端 D1；备份点及可恢复范围应在 Dashboard 再核验。保留输出中的 bookmark 供应急使用。
 2. **Migration。** 核对 `migrations/0001_init.sql` → `0002_i18n.sql` → `0003_retired_image_keys.sql` 顺序及目标库，然后人工执行 `wrangler d1 migrations apply prompt-vault-db --remote`。Wrangler help 说明该命令会提示确认、逐条应用未执行 migration，并在应用后生成备份；失败的单条 migration 会回滚，先前成功的 migration 保留。应用没有 request-time auto migration。生产操作者应在确认 SQL 和备份后执行，不能把此命令接入自动 deploy。
-3. **Worker。** preflight 全绿后执行 `pnpm deploy`；记录新 Worker version ID，确认 Custom Domain 路由生效。
+3. **Worker。** preflight 全绿后执行 `pnpm run deploy`；记录新 Worker version ID，确认 Custom Domain 路由生效。
 4. **Smoke。** 按下方清单验证；失败时立即停止后续操作并评估代码与 schema 的兼容性。
 
 ### Smoke tests

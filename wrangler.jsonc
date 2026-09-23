@@ -25,7 +25,7 @@
 		{
 			"binding": "DB",
 			"database_name": "prompt-vault-db",
-			"database_id": "00000000-0000-0000-0000-000000000000",
+			"database_id": "688e2dd5-99f8-4146-ba85-0fb8db012836",
 			"migrations_dir": "migrations"
 		}
 	],
