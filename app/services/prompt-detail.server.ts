@@ -31,6 +31,19 @@ export type PromptDetail = {
 export async function getPromptDetail(
   db: D1Database, slug: string, uiLocale: Locale, requestedLanguage: string | null,
 ): Promise<PromptDetail> {
+  return loadPromptDetail(db, "slug", slug, uiLocale, requestedLanguage);
+}
+
+export async function getAdminPromptPreview(
+  db: D1Database, id: number, uiLocale: Locale, requestedLanguage: string | null,
+): Promise<PromptDetail> {
+  return loadPromptDetail(db, "id", id, uiLocale, requestedLanguage);
+}
+
+async function loadPromptDetail(
+  db: D1Database, lookup: "slug" | "id", value: string | number,
+  uiLocale: Locale, requestedLanguage: string | null,
+): Promise<PromptDetail> {
   let requested: Locale | null = null;
   try { if (requestedLanguage !== null) requested = parseLocale(requestedLanguage); }
   catch { /* source fallback */ }
@@ -47,9 +60,9 @@ export async function getPromptDetail(
       AND pt.locale <> p.source_language
     LEFT JOIN category_translations ct ON ct.category_id = c.id AND ct.locale = ?
       AND ct.locale <> c.source_language
-    WHERE p.slug = ?`).bind(requested, uiLocale, slug).first<PromptRow>();
+    WHERE p.${lookup} = ?`).bind(requested, uiLocale, value).first<PromptRow>();
 
-  if (!row || row.status !== "published" && !row.deleted_at)
+  if (!row || lookup === "slug" && row.status !== "published" && !row.deleted_at)
     throw new Response("Not Found", { status: 404 });
   if (row.deleted_at) throw new Response("Gone", { status: 410 });
 

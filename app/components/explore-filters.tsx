@@ -3,11 +3,13 @@ import type { ExploreFilters } from "~/lib/explore";
 import { uiCopy } from "~/lib/ui-copy";
 
 type CategoryOption = { slug: string; name: string };
+type TagOption = { slug: string; name: string };
 
-export function ExploreFiltersBar({ locale, filters, categories, models, ratios }: {
+export function ExploreFiltersBar({ locale, filters, categories, tags, models, ratios }: {
   locale: Locale;
   filters: ExploreFilters;
   categories: CategoryOption[];
+  tags: TagOption[];
   models: string[];
   ratios: string[];
 }) {
@@ -27,6 +29,13 @@ export function ExploreFiltersBar({ locale, filters, categories, models, ratios 
             <select name="category" defaultValue={filters.category}>
               <option value="">{t.allCategories}</option>
               {categories.map((category) => <option key={category.slug} value={category.slug}>{category.name}</option>)}
+            </select>
+          </label>
+          <label>
+            <span>{t.tags}</span>
+            <select name="tag" defaultValue={filters.tag}>
+              <option value="">{t.allTags}</option>
+              {tags.map((tag) => <option key={tag.slug} value={tag.slug}>{tag.name}</option>)}
             </select>
           </label>
           <label>

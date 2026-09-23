@@ -33,14 +33,15 @@ export const links: Route.LinksFunction = () => [
 
 export function loader({ request }: Route.LoaderArgs) {
   const locale = readUiLocale(request);
-  const headers = new Headers({ "Cache-Control": "private, no-store" });
   const cookie = uiLocaleCookie(request, locale);
-  if (cookie) headers.set("Set-Cookie", cookie);
-  return data({ locale }, { headers });
+  return cookie
+    ? data({ locale }, { headers: { "Set-Cookie": cookie } })
+    : data({ locale });
 }
 
 export function documentLanguage(matches: Pick<UIMatch, "id" | "loaderData">[], locale: Locale): Locale {
-  const detail = matches.find((match) => match.id === "routes/prompt-detail")?.loaderData as
+  const detail = matches.find((match) =>
+    match.id === "routes/prompt-detail" || match.id === "routes/admin-prompt-preview")?.loaderData as
     Awaited<ReturnType<typeof promptDetailLoader>> | undefined;
   return detail?.prompt.contentLanguage ?? locale;
 }

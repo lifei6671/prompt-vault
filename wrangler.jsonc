@@ -11,7 +11,9 @@
 		}
 	],
 	"observability": {
-		"enabled": true
+		"enabled": true,
+		"redact_query_string": true,
+		"logs": { "invocation_logs": false }
 	},
 	"cache": {
 		"enabled": true

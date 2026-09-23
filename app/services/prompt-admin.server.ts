@@ -1,3 +1,5 @@
+import { env } from "cloudflare:workers";
+import { cleanupImageKeys } from "./image-upload.server";
 import { parseSelectOptions, type Locale, type SelectOption } from "../lib/localization";
 import { scanPromptKeys } from "../lib/prompt-template";
 
@@ -76,13 +78,76 @@ export function parseVariables(json: string, source: Locale): Variable[] {
     return { key, type: item.type, label, placeholder, translation_label, translation_placeholder, options };
   });
 }
-function validateTokens(source: string, translation: string | null, variables: Variable[]) {
+export function validateTokens(source: string, translation: string | null, variables: Variable[]) {
   const keys = new Set(scanPromptKeys(source));
   if (keys.size !== variables.length || variables.some((item) => !keys.has(item.key))) invalid("tokens");
   if (translation !== null) {
     const translated = new Set(scanPromptKeys(translation));
     if (translated.size !== keys.size || [...keys].some((key) => !translated.has(key))) invalid("tokens");
   }
+}
+export async function parsePromptFields(db: D1Database, form: FormData, source: Locale) {
+  const slug = field(form, "slug", 80, true);
+  if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)) invalid();
+  const title = field(form, "title", 200, true);
+  const description = contentField(form, "description", 2000) || null;
+  const template = contentField(form, "prompt_template", 50_000, true);
+  const imageAlt = field(form, "image_alt", 500, true);
+  const model = field(form, "model", 120) || null;
+  const ratio = field(form, "ratio", 60) || null;
+  const categoryId = parsePromptId(field(form, "category_id", 30, true));
+  if (!await db.prepare("SELECT 1 FROM categories WHERE id = ?").bind(categoryId).first())
+    throw new PromptAdminError(409, "conflict");
+  const tagIds = [...new Set(form.getAll("tag_ids").map((value) => {
+    if (typeof value !== "string") invalid();
+    return parsePromptId(value);
+  }))];
+  if (tagIds.length) {
+    const found = await db.prepare(`SELECT id FROM tags WHERE id IN (${tagIds.map(() => "?").join(",")})`)
+      .bind(...tagIds).all<{ id: number }>();
+    if (found.results.length !== tagIds.length) throw new PromptAdminError(409, "conflict");
+  }
+  const target = otherLocale(source);
+  if (field(form, "translation_locale", 5) !== target) invalid();
+  const mode = field(form, "translation_mode", 10);
+  if (mode !== "present" && mode !== "remove") invalid();
+  const translatedTitle = field(form, "translation_title", 200);
+  const translatedDescription = contentField(form, "translation_description", 2000) || null;
+  const translatedTemplate = contentField(form, "translation_prompt_template", 50_000);
+  const translatedAlt = field(form, "translation_image_alt", 500);
+  if (mode === "present" && (!translatedTitle || !translatedTemplate || !translatedAlt)) invalid();
+
+  const variables = parseVariables(field(form, "variables_json", 100_000), source);
+  validateTokens(template, mode === "present" ? translatedTemplate : null, variables);
+  return { slug, title, description, template, imageAlt, model, ratio, categoryId, tagIds, target, mode, translatedTitle, translatedDescription, translatedTemplate, translatedAlt, variables };
+}
+export function relatedPromptStatements(db: D1Database, id: number, now: string,
+  fields: Awaited<ReturnType<typeof parsePromptFields>>): D1PreparedStatement[] {
+  const { target, mode, translatedTitle, translatedDescription, translatedTemplate, translatedAlt, variables, tagIds } = fields;
+  const statements: D1PreparedStatement[] = [
+    mode === "present"
+      ? db.prepare(`INSERT INTO prompt_translations
+        (prompt_id, locale, title, description, prompt_template, image_alt)
+        VALUES (?, ?, ?, ?, ?, ?) ON CONFLICT(prompt_id, locale) DO UPDATE SET
+        title = excluded.title, description = excluded.description,
+        prompt_template = excluded.prompt_template, image_alt = excluded.image_alt`)
+        .bind(id, target, translatedTitle, translatedDescription, translatedTemplate, translatedAlt)
+      : db.prepare("DELETE FROM prompt_translations WHERE prompt_id = ? AND locale = ?").bind(id, target),
+  ];
+  variables.forEach((variable, index) => {
+    statements.push(db.prepare(`INSERT INTO prompt_variables
+      (prompt_id, variable_key, label, input_type, input_placeholder, options_json,
+       sort_order, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`)
+      .bind(id, variable.key, variable.label, variable.type, variable.placeholder,
+        variable.options === null ? null : JSON.stringify(variable.options), index, now, now));
+    if (variable.translation_label) statements.push(db.prepare(`INSERT INTO prompt_variable_translations
+      (variable_id, locale, label, input_placeholder)
+      VALUES ((SELECT id FROM prompt_variables WHERE prompt_id = ? AND variable_key = ?), ?, ?, ?)`)
+      .bind(id, variable.key, target, variable.translation_label, variable.translation_placeholder));
+  });
+  tagIds.forEach((tagId) => statements.push(
+    db.prepare("INSERT INTO prompt_tags (prompt_id, tag_id) VALUES (?, ?)").bind(id, tagId)));
+  return statements;
 }
 export async function listAdminPrompts(db: D1Database): Promise<AdminListRow[]> {
   const rows = await db.prepare(`SELECT p.id, p.slug, p.title, p.status, p.model, p.ratio,
@@ -144,16 +209,32 @@ function mapWriteError(error: unknown): never {
     throw new PromptAdminError(409, "conflict");
   throw error;
 }
-export async function mutateAdminPrompt(db: D1Database, id: number, form: FormData) {
+export async function mutateAdminPrompt(db: D1Database, id: number, form: FormData, bucket: R2Bucket = env.IMAGES) {
   const intent = field(form, "_intent", 20);
   if (!["save", "publish", "withdraw", "delete"].includes(intent)) invalid();
   const prompt = await row(db, id);
   if (prompt.deleted_at) throw new PromptAdminError(409, "deleted");
   const now = new Date().toISOString();
   if (intent === "delete") {
-    const result = await db.prepare("UPDATE prompts SET deleted_at = ?, updated_at = ? WHERE id = ? AND deleted_at IS NULL")
-      .bind(now, now, id).run();
-    if (!result.meta.changes) throw new PromptAdminError(409, "conflict");
+    // RETURNING captures the keys of the version actually deleted, even if a replace won first.
+    const deleted = await db.prepare(`UPDATE prompts SET deleted_at = ?, updated_at = ?
+      WHERE id = ? AND deleted_at IS NULL RETURNING original_image_key, preview_image_key`)
+      .bind(now, now, id).first<{ original_image_key: string; preview_image_key: string }>();
+    if (!deleted) throw new PromptAdminError(409, "conflict");
+    try {
+      const shared = await db.prepare(`SELECT 1 FROM prompts WHERE id <> ? AND deleted_at IS NULL
+        AND (original_image_key IN (?, ?) OR preview_image_key IN (?, ?))`)
+        .bind(id, deleted.original_image_key, deleted.preview_image_key,
+          deleted.original_image_key, deleted.preview_image_key).first();
+      if (!shared)
+        await cleanupImageKeys(bucket, [deleted.original_image_key, deleted.preview_image_key], "soft_delete");
+    } catch (error) {
+      // The DB deletion is already committed. A failed safety check leaves an orphan, not a broken active image.
+      console.error("Could not check shared images after soft delete", {
+        id, keys: [deleted.original_image_key, deleted.preview_image_key],
+        error: error instanceof Error ? error.name : "unknown",
+      });
+    }
     return;
   }
   if (intent === "withdraw") {
@@ -173,39 +254,10 @@ export async function mutateAdminPrompt(db: D1Database, id: number, form: FormDa
     return;
   }
   if (form.has("source_language") || form.has("original_image_key") || form.has("preview_image_key")) invalid();
-  const slug = field(form, "slug", 80, true);
-  if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)) invalid();
-  if (prompt.published_at && slug !== prompt.slug) throw new PromptAdminError(409, "slugFrozen");
-  const title = field(form, "title", 200, true);
-  const description = contentField(form, "description", 2000) || null;
-  const template = contentField(form, "prompt_template", 50_000, true);
-  const imageAlt = field(form, "image_alt", 500, true);
-  const model = field(form, "model", 120) || null;
-  const ratio = field(form, "ratio", 60) || null;
-  const categoryId = parsePromptId(field(form, "category_id", 30, true));
-  if (!await db.prepare("SELECT 1 FROM categories WHERE id = ?").bind(categoryId).first())
-    throw new PromptAdminError(409, "conflict");
-  const tagIds = [...new Set(form.getAll("tag_ids").map((value) => {
-    if (typeof value !== "string") invalid();
-    return parsePromptId(value);
-  }))];
-  if (tagIds.length) {
-    const found = await db.prepare(`SELECT id FROM tags WHERE id IN (${tagIds.map(() => "?").join(",")})`)
-      .bind(...tagIds).all<{ id: number }>();
-    if (found.results.length !== tagIds.length) throw new PromptAdminError(409, "conflict");
-  }
-  const target = otherLocale(prompt.source_language);
-  if (field(form, "translation_locale", 5) !== target) invalid();
-  const mode = field(form, "translation_mode", 10);
-  if (mode !== "present" && mode !== "remove") invalid();
-  const translatedTitle = field(form, "translation_title", 200);
-  const translatedDescription = contentField(form, "translation_description", 2000) || null;
-  const translatedTemplate = contentField(form, "translation_prompt_template", 50_000);
-  const translatedAlt = field(form, "translation_image_alt", 500);
-  if (mode === "present" && (!translatedTitle || !translatedTemplate || !translatedAlt)) invalid();
-  
-  const variables = parseVariables(field(form, "variables_json", 100_000), prompt.source_language);
-  validateTokens(template, mode === "present" ? translatedTemplate : null, variables);
+  if (prompt.published_at && field(form, "slug", 80, true) !== prompt.slug)
+    throw new PromptAdminError(409, "slugFrozen");
+  const fields = await parsePromptFields(db, form, prompt.source_language);
+  const { slug, title, description, template, imageAlt, model, ratio, categoryId } = fields;
   const statements: D1PreparedStatement[] = [
     // A failed assertion aborts the D1 batch before any related row changes.
     db.prepare(`SELECT CASE WHEN EXISTS (
@@ -216,29 +268,9 @@ export async function mutateAdminPrompt(db: D1Database, id: number, form: FormDa
       image_alt = ?, model = ?, ratio = ?, category_id = ?, updated_at = ?
       WHERE id = ? AND deleted_at IS NULL`)
       .bind(slug, title, description, template, imageAlt, model, ratio, categoryId, now, id),
-    mode === "present"
-      ? db.prepare(`INSERT INTO prompt_translations
-        (prompt_id, locale, title, description, prompt_template, image_alt)
-        VALUES (?, ?, ?, ?, ?, ?) ON CONFLICT(prompt_id, locale) DO UPDATE SET
-        title = excluded.title, description = excluded.description,
-        prompt_template = excluded.prompt_template, image_alt = excluded.image_alt`)
-        .bind(id, target, translatedTitle, translatedDescription, translatedTemplate, translatedAlt)
-      : db.prepare("DELETE FROM prompt_translations WHERE prompt_id = ? AND locale = ?").bind(id, target),
     db.prepare("DELETE FROM prompt_variables WHERE prompt_id = ?").bind(id),
     db.prepare("DELETE FROM prompt_tags WHERE prompt_id = ?").bind(id),
   ];
-  variables.forEach((variable, index) => {
-    statements.push(db.prepare(`INSERT INTO prompt_variables
-      (prompt_id, variable_key, label, input_type, input_placeholder, options_json,
-       sort_order, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`)
-      .bind(id, variable.key, variable.label, variable.type, variable.placeholder,
-        variable.options === null ? null : JSON.stringify(variable.options), index, now, now));
-    if (variable.translation_label) statements.push(db.prepare(`INSERT INTO prompt_variable_translations
-      (variable_id, locale, label, input_placeholder)
-      VALUES ((SELECT id FROM prompt_variables WHERE prompt_id = ? AND variable_key = ?), ?, ?, ?)`)
-      .bind(id, variable.key, target, variable.translation_label, variable.translation_placeholder));
-  });
-  tagIds.forEach((tagId) => statements.push(
-    db.prepare("INSERT INTO prompt_tags (prompt_id, tag_id) VALUES (?, ?)").bind(id, tagId)));
+  statements.push(...relatedPromptStatements(db, id, now, fields));
   try { await db.batch(statements); } catch (error) { mapWriteError(error); }
 }

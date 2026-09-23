@@ -236,6 +236,8 @@ describe("Prompt admin", () => {
       expect(editHtml).toContain(locale === "zh-CN" ? "Prompt 正文" : "Prompt body");
       expect(editHtml).toContain("original.png");
       expect(editHtml).toContain("variables_json");
+      expect(editHtml).toContain(`/admin/prompts/${id}/preview?ui_locale=${locale}`);
+      expect(editHtml).toContain(locale === "zh-CN" ? ">预览</a>" : ">Preview</a>");
       expect(editHtml).toContain("en-US");
       const listRouter = createMemoryRouter([{ path: "/", element: createElement(Outlet, { context: locale }),
         children: [{ index: true, element: createElement(AdminPrompts, {
@@ -244,6 +246,14 @@ describe("Prompt admin", () => {
       const listHtml = renderToStaticMarkup(createElement(RouterProvider, { router: listRouter }));
       expect(listHtml).toContain("render-admin");
     }
+    await mutateAdminPrompt(env.DB, id, intent("delete"));
+    const deletedRouter = createMemoryRouter([{ path: "/", element: createElement(Outlet, { context: "zh-CN" }),
+      children: [{ index: true, element: createElement(AdminPromptEdit, {
+        loaderData: { prompt: await prompt(id), taxonomy: await listPromptTaxonomy(env.DB) },
+        actionData: undefined,
+      } as Parameters<typeof AdminPromptEdit>[0]) }] }]);
+    expect(renderToStaticMarkup(createElement(RouterProvider, { router: deletedRouter })))
+      .not.toContain(`/admin/prompts/${id}/preview`);
   });
 
   it("maps action errors to 400/404/409 with no-store under the admin parent", async () => {

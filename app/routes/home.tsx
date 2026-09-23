@@ -28,12 +28,23 @@ export async function loader({ request }: Route.LoaderArgs) {
   const locale = readUiLocale(request);
   const filters = readExploreFilters(url.searchParams);
   const result = await listExplorePrompts(env.DB, filters, locale, page);
+  const filterKeys = ["category", "tag", "q", "model", "ratio", "source_language",
+    "page", "ui_locale", "prompt_locale"];
+  const knownFilterQuery = [...url.searchParams.keys()].every((key) => filterKeys.includes(key));
   const category = result.categories.find((item) =>
     item.slug.toLowerCase() === filters.category.toLowerCase());
-  if (filters.category && !filters.q && !filters.model && !filters.ratio && !filters.sourceLanguage
-    && [...url.searchParams.keys()].every((key) =>
-      ["category", "page", "ui_locale", "prompt_locale"].includes(key)) && category) {
+  if (filters.category && !filters.tag && !filters.q && !filters.model && !filters.ratio && !filters.sourceLanguage
+    && knownFilterQuery && category) {
     const target = new URL(`/category/${encodeURIComponent(category.slug)}`, url);
+    if (page >= 2) target.searchParams.set("page", String(page));
+    if (url.searchParams.has("ui_locale")) target.searchParams.set("ui_locale", locale);
+    throw redirect(`${target.pathname}${target.search}`);
+  }
+  const tag = result.tags.find((item) =>
+    item.slug.toLowerCase() === filters.tag.toLowerCase());
+  if (filters.tag && !filters.category && !filters.q && !filters.model && !filters.ratio
+    && !filters.sourceLanguage && knownFilterQuery && tag) {
+    const target = new URL(`/tag/${encodeURIComponent(tag.slug)}`, url);
     if (page >= 2) target.searchParams.set("page", String(page));
     if (url.searchParams.has("ui_locale")) target.searchParams.set("ui_locale", locale);
     throw redirect(`${target.pathname}${target.search}`);
@@ -43,14 +54,14 @@ export async function loader({ request }: Route.LoaderArgs) {
 }
 
 export default function Home({ loaderData }: Route.ComponentProps) {
-  const { cards, page, totalPages, categories, models, ratios, locale, filters, pageUrl, imageBaseUrl } = loaderData;
+  const { cards, page, totalPages, categories, tags, models, ratios, locale, filters, pageUrl, imageBaseUrl } = loaderData;
   const t = uiCopy(locale);
   const url = new URL(pageUrl, "https://vault.disign.me");
   return (
     <>
       <SiteHeader locale={locale} filters={filters} url={url} />
       <main className="explore-main">
-        <ExploreFiltersBar locale={locale} filters={filters} categories={categories} models={models} ratios={ratios} />
+        <ExploreFiltersBar locale={locale} filters={filters} categories={categories} tags={tags} models={models} ratios={ratios} />
         {cards.length
           ? <PromptGrid prompts={cards} imageBaseUrl={imageBaseUrl} />
           : <section className="empty-state">

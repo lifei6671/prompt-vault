@@ -12,7 +12,7 @@ export async function loader() {
 export default function AdminPrompts({ loaderData }: Route.ComponentProps) {
   const t = adminPromptCopy(useOutletContext<Locale>());
   return <section className="space-y-6">
-    <h1 className="text-3xl font-semibold">{t.prompts}</h1>
+    <div className="flex flex-wrap items-center justify-between gap-3"><h1 className="text-3xl font-semibold">{t.prompts}</h1><a className="rounded-md bg-primary px-4 py-2 text-sm font-semibold text-white" href="/admin/prompts/new">{t.create}</a></div>
     {loaderData.items.length === 0 ? <p className="text-muted-foreground">{t.empty}</p> :
       <div className="overflow-x-auto rounded-md border border-border bg-white">
         <table className="w-full min-w-[850px] text-left text-sm">

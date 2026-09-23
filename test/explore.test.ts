@@ -82,6 +82,9 @@ describe("Explore D1 listing", () => {
     expect((await list("ratio=16%3A9")).cards.map((card) => card.slug)).toEqual(["prompt-3"]);
     expect((await list("source_language=en-US")).cards.map((card) => card.slug)).toEqual(["prompt-2"]);
     expect((await list("category=poster&model=Flux")).total).toBe(0);
+    expect((await list("tag=cinematic")).cards.map((card) => card.slug)).toEqual(["prompt-1"]);
+    expect((await list("category=poster&tag=cinematic")).cards.map((card) => card.slug)).toEqual(["prompt-1"]);
+    expect((await list("category=photo&tag=cinematic")).total).toBe(0);
   });
 
   it("searches source title, description, model, category, tag and translated names", async () => {
@@ -100,6 +103,7 @@ describe("Explore D1 listing", () => {
     });
     expect(result.cards.find((card) => card.slug === "prompt-2")?.category_name).toBe("摄影");
     expect(result.categories.find((category) => category.slug === "photo")?.name).toBe("摄影");
+    expect(result.tags).toContainEqual({ slug: "cinematic", name: "Cinematic" });
   });
 
   it("returns a real second page and rejects pages past the end", async () => {

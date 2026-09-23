@@ -3,6 +3,9 @@ import { data, Form, redirect, useOutletContext } from "react-router";
 import type { Route } from "./+types/admin-prompt-edit";
 import type { Locale } from "../lib/localization";
 import { adminPromptCopy } from "../lib/admin-prompt-copy";
+import { usePromptImageUpload } from "../lib/use-prompt-image-upload";
+import { UploadError } from "../services/image-upload.server";
+import { replacePromptImage } from "../services/prompt-image.server";
 import { getAdminPrompt, listPromptTaxonomy, mutateAdminPrompt, parsePromptId, PromptAdminError } from "../services/prompt-admin.server";
 
 export const headers: Route.HeadersFunction = () => ({ "Cache-Control": "no-store" });
@@ -22,14 +25,17 @@ export async function loader({ params }: Route.LoaderArgs) {
 export async function action({ request, params }: Route.ActionArgs) {
   try {
     const id = parsePromptId(params.id);
-    await mutateAdminPrompt(env.DB, id, await request.formData());
+    const form = await request.formData();
+    if (form.get("_intent") === "replace_image")
+      await replacePromptImage(env.DB, env.IMAGES, id, form);
+    else await mutateAdminPrompt(env.DB, id, form);
     const url = new URL(request.url);
     const suffix = url.searchParams.has("ui_locale") ? `?ui_locale=${url.searchParams.get("ui_locale")}` : "";
     return redirect(`/admin/prompts/${id}/edit${suffix}`, {
       status: 303, headers: { "Cache-Control": "no-store" },
     });
   } catch (error) {
-    if (error instanceof PromptAdminError) return data({ error: error.code }, {
+    if (error instanceof PromptAdminError || error instanceof UploadError) return data({ error: error.code }, {
       status: error.status, headers: { "Cache-Control": "no-store" },
     });
     return data({ error: "failed" as const }, { status: 500, headers: { "Cache-Control": "no-store" } });
@@ -40,7 +46,9 @@ const label = "block space-y-1 text-sm font-medium";
 const panel = "space-y-4 rounded-md border border-border bg-white p-5";
 const button = "rounded-md border border-border px-4 py-2 text-sm font-medium";
 export default function AdminPromptEdit({ loaderData, actionData }: Route.ComponentProps) {
-  const t = adminPromptCopy(useOutletContext<Locale>());
+  const locale = useOutletContext<Locale>();
+  const t = adminPromptCopy(locale);
+  const { reference, state: uploadState, previewUrl, onImage } = usePromptImageUpload();
   const { prompt, taxonomy } = loaderData;
   const target = prompt.source_language === "zh-CN" ? "en-US" : "zh-CN";
   const status = prompt.deleted_at ? t.deleted : prompt.status === "published" ? t.published : t.draft;
@@ -50,11 +58,16 @@ export default function AdminPromptEdit({ loaderData, actionData }: Route.Compon
     <a className="text-sm text-primary underline" href="/admin/prompts">← {t.back}</a>
     <div className="flex flex-wrap items-baseline justify-between gap-3">
       <h1 className="text-3xl font-semibold">{t.edit}: {prompt.title}</h1>
-      <span className="text-sm font-medium">{t.status}: {status}</span>
+      <div className="flex items-center gap-4">
+        {editable && <a className="text-sm font-medium text-primary underline" href={`/admin/prompts/${prompt.id}/preview?ui_locale=${locale}`}>{t.previewPrompt}</a>}
+        <span className="text-sm font-medium">{t.status}: {status}</span>
+      </div>
     </div>
     {actionData?.error && <p role="alert" className="rounded-md border border-red-300 bg-red-50 p-3 text-sm text-red-800">
       {actionData.error === "deleted" ? t.deletedError : actionData.error === "slugFrozen" ? t.slugFrozen :
-        actionData.error === "tokens" ? t.tokens : t[actionData.error]}
+        actionData.error === "tokens" ? t.tokens :
+        actionData.error === "missingUpload" ? t.missingUpload :
+        actionData.error === "tooLarge" ? t.tooLarge : t[actionData.error]}
     </p>}
     <Form method="post" className="space-y-6">
       <input type="hidden" name="_intent" value="save" />
@@ -134,6 +147,24 @@ export default function AdminPromptEdit({ loaderData, actionData }: Route.Compon
         <div><dt>Preview</dt><dd>{prompt.preview_width} × {prompt.preview_height} · {prompt.preview_size_bytes} B</dd></div>
       </dl>
     </section>
+    {editable && <section className={panel}>
+      <h2 className="text-lg font-semibold">{t.replaceImage}</h2>
+      <label className={label}>{t.originalImage}
+        <input className={input} type="file" accept="image/jpeg,image/png,image/webp"
+          onChange={(event) => void onImage(event.currentTarget.files?.[0])} />
+      </label>
+      <p aria-live="polite" className="text-sm text-muted-foreground">
+        {uploadState === "idle" ? t.chooseImage : uploadState === "uploading" ? t.uploading :
+          uploadState === "ready" ? t.replaceReady : t.uploadFailed}
+      </p>
+      {previewUrl && <img className="max-h-64 rounded-md object-contain" src={previewUrl} alt={t.previewImage} />}
+      <Form method="post">
+        <input type="hidden" name="_intent" value="replace_image" />
+        <input type="hidden" name="upload_reference" value={reference} />
+        <button className="rounded-md bg-primary px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
+          type="submit" disabled={uploadState !== "ready"}>{t.replaceImage}</button>
+      </Form>
+    </section>}
     {editable && <section className={panel}>
       <h2 className="text-lg font-semibold">{t.status}: {status}</h2>
       <p className="text-sm text-muted-foreground">{t.saveFirst}</p>

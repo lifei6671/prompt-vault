@@ -103,7 +103,7 @@ slug、公开路径、分页和 canonical 保持 4.1 与第 5 节的单一身份
 
 ## 6. 数据模型与语言职责
 
-所有时间统一使用 UTC ISO-8601。D1 执行外键约束；迁移依次应用 `0001_init.sql`、`0002_i18n.sql`，不重写 0001 或在业务请求中迁移。首版内容 locale 白名单为 `zh-CN`、`en-US`，其他值在写入和读取边界拒绝。新增语言时再扩展约束与校验，不新增按语言平铺字段。
+所有时间统一使用 UTC ISO-8601。D1 执行外键约束；迁移依次应用 `0001_init.sql`、`0002_i18n.sql`、`0003_retired_image_keys.sql`，不重写 0001 或在业务请求中迁移。首版内容 locale 白名单为 `zh-CN`、`en-US`，其他值在写入和读取边界拒绝。新增语言时再扩展约束与校验，不新增按语言平铺字段。
 
 ### 6.1 原文与翻译
 
@@ -177,9 +177,11 @@ R2 与 D1 没有跨服务事务。设计目标是最多留下可回收的孤儿�
 
 | 响应 | 策略 |
 | --- | --- |
-| 公共匿名 GET HTML | Cache-Control: public, max-age=60, s-maxage=300, stale-while-revalidate=60 |
-| 管理员预览 | Cache-Control: no-store，立即读取 D1 最新内容 |
-| /admin/*、写请求、4xx/5xx | Cache-Control: no-store |
+| 匿名默认语言的首页、分类、标签、详情 GET/HEAD HTML | Cache-Control: public, max-age=60, s-maxage=300, stale-while-revalidate=60；普通列表 page>=2 也适用 |
+| /robots.txt、/sitemap.xml | Cache-Control: public, max-age=300, s-maxage=300 |
+| 管理员预览及 /admin、/admin/* | Cache-Control: no-store；后台立即读取 D1 最新内容 |
+| 非 GET/HEAD、错误页（含 410）、Set-Cookie、任何 Cookie、ui_locale/prompt_locale query、发现筛选及未知 query | Cache-Control: no-store；locale 变体不依赖 Vary: Cookie 缓存 |
+| Vite/static asset | 保留已有缓存头，不套用 HTML 策略 |
 | R2 图片 | vault-pic.disign.me 直出，对象 immutable 一年；key 不可变，替换生成新 key |
 
 接受公开页面最长约 5 分钟内容延迟。暂不实现主动 purge、cache tag 或 Redis/Cache API 手工缓存；有真实需要后再引入。
@@ -238,7 +240,7 @@ route 负责请求边界、SSR 数据装配和 action；*.server.ts 负责 D1/R2
 使用 Vitest + `@cloudflare/vitest-plugin`。按实施阶段至少覆盖：
 
 - zh-CN/en-US 白名单、原文/译文整体回退、select 稳定 value 与本地化 label、非法 locale/option；
-- 0001 + 0002 从空库迁移，以及旧字符串选项转换与翻译表约束；
+- 0001 + 0002 + 0003 从空库迁移，以及旧字符串选项转换与翻译表约束；
 - slug 规范化与首次发布后冻结；
 - token 扫描、变量校验、单轮替换、空值保留 token；
 - 草稿不可公开、删除后返回 410；
@@ -270,11 +272,11 @@ route 负责请求边界、SSR 数据装配和 action；*.server.ts 负责 D1/R2
 - IMAGE_BASE_URL=https://vault-pic.disign.me；
 - DB、IMAGES 等 Binding 通过 wrangler types 生成类型，业务代码不手写不完整 Env。
 
-继续不单独建设 staging。部署前运行项目定义的 typecheck、test、build。migration 人工执行时，部署清单必须包含 D1 Time Travel/备份确认与回滚检查；应用启动时不自动迁移。
+继续不单独建设 staging。部署前运行 `pnpm release:check` 和 `pnpm verify:release`（typecheck、test、build）；全零 D1 database_id 必须阻断 deploy。远端 migration 仅人工按 0001→0002→0003 执行，部署清单必须包含 D1 Time Travel/备份确认与回滚检查；应用启动时不自动迁移。具体命令与 smoke/回滚步骤见 `docs/deployment.md`。
 
 ## 15. 可观测性
 
-启用 Cloudflare Workers Observability，只记录必要结构化日志：request id、route、status、duration、关键 D1/R2 错误、后台写操作类型，以及 R2 清理失败的补偿线索。禁止记录完整 Prompt 正文、最终变量值、Access Token、Cookie 或其他认证信息。不引入独立日志平台或 APM。
+启用 Cloudflare Workers Observability，隐藏自动日志中的 query string，并关闭 invocation logs；Worker 每个请求输出一条结构化摘要：requestId（优先 cf-ray，否则 UUID）、method、pathname（不含 query）、status、durationMs、admin。已有 D1/R2 清理错误日志可以保留。禁止记录完整 Prompt 正文、最终变量值、Access Token、Cookie、query 值、表单/body 或其他认证信息。不引入独立日志平台或 APM。
 
 ## 16. 验收标准
 
@@ -294,7 +296,7 @@ route 负责请求边界、SSR 数据装配和 action；*.server.ts 负责 D1/R2
 - 页面源代码包含详情标题、描述、H1、原始 Prompt、图片及 alt；
 - sitemap 仅包含应公开内容，canonical 与分页规则正确；
 - Access 未认证用户不能进入 /admin/*，管理员可创建草稿、上传两种图片、维护变量/分类/标签、发布、撤回、编辑、软删除；
-- D1 migration 可从空库依次应用 0001、0002，旧 v0.2 行可保留原文并转换 select 选项；
+- D1 migration 可从空库依次应用 0001、0002、0003，旧 v0.2 行可保留原文并转换 select 选项；
 - 项目定义的 typecheck、test、build 均通过。
 
 ## 17. 实施顺序

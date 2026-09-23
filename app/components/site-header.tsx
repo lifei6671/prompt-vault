@@ -19,6 +19,7 @@ function SearchForm({ filters, locale }: { filters: ExploreFilters; locale: Loca
     <form action="/" method="get" role="search" className="site-search">
       <input type="hidden" name="ui_locale" value={locale} />
       {filters.category && <input type="hidden" name="category" value={filters.category} />}
+      {filters.tag && <input type="hidden" name="tag" value={filters.tag} />}
       {filters.model && <input type="hidden" name="model" value={filters.model} />}
       {filters.ratio && <input type="hidden" name="ratio" value={filters.ratio} />}
       {filters.sourceLanguage && <input type="hidden" name="source_language" value={filters.sourceLanguage} />}

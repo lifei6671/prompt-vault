@@ -154,3 +154,6 @@ worker-configuration.d.ts
 # Task-local scaffolding and package-manager caches
 phase1-scaffold/
 .tmp-*/
+.xdg-config/
+.corepack
+.codegraph/

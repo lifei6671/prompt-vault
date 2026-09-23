@@ -5,6 +5,7 @@ export const PAGE_SIZE = 24;
 export type ExploreFilters = {
   q: string;
   category: string;
+  tag: string;
   model: string;
   ratio: string;
   sourceLanguage: string;
@@ -14,6 +15,7 @@ export function readExploreFilters(params: URLSearchParams): ExploreFilters {
   return {
     q: (params.get("q") ?? "").trim(),
     category: params.get("category") ?? "",
+    tag: params.get("tag") ?? "",
     model: params.get("model") ?? "",
     ratio: params.get("ratio") ?? "",
     sourceLanguage: params.get("source_language") ?? "",

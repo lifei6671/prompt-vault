@@ -74,6 +74,8 @@ describe("public SEO metadata", () => {
     expect(filtered).toContainEqual({ tagName: "link", rel: "canonical", href: "https://vault.disign.me/?page=2" });
     expect(filtered).toContainEqual({ name: "robots", content: "noindex,follow" });
     expect(meta(await explore("/?unknown=1"))).toContainEqual({ name: "robots", content: "noindex,follow" });
+    expect(meta(await explore("/?category=poster&tag=cinematic"))).toContainEqual(
+      { name: "robots", content: "noindex,follow" });
     expect(meta(await explore("/?category=missing"))).toContainEqual({ name: "robots", content: "noindex,follow" });
     await expect(explore("/?page=0&q=poster")).rejects.toMatchObject({ status: 404 });
     await expect(explore("/?page=3")).rejects.toMatchObject({ status: 404 });
@@ -81,6 +83,13 @@ describe("public SEO metadata", () => {
 
   it("redirects a category-only filter and keeps fixed Category and Tag canonical pagination", async () => {
     const redirected = await explore("/?category=poster&ui_locale=en-US").catch((error: Response) => error);
+    const tagRedirected = await explore("/?tag=cinematic&ui_locale=en-US").catch((error: Response) => error);
+    expect(tagRedirected).toBeInstanceOf(Response);
+    expect((tagRedirected as Response).headers.get("Location")).toBe("/tag/cinematic?ui_locale=en-US");
+    const submittedCategory = await explore("/?category=poster&tag=&model=&ratio=&source_language=&ui_locale=en-US").catch((error: Response) => error);
+    expect((submittedCategory as Response).headers.get("Location")).toBe("/category/poster?ui_locale=en-US");
+    const submittedTag = await explore("/?category=&tag=cinematic&model=&ratio=&source_language=&ui_locale=en-US").catch((error: Response) => error);
+    expect((submittedTag as Response).headers.get("Location")).toBe("/tag/cinematic?ui_locale=en-US");
     expect(redirected).toBeInstanceOf(Response);
     expect((redirected as Response).status).toBe(302);
     expect((redirected as Response).headers.get("Location"))
