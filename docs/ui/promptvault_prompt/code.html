@@ -1,0 +1,362 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1.0" name="viewport"><meta content="web_standard" name="shell-type"><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;display=swap" rel="stylesheet"><style>@layer base { html, body { margin: 0; padding: 0; } body { overscroll-behavior: none; } main > :first-child { margin-top: 0 !important; } main > :last-child { margin-bottom: 0 !important; } } ::-webkit-scrollbar { display: none; }</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { colors: { "outline-variant": "#c3c6d7", "on-secondary-container": "#fffbff", "secondary": "#1d4ed8", "background": "#fbf8fc", "on-tertiary-container": "#ffede6", "text-muted": "#A1A1AA", "text-secondary": "#71717A", "outline": "#737686", "tertiary-fixed-dim": "#ffb596", "on-secondary-fixed-variant": "#0039b5", "action-primary-hover": "#1D4ED8", "on-tertiary-fixed": "#360f00", "tertiary-fixed": "#ffdbcd", "surface-bright": "#fbf8fc", "surface-container": "#f0edf1", "surface": "#fbf8fc", "inverse-on-surface": "#f3f0f4", "on-secondary-fixed": "#001551", "on-tertiary-fixed-variant": "#7d2d00", "status-success": "#16A34A", "on-background": "#1b1b1e", "on-error": "#ffffff", "surface-container-lowest": "#ffffff", "error-container": "#ffdad6", "error": "#ba1a1a", "border-default": "#E4E4E7", "secondary-fixed": "#dce1ff", "bg-inverse": "#111111", "primary-fixed": "#dbe1ff", "on-surface": "#1b1b1e", "surface-container-low": "#f6f2f7", "status-danger": "#DC2626", "on-secondary": "#ffffff", "secondary-fixed-dim": "#b7c4ff", "tertiary": "#943700", "surface-dim": "#dcd9dd", "inverse-primary": "#b4c5ff", "surface-tint": "#0053db", "action-primary": "#2563EB", "surface-variant": "#e4e1e6", "surface-container-high": "#eae7eb", "primary-fixed-dim": "#b4c5ff", "border-hover": "#D4D4D8", "on-tertiary": "#ffffff", "on-primary-fixed": "#00174b", "on-surface-variant": "#434655", "surface-container-highest": "#e4e1e6", "primary-container": "#2563eb", "on-primary-container": "#eeefff", "on-error-container": "#93000a", "tertiary-container": "#bc4800", "on-primary-fixed-variant": "#003ea8", "text-primary": "#18181B", "bg-surface": "#FFFFFF", "bg-page": "#F7F7F5", "on-primary": "#ffffff", "inverse-surface": "#303033", "secondary-container": "#4069f2", "primary": "#004ac6" }, borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, spacing: { "space-xs": "0.25rem", "space-sm": "0.5rem", "gutter": "1.5rem", "space-lg": "1.5rem", "margin-mobile": "1rem", "space-md": "1rem", "gutter-mobile": "1rem", "space-xl": "2rem", "margin": "2rem" }, fontFamily: { "detail-title": ["Inter"], "body": ["Inter"], "page-title": ["Inter"], "metadata": ["Inter"], "code-json": ["JetBrains Mono"], "page-title-mobile": ["Inter"], "section-title": ["Inter"], "card-title": ["Inter"], "prompt-text": ["Inter"] }, fontSize: { "detail-title": ["24px", { "lineHeight": "31px", "letterSpacing": "-0.01em", "fontWeight": "600" }], "body": ["15px", { "lineHeight": "24px", "letterSpacing": "0em", "fontWeight": "400" }], "page-title": ["32px", { "lineHeight": "38px", "letterSpacing": "-0.02em", "fontWeight": "700" }], "metadata": ["13px", { "lineHeight": "18px", "letterSpacing": "0.01em", "fontWeight": "500" }], "code-json": ["13px", { "lineHeight": "20px", "letterSpacing": "0em", "fontWeight": "400" }], "page-title-mobile": ["26px", { "lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "700" }], "section-title": ["16px", { "lineHeight": "22px", "letterSpacing": "-0.005em", "fontWeight": "600" }], "card-title": ["15px", { "lineHeight": "21px", "letterSpacing": "0em", "fontWeight": "600" }], "prompt-text": ["15px", { "lineHeight": "25px", "letterSpacing": "0em", "fontWeight": "400" }] } } } };</script></head><body class="bg-bg-page font-body text-body text-text-primary antialiased selection:bg-primary-fixed selection:text-on-primary-fixed"><header class="sticky top-0 z-50 w-full h-16 bg-bg-surface border-b border-border-default"><div class="h-16 max-w-[1360px] mx-auto px-space-lg flex items-center justify-between gap-space-lg"><div class="flex items-center gap-space-lg shrink-0"><a class="flex items-center gap-space-sm group focus:outline-none" data-path="explore" href="#"><img alt="PromptVault Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1VDyIRFFWScF3Bn_ZlKgQ5fTYIeOZWGun1Li6LpXL-2T_jGVELGlP7Y9_FRFf41_jbgoU3kvvdwXlb_5HgeTgnfzdH8KRXkYeRAcZvg3W3gsMjFUOyW9JSwDYSKgYa42qseOQjTUbeX64vy0ZhrT9kO2MvjX_Y39UIOh_8HAEVPO4ZDu-Ij6eA_ryiqFLlGVf_9MNDesJ_YGqkwUZovJfHoBzL_zCHlzJdL2bb2BN8LIZTmx32Sd_dm5pc"><span class="font-detail-title text-card-title text-text-primary tracking-tight">PromptVault</span></a><nav class="hidden md:flex items-center gap-space-lg ml-space-xs" data-active-classes="text-text-primary font-section-title font-semibold"><a aria-current="page" class="transition-colors py-space-xs text-text-primary font-section-title font-semibold" data-path="explore" href="#">探索</a><a class="font-body text-metadata text-on-surface-variant hover:text-on-surface transition-colors py-space-xs" data-path="categories" href="#">分类</a></nav></div><div class="flex-1 max-w-xl mx-auto hidden sm:block"><div class="relative flex items-center w-full"><span class="material-symbols-outlined absolute left-3 text-[18px] text-text-muted pointer-events-none">search</span><input class="w-full h-9 pl-9 pr-14 bg-bg-surface border border-border-default rounded-lg font-body text-metadata text-text-primary placeholder:text-text-muted focus:outline-none focus:border-action-primary focus:ring-1 focus:ring-action-primary transition-all" placeholder="搜索 Prompt、风格、模型或标签" type="text"><div class="absolute right-2.5 flex items-center pointer-events-none"><kbd class="px-1.5 py-0.5 border border-border-default rounded bg-bg-page font-code-json text-[11px] text-text-muted leading-none shadow-none">⌘K</kbd></div></div></div><div class="flex items-center gap-space-md shrink-0"><div class="hidden lg:flex items-center p-0.5 border border-border-default rounded-lg bg-bg-surface"><button class="px-2 py-1 font-metadata text-metadata text-text-primary font-semibold rounded bg-bg-page hover:text-text-primary transition-colors" type="button">中文</button><span class="text-border-default font-metadata text-metadata select-none">/</span><button class="px-2 py-1 font-metadata text-metadata text-on-surface-variant hover:text-text-primary transition-colors" type="button">EN</button></div><a class="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border-default bg-bg-surface font-metadata text-metadata text-on-surface-variant hover:border-border-hover hover:bg-bg-page hover:text-text-primary transition-colors" data-path="collections" href="#"><span class="material-symbols-outlined text-[16px]">bookmark</span><span class="">收藏</span></a><a class="hidden sm:inline-flex items-center justify-center px-3.5 py-1.5 rounded-lg bg-action-primary hover:bg-action-primary-hover font-metadata text-metadata font-medium text-on-primary transition-colors shadow-none" data-path="login" href="#">登录</a><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></header><main class="w-full bg-bg-page min-h-[calc(100vh-4rem)] pt-0"><div class="max-w-[1360px] mx-auto px-space-lg py-space-xl"><div class="flex flex-col w-full">
+<!-- Discover & Filter System -->
+<section class="w-full flex flex-col gap-space-md mb-space-xl">
+<!-- Row 1: Core Type Segmented Switch & Sort Controls -->
+<div class="w-full flex flex-col lg:flex-row items-start lg:items-center justify-between gap-space-md">
+<!-- Media Type Badges -->
+<div class="flex items-center gap-1.5 p-1 bg-surface-container rounded-xl overflow-x-auto max-w-full"><button class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-surface text-text-primary shadow-sm font-metadata text-metadata font-medium transition-colors" type="button"><span class="">全部</span><span class="text-[11px] font-code-json text-text-muted font-normal">3,842</span></button><button class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-text-secondary hover:text-text-primary hover:bg-surface/50 font-metadata text-metadata transition-colors" type="button"><span class="">图片</span><span class="text-[11px] font-code-json text-text-muted font-normal">2.4k</span></button><button class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-text-secondary hover:text-text-primary hover:bg-surface/50 font-metadata text-metadata transition-colors" type="button"><span class="">视频</span><span class="text-[11px] font-code-json text-text-muted font-normal">890</span></button><button class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-text-secondary hover:text-text-primary hover:bg-surface/50 font-metadata text-metadata transition-colors" type="button"><span class="">文本</span><span class="text-[11px] font-code-json text-text-muted font-normal">540</span></button></div>
+<!-- Right Alignment: Quick Presets & Sort Segment -->
+<div class="flex items-center gap-space-sm flex-wrap self-end lg:self-auto">
+<div class="flex items-center gap-1 bg-surface-container rounded-lg p-0.5">
+<button class="px-3 py-1 rounded-md bg-surface text-text-primary shadow-sm font-metadata text-metadata font-medium transition-colors" type="button">推荐</button>
+<button class="px-3 py-1 rounded-md text-text-secondary hover:text-text-primary font-metadata text-metadata transition-colors" type="button">热门</button>
+<button class="px-3 py-1 rounded-md text-text-secondary hover:text-text-primary font-metadata text-metadata transition-colors" type="button">最新</button>
+</div>
+<button class="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-surface hover:bg-surface-container-low text-text-secondary hover:text-text-primary font-metadata text-metadata shadow-sm transition-colors" type="button">
+<span class="material-symbols-outlined text-[16px]">tune</span>
+<span class="">筛选视图</span>
+</button>
+</div>
+</div>
+<!-- Row 2: Editorial Dropdowns Filter Rack -->
+<div class="w-full flex items-center gap-2 overflow-x-auto py-1 scrollbar-none">
+<!-- Model Dropdown -->
+<div class="relative group shrink-0">
+<button class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface hover:bg-surface-container-low text-text-primary font-metadata text-metadata shadow-sm transition-colors" type="button">
+<span class="text-text-muted font-normal">模型:</span>
+<span class="font-medium">全部模型</span>
+<span class="material-symbols-outlined text-[16px] text-text-muted transition-transform group-hover:rotate-180">keyboard_arrow_down</span>
+</button>
+</div>
+<!-- Category Filter -->
+<div class="relative group shrink-0">
+<button class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface hover:bg-surface-container-low text-text-primary font-metadata text-metadata shadow-sm transition-colors" type="button">
+<span class="text-text-muted font-normal">风格分类:</span>
+<span class="font-medium">全部类别</span>
+<span class="material-symbols-outlined text-[16px] text-text-muted transition-transform group-hover:rotate-180">keyboard_arrow_down</span>
+</button>
+</div>
+<!-- Aspect Ratio Chips -->
+<div class="relative group shrink-0">
+<button class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface hover:bg-surface-container-low text-text-primary font-metadata text-metadata shadow-sm transition-colors" type="button">
+<span class="text-text-muted font-normal">画幅比例:</span>
+<span class="font-medium">全部比例</span>
+<span class="material-symbols-outlined text-[16px] text-text-muted transition-transform group-hover:rotate-180">keyboard_arrow_down</span>
+</button>
+</div>
+<!-- Language Selector -->
+<div class="relative group shrink-0"><button class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface hover:bg-surface-container-low text-text-primary font-metadata text-metadata shadow-sm transition-colors" type="button"><span class="text-text-muted font-normal">Prompt 语言:</span><span class="font-medium">全部</span><span class="material-symbols-outlined text-[16px] text-text-muted transition-transform group-hover:rotate-180">keyboard_arrow_down</span></button></div>
+<!-- Divider -->
+<div class="h-4 w-px bg-outline-variant/40 shrink-0 mx-1"></div>
+<!-- Active Quick Pills -->
+<div class="flex items-center gap-1.5 shrink-0">
+<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-primary-fixed text-on-primary-fixed font-metadata text-[12px]">
+<span class="">Midjourney v6</span>
+<button class="hover:opacity-75 flex items-center" type="button"><span class="material-symbols-outlined text-[13px]">close</span></button>
+</span>
+<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-surface-container-high text-text-secondary font-metadata text-[12px] hover:text-text-primary cursor-pointer transition-colors">
+<span class="">重置全部条件</span>
+</span>
+</div>
+</div>
+</section>
+<!-- Masonry Visual Index (Strict uncropped aspect ratios: 3:4, 16:9, 1:1, 2:3, 2.35:1) -->
+<main class="w-full">
+<div class="columns-1 sm:columns-2 md:columns-3 lg:columns-4 xl:columns-5 gap-space-lg [column-fill:_balance]">
+<!-- Card 1: Ratio 3:4 Poster -->
+<article class="break-inside-avoid mb-space-lg group relative flex flex-col bg-surface rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow cursor-pointer">
+<div class="relative w-full aspect-[3/4] bg-surface-container-high overflow-hidden">
+<img alt="复古日系杂志风城市漫游海报" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.02]" data-alt="Editorial retro Japanese typography risograph city poster, geometric layout with bold grain texture, muted terracotta orange and cobalt blue ink, minimalist Bauhaus architectural lines, cinematic soft studio overhead lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBlokA3Cl4JigVmWnCowBft5YOS4aU8iBvAtJ58JjgS9w4QJhtAYpPs9LiPLPMNS0ogipuUVlOisDDiKVsV6Alp0Lxnu71CfnYScTL_EmjSr8aL56BiqR0HuiAxMMvYCZd8WYOGFsCFMZF_-pZhcIHzbJTrW5NgnlXWGZMF1KPWEunkwxGByo8RP2d7u_d40hkQ-2hmPOno_JCzGc7JGcjx5CW3rb76OBBQ5B6-iaB90C3-SnHsYN5e">
+<div class="absolute inset-0 bg-gradient-to-t from-bg-inverse/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+<!-- Top Floating Action -->
+<div class="absolute top-2.5 right-2.5 flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+<button aria-label="收藏" class="w-7 h-7 rounded-lg bg-surface/90 hover:bg-surface text-text-primary flex items-center justify-center shadow-sm backdrop-blur-sm transition-colors" type="button">
+<span class="material-symbols-outlined text-[16px]">bookmark</span>
+</button>
+</div>
+<!-- Bottom Floating Action -->
+<div class="absolute bottom-2.5 right-2.5 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="flex items-center gap-1 px-2.5 py-1 rounded-md bg-bg-inverse/85 hover:bg-bg-inverse text-white font-metadata text-[12px] backdrop-blur-sm shadow-sm transition-all" onclick="event.stopPropagation(); copyPrompt(this, 'Japanese risograph travel poster, geometric Bauhaus lines, Tokyo city scape --ar 3:4')" type="button">
+<span class="material-symbols-outlined text-[14px]">content_copy</span>
+<span class="">复制 Prompt</span>
+</button>
+</div>
+<!-- Aspect Tag Badge -->
+<span class="absolute bottom-2.5 left-2.5 px-1.5 py-0.5 rounded bg-bg-inverse/60 text-white font-code-json text-[11px] backdrop-blur-sm leading-none">3:4</span>
+</div>
+<div class="p-3.5 flex flex-col gap-1.5">
+<h3 class="font-card-title text-card-title text-text-primary line-clamp-2 leading-snug">复古日系杂志风城市漫游海报</h3>
+<div class="flex items-center justify-between text-text-secondary font-metadata text-metadata pt-0.5">
+<span class="truncate">Midjourney v6 · 海报设计</span>
+<span class="text-text-muted text-[11px] font-code-json shrink-0">v6.1</span>
+</div>
+</div>
+</article>
+<!-- Card 2: Ratio 16:9 Architecture Cyberpunk -->
+<article class="break-inside-avoid mb-space-lg group relative flex flex-col bg-surface rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow cursor-pointer">
+<div class="relative w-full aspect-[16/9] bg-surface-container-high overflow-hidden">
+<img alt="赛博朋克雨夜街道机能风人像摄影" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.02]" data-alt="Cinematic widescreen photo of futuristic Tokyo alleyway in twilight rain, puddles reflecting neon blue and amber street lamps, lonely wanderer wearing an oversized techwear jacket, high-end 35mm film grain, moody cinematic atmosphere." src="https://lh3.googleusercontent.com/aida-public/AB6AXuABtGyuHusN_h0SJ2UXCBnvrNWSJ5rdOCSbwr1uzh8oZulbx_jzzdaUgJWTCUOIgJvdSRpdnM72nL6UmyK5Ag7HHhc3AEfuEPR1o6WSuz6VTmK1z_JUXMh3UWVlKOBc8sOcg50bi_-HS0ubuaSHPF-W-5pjDaI5-oofnpXSPqlt74Iq88gyCGG9Z7sQeMsB91riZk0TY23EbwtRrvCLi3MLlHYxEfFMNe0449e63uNldoCvoYprzoJ0">
+<div class="absolute inset-0 bg-gradient-to-t from-bg-inverse/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+<div class="absolute top-2.5 right-2.5 flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+<button aria-label="收藏" class="w-7 h-7 rounded-lg bg-surface/90 hover:bg-surface text-text-primary flex items-center justify-center shadow-sm backdrop-blur-sm transition-colors" type="button">
+<span class="material-symbols-outlined text-[16px]">bookmark</span>
+</button>
+</div>
+<div class="absolute bottom-2.5 right-2.5 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="flex items-center gap-1 px-2.5 py-1 rounded-md bg-bg-inverse/85 hover:bg-bg-inverse text-white font-metadata text-[12px] backdrop-blur-sm shadow-sm transition-all" onclick="event.stopPropagation(); copyPrompt(this, 'Cinematic rainy street in Tokyo, cyber techwear wanderer, moody cinematic 35mm film --ar 16:9')" type="button">
+<span class="material-symbols-outlined text-[14px]">content_copy</span>
+<span class="">复制 Prompt</span>
+</button>
+</div>
+<span class="absolute bottom-2.5 left-2.5 px-1.5 py-0.5 rounded bg-bg-inverse/60 text-white font-code-json text-[11px] backdrop-blur-sm leading-none">16:9</span>
+</div>
+<div class="p-3.5 flex flex-col gap-1.5">
+<h3 class="font-card-title text-card-title text-text-primary line-clamp-2 leading-snug">赛博朋克雨夜街道机能风人像摄影</h3>
+<div class="flex items-center justify-between text-text-secondary font-metadata text-metadata pt-0.5">
+<span class="truncate">Flux.1 Schnell · 街头摄影</span>
+<span class="text-text-muted text-[11px] font-code-json shrink-0">RAW</span>
+</div>
+</div>
+</article>
+<!-- Card 3: Ratio 1:1 Clean 3D Render -->
+<article class="break-inside-avoid mb-space-lg group relative flex flex-col bg-surface rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow cursor-pointer">
+<div class="relative w-full aspect-square bg-surface-container-high overflow-hidden">
+<img alt="极简哑光陶土几何构成3D静物" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.02]" data-alt="Minimalist abstract 3D matte porcelain geometries floating on soft sand background, warm directional architectural shadows, elegant balanced composition, subtle pastel cream and terracotta tones, 8k resolution octane render." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCeRhbx5BPVUTIcesHI1G7AkvaE-4WFEikWQt0kA6K-rIZs1IpBhuBqqkNsiOo6TJYBvTHSxsBr417GxvZjSFPX39j2sLSrtxwjxY4j_8vn7fARwJs0T-rS5iQASSOnepC347gMthZT3_nFjqbckK7qrDZ7gFdbzjLXq_Me5D-Fy3JafdsBU5go1hnKrTlh4D_Td175nkFXDJbSjX0H2wpC0nrgcolaLfKyd4NiMypILJdxEYS9bj6F">
+<div class="absolute inset-0 bg-gradient-to-t from-bg-inverse/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+<div class="absolute top-2.5 right-2.5 flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+<button aria-label="收藏" class="w-7 h-7 rounded-lg bg-surface/90 hover:bg-surface text-text-primary flex items-center justify-center shadow-sm backdrop-blur-sm transition-colors" type="button">
+<span class="material-symbols-outlined text-[16px]">bookmark</span>
+</button>
+</div>
+<div class="absolute bottom-2.5 right-2.5 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="flex items-center gap-1 px-2.5 py-1 rounded-md bg-bg-inverse/85 hover:bg-bg-inverse text-white font-metadata text-[12px] backdrop-blur-sm shadow-sm transition-all" onclick="event.stopPropagation(); copyPrompt(this, 'Minimalist 3D ceramic primitives, Octane render, warm architectural sunlight --ar 1:1')" type="button">
+<span class="material-symbols-outlined text-[14px]">content_copy</span>
+<span class="">复制 Prompt</span>
+</button>
+</div>
+<span class="absolute bottom-2.5 left-2.5 px-1.5 py-0.5 rounded bg-bg-inverse/60 text-white font-code-json text-[11px] backdrop-blur-sm leading-none">1:1</span>
+</div>
+<div class="p-3.5 flex flex-col gap-1.5">
+<h3 class="font-card-title text-card-title text-text-primary line-clamp-2 leading-snug">极简哑光陶土几何构成3D静物</h3>
+<div class="flex items-center justify-between text-text-secondary font-metadata text-metadata pt-0.5">
+<span class="truncate">ChatGPT Image · 3D渲染</span>
+<span class="text-text-muted text-[11px] font-code-json shrink-0">DALL-E 3</span>
+</div>
+</div>
+</article>
+<!-- Card 4: Ratio 2:3 Macro Nature Photo -->
+<article class="break-inside-avoid mb-space-lg group relative flex flex-col bg-surface rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow cursor-pointer">
+<div class="relative w-full aspect-[2/3] bg-surface-container-high overflow-hidden">
+<img alt="微距水滴折射多肉植物晨光特写" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.02]" data-alt="Extreme macro photography of crystalline dewdrop clinging to a jade succulent leaf, refraction of morning sunrise inside the water droplet, velvety soft green background, hyper-detailed natural texture, shallow depth of field." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBQTYONteWkfkxLyPBMf3a4cDGlBKDesJhzR_7lklOEGXhPgU5GYXhyhjKKLuLSVY1YhGMWiHnEySbaEhMszaT-gweVoJSYeX6Pg9ta0YLU0nWvzfwl3QqBy4U3k_2fcDTPONzspjTRVoCWbTgKGaO4KRAv-fTdW5W8MQBE7OFBc3kZ4RcI0G4TvL2YkVInB6LG5DprRnntpdwOleiqaj7JaMSmlpJRZmL8b7nelo_TLiiut00WS2SO">
+<div class="absolute inset-0 bg-gradient-to-t from-bg-inverse/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+<div class="absolute top-2.5 right-2.5 flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+<button aria-label="收藏" class="w-7 h-7 rounded-lg bg-surface/90 hover:bg-surface text-text-primary flex items-center justify-center shadow-sm backdrop-blur-sm transition-colors" type="button">
+<span class="material-symbols-outlined text-[16px]">bookmark</span>
+</button>
+</div>
+<div class="absolute bottom-2.5 right-2.5 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="flex items-center gap-1 px-2.5 py-1 rounded-md bg-bg-inverse/85 hover:bg-bg-inverse text-white font-metadata text-[12px] backdrop-blur-sm shadow-sm transition-all" onclick="event.stopPropagation(); copyPrompt(this, 'Macro dew drop on succulent leaf, morning refraction, shallow depth of field, 100mm macro lens --ar 2:3')" type="button">
+<span class="material-symbols-outlined text-[14px]">content_copy</span>
+<span class="">复制 Prompt</span>
+</button>
+</div>
+<span class="absolute bottom-2.5 left-2.5 px-1.5 py-0.5 rounded bg-bg-inverse/60 text-white font-code-json text-[11px] backdrop-blur-sm leading-none">2:3</span>
+</div>
+<div class="p-3.5 flex flex-col gap-1.5">
+<h3 class="font-card-title text-card-title text-text-primary line-clamp-2 leading-snug">微距水滴折射多肉植物晨光特写</h3>
+<div class="flex items-center justify-between text-text-secondary font-metadata text-metadata pt-0.5">
+<span class="truncate">Midjourney v6 · 微距写实</span>
+<span class="text-text-muted text-[11px] font-code-json shrink-0">v6.0</span>
+</div>
+</div>
+</article>
+<!-- Card 5: Ratio 2.35:1 Cinematic Landscape -->
+<article class="break-inside-avoid mb-space-lg group relative flex flex-col bg-surface rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow cursor-pointer">
+<div class="relative w-full aspect-[2.35/1] bg-surface-container-high overflow-hidden">
+<img alt="冰岛玄武岩海岸极地宽幅全景" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.02]" data-alt="Anamorphic panoramic vista of Icelandic basalt column cliffs emerging from dark Atlantic waves, dramatic Nordic overcast mood, sea mist catching silver light, high dynamic range cinematic color grading." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDJhLLvfdoPCWeyBD2bwfdHBEGzgUFTsfqA5ROPcS6y9eihmQ2a0WeUQKCyuIRotmYlt5xEHkANCX_yxjKhyve_ncQhkxfuX3lNfHAqDIOkM135Lyt7PgsToSe7PAvqd923De5UnArZMugz82QgcVSkzHwOQwYnwDe2TDPDtv1maabvSdxqetpByBmIJK91_GRRnm8TXf2QQzU7Vi0SgcR8E1bIuGn0uv7jzoMfsdUKlEbPcGK9fFHT">
+<div class="absolute inset-0 bg-gradient-to-t from-bg-inverse/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+<div class="absolute top-2.5 right-2.5 flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+<button aria-label="收藏" class="w-7 h-7 rounded-lg bg-surface/90 hover:bg-surface text-text-primary flex items-center justify-center shadow-sm backdrop-blur-sm transition-colors" type="button">
+<span class="material-symbols-outlined text-[16px]">bookmark</span>
+</button>
+</div>
+<div class="absolute bottom-2.5 right-2.5 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="flex items-center gap-1 px-2.5 py-1 rounded-md bg-bg-inverse/85 hover:bg-bg-inverse text-white font-metadata text-[12px] backdrop-blur-sm shadow-sm transition-all" onclick="event.stopPropagation(); copyPrompt(this, 'Iceland basalt cliffs ocean waves, anamorphic lens, overcast cinematic --ar 21:9')" type="button">
+<span class="material-symbols-outlined text-[14px]">content_copy</span>
+<span class="">复制 Prompt</span>
+</button>
+</div>
+<span class="absolute bottom-2.5 left-2.5 px-1.5 py-0.5 rounded bg-bg-inverse/60 text-white font-code-json text-[11px] backdrop-blur-sm leading-none">2.35:1</span>
+</div>
+<div class="p-3.5 flex flex-col gap-1.5">
+<h3 class="font-card-title text-card-title text-text-primary line-clamp-2 leading-snug">冰岛玄武岩海岸极地宽幅全景</h3>
+<div class="flex items-center justify-between text-text-secondary font-metadata text-metadata pt-0.5">
+<span class="truncate">SDXL Turbo · 自然风光</span>
+<span class="text-text-muted text-[11px] font-code-json shrink-0">1.0</span>
+</div>
+</div>
+</article>
+<!-- Card 6: Ratio 3:4 Interior Architecture -->
+<article class="break-inside-avoid mb-space-lg group relative flex flex-col bg-surface rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow cursor-pointer">
+<div class="relative w-full aspect-[3/4] bg-surface-container-high overflow-hidden">
+<img alt="现代斯堪的纳维亚极简家居室内光影" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.02]" data-alt="Editorial Scandinavian living room bathed in golden afternoon sunlight, natural light and deep shadow play across a beige boucle armchair, raw oak wood floors, minimalist linen curtains, Kinfolk magazine style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDTaY-ACHBkTOCg25-dMcTtSqPO8acPWhyuO9rPvcqxAT-t8SNlcso58XnT17_s3tmJ-Z6asqiAdkGiGc3-dMmJ4oRtl-A5tT5Rf7w3L1RQ4MqW2ZL0IATNvuka0GqQA2WxoPSudrPO2AQ9Dbh9Mt8v_qMnMiCQX9ZYUlSXmEv-82LUaBtEiPgfHlXRqd4QZg5Jt2LsldIj0i-OtBeVmE1K7vidOSw9NzWoxKjDs1YWNPEev9j6iACk">
+<div class="absolute inset-0 bg-gradient-to-t from-bg-inverse/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+<div class="absolute top-2.5 right-2.5 flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+<button aria-label="收藏" class="w-7 h-7 rounded-lg bg-surface/90 hover:bg-surface text-text-primary flex items-center justify-center shadow-sm backdrop-blur-sm transition-colors" type="button">
+<span class="material-symbols-outlined text-[16px]">bookmark</span>
+</button>
+</div>
+<div class="absolute bottom-2.5 right-2.5 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="flex items-center gap-1 px-2.5 py-1 rounded-md bg-bg-inverse/85 hover:bg-bg-inverse text-white font-metadata text-[12px] backdrop-blur-sm shadow-sm transition-all" onclick="event.stopPropagation(); copyPrompt(this, 'Scandinavian minimalist interior, boucle armchair, architectural sunlight and shadows, Kinfolk aesthetic --ar 3:4')" type="button">
+<span class="material-symbols-outlined text-[14px]">content_copy</span>
+<span class="">复制 Prompt</span>
+</button>
+</div>
+<span class="absolute bottom-2.5 left-2.5 px-1.5 py-0.5 rounded bg-bg-inverse/60 text-white font-code-json text-[11px] backdrop-blur-sm leading-none">3:4</span>
+</div>
+<div class="p-3.5 flex flex-col gap-1.5">
+<h3 class="font-card-title text-card-title text-text-primary line-clamp-2 leading-snug">现代斯堪的纳维亚极简家居室内光影</h3>
+<div class="flex items-center justify-between text-text-secondary font-metadata text-metadata pt-0.5">
+<span class="truncate">Midjourney v6 · 空间设计</span>
+<span class="text-text-muted text-[11px] font-code-json shrink-0">v6.1</span>
+</div>
+</div>
+</article>
+<!-- Card 7: Ratio 1:1 Illustration Editorial -->
+<article class="break-inside-avoid mb-space-lg group relative flex flex-col bg-surface rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow cursor-pointer">
+<div class="relative w-full aspect-square bg-surface-container-high overflow-hidden">
+<img alt="前沿科技人机协同概念编辑插画" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.02]" data-alt="Modern vector editorial illustration of a woman working with glowing holograms, flat design with rich texture overlay, warm palette of sage green, navy blue and soft amber, New Yorker magazine cover style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC_e8660jNR7Q6mMOORsPWLmio9Ujq1KPUAQk2iQPt7H_YgXOWbH4MCT2OBEbLIukl9sPs30R2QhW5YQMv0I7CKOI1qPs5xO62vAehpRTaSKcJ7BCngQHEUFWOC0WvBWGrfLuvn5UQ-N1SNQ-BIPN9DwyDqJ5i6QtSCrpOidcC_gzb8wVWlcgd4mEZH9WT112hDBnhFC-oreI-hM-oW-OxU8p3_nVeK7RYXUtQ_fJTZMWSv1kw9fJz2">
+<div class="absolute inset-0 bg-gradient-to-t from-bg-inverse/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+<div class="absolute top-2.5 right-2.5 flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+<button aria-label="收藏" class="w-7 h-7 rounded-lg bg-surface/90 hover:bg-surface text-text-primary flex items-center justify-center shadow-sm backdrop-blur-sm transition-colors" type="button">
+<span class="material-symbols-outlined text-[16px]">bookmark</span>
+</button>
+</div>
+<div class="absolute bottom-2.5 right-2.5 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="flex items-center gap-1 px-2.5 py-1 rounded-md bg-bg-inverse/85 hover:bg-bg-inverse text-white font-metadata text-[12px] backdrop-blur-sm shadow-sm transition-all" onclick="event.stopPropagation(); copyPrompt(this, 'Editorial vector illustration, woman interacting with data UI, textured grain, New Yorker style --ar 1:1')" type="button">
+<span class="material-symbols-outlined text-[14px]">content_copy</span>
+<span class="">复制 Prompt</span>
+</button>
+</div>
+<span class="absolute bottom-2.5 left-2.5 px-1.5 py-0.5 rounded bg-bg-inverse/60 text-white font-code-json text-[11px] backdrop-blur-sm leading-none">1:1</span>
+</div>
+<div class="p-3.5 flex flex-col gap-1.5">
+<h3 class="font-card-title text-card-title text-text-primary line-clamp-2 leading-snug">前沿科技人机协同概念编辑插画</h3>
+<div class="flex items-center justify-between text-text-secondary font-metadata text-metadata pt-0.5">
+<span class="truncate">ChatGPT Image · 商业插画</span>
+<span class="text-text-muted text-[11px] font-code-json shrink-0">DALL-E 3</span>
+</div>
+</div>
+</article>
+<!-- Card 8: Ratio 16:9 Cinema Still -->
+<article class="break-inside-avoid mb-space-lg group relative flex flex-col bg-surface rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow cursor-pointer">
+<div class="relative w-full aspect-[16/9] bg-surface-container-high overflow-hidden">
+<img alt="暮色红杉林中古典跑车电影级空镜" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.02]" data-alt="Cinematography still of vintage sports coupe driving through misty redwood forest at dusk, amber tail lights trailing motion blur, cinematic lens flares, deep forest green and dusk orange color palette." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC6S4QEqwhi5PpgCJq4PAH_4xnX4Jxv4Jg30y8AfZBoZa5LFnYVIr_aOuev9zjNOsdGduAvgOzcQ7RnMxc9Ou18vKoBx-YrHdMN2uQ8yRsmt4PSWznF39B4gm1k4R4bt9kmv20Xt0_hzy_h2-VYD20M7lNg-KBR0bm84YipEuVncuN-sTM09qIumMFX3GXe_U8G-uo8uaHRRZcs5ppmmeJkk6-lTo4g9QBmZJtDqSykG-P2qAJwOMhb">
+<div class="absolute inset-0 bg-gradient-to-t from-bg-inverse/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+<div class="absolute top-2.5 right-2.5 flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+<button aria-label="收藏" class="w-7 h-7 rounded-lg bg-surface/90 hover:bg-surface text-text-primary flex items-center justify-center shadow-sm backdrop-blur-sm transition-colors" type="button">
+<span class="material-symbols-outlined text-[16px]">bookmark</span>
+</button>
+</div>
+<div class="absolute bottom-2.5 right-2.5 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="flex items-center gap-1 px-2.5 py-1 rounded-md bg-bg-inverse/85 hover:bg-bg-inverse text-white font-metadata text-[12px] backdrop-blur-sm shadow-sm transition-all" onclick="event.stopPropagation(); copyPrompt(this, 'Vintage sports car driving redwood highway, foggy dusk, anamorphic cinematic lighting --ar 16:9')" type="button">
+<span class="material-symbols-outlined text-[14px]">content_copy</span>
+<span class="">复制 Prompt</span>
+</button>
+</div>
+<span class="absolute bottom-2.5 left-2.5 px-1.5 py-0.5 rounded bg-bg-inverse/60 text-white font-code-json text-[11px] backdrop-blur-sm leading-none">16:9</span>
+</div>
+<div class="p-3.5 flex flex-col gap-1.5">
+<h3 class="font-card-title text-card-title text-text-primary line-clamp-2 leading-snug">暮色红杉林中古典跑车电影级空镜</h3>
+<div class="flex items-center justify-between text-text-secondary font-metadata text-metadata pt-0.5">
+<span class="truncate">Flux.1 Pro · 电影剧照</span>
+<span class="text-text-muted text-[11px] font-code-json shrink-0">Flux</span>
+</div>
+</div>
+</article>
+<!-- Card 9: Ratio 3:4 Fashion Editorial -->
+<article class="break-inside-avoid mb-space-lg group relative flex flex-col bg-surface rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow cursor-pointer">
+<div class="relative w-full aspect-[3/4] bg-surface-container-high overflow-hidden">
+<img alt="极简先锋结构高定时尚摄影大片" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.02]" data-alt="High fashion studio portrait of an Asian model in avant-garde draped organza trench coat, sharp studio contour lighting, monochromatic silver and charcoal tones, elegant high key Vogue cover aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB7iIrVPeqitdbqy1c6OHru2LOF5kVxBPpdtmsGAJQZbq_PYp0YYXaz0aC7W_3OJyX8isSBRhdAINStaa90fOYAOLyFJsc62r_UsnhgUqOae5gO0pA3hE-KnXzzYeuSs8rHUbohQi52J2zEbnBYznr8-wdLwGD4lUVw8ztjEKw4qEys4_IuHsdx6rIpdnlkknkzccaEx1hHzPUqG3qCXntSpVsZ_G7eIEXrWuisiKWPJqoQwsJONSAZ">
+<div class="absolute inset-0 bg-gradient-to-t from-bg-inverse/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+<div class="absolute top-2.5 right-2.5 flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+<button aria-label="收藏" class="w-7 h-7 rounded-lg bg-surface/90 hover:bg-surface text-text-primary flex items-center justify-center shadow-sm backdrop-blur-sm transition-colors" type="button">
+<span class="material-symbols-outlined text-[16px]">bookmark</span>
+</button>
+</div>
+<div class="absolute bottom-2.5 right-2.5 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="flex items-center gap-1 px-2.5 py-1 rounded-md bg-bg-inverse/85 hover:bg-bg-inverse text-white font-metadata text-[12px] backdrop-blur-sm shadow-sm transition-all" onclick="event.stopPropagation(); copyPrompt(this, 'High fashion portrait, draped organza trench, studio contour strobe lights, Vogue editorial style --ar 3:4')" type="button">
+<span class="material-symbols-outlined text-[14px]">content_copy</span>
+<span class="">复制 Prompt</span>
+</button>
+</div>
+<span class="absolute bottom-2.5 left-2.5 px-1.5 py-0.5 rounded bg-bg-inverse/60 text-white font-code-json text-[11px] backdrop-blur-sm leading-none">3:4</span>
+</div>
+<div class="p-3.5 flex flex-col gap-1.5">
+<h3 class="font-card-title text-card-title text-text-primary line-clamp-2 leading-snug">极简先锋结构高定时尚摄影大片</h3>
+<div class="flex items-center justify-between text-text-secondary font-metadata text-metadata pt-0.5">
+<span class="truncate">Midjourney v6 · 时尚大片</span>
+<span class="text-text-muted text-[11px] font-code-json shrink-0">v6.0</span>
+</div>
+</div>
+</article>
+<!-- Card 10: Ratio 1:1 Futuristic UI Hologram -->
+<article class="break-inside-avoid mb-space-lg group relative flex flex-col bg-surface rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow cursor-pointer">
+<div class="relative w-full aspect-square bg-surface-container-high overflow-hidden">
+<img alt="未来主义深空全息数据交互界面" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.02]" data-alt="Futuristic glowing user interface HUD element floating in space, crisp cyan vector lines, radial charts and data graphs, dark void background, high precision engineering schematic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAuTTBBpqqlNsV2NpBsBF2mzkgIwLYB1Tuxk9zRJDcd6QDKTTggjz7XEDbjFS0usF9DJwUnsmeDmXqbjEPRd3kGOsS1Stc0Z6dxX5d6nsxfldUdOIcKNHIDQsfNN5gau3mxfZhmkRoya_1aAiEi4gqeaayBvlRErVZSkWmoDHhFxoMLIWsKOs_-ktariQeOug16_joSayCxT-fDYxp_HnhsYW2fQFdTS7F2D2Ws44KTamtiTfRGHvJb">
+<div class="absolute inset-0 bg-gradient-to-t from-bg-inverse/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+<div class="absolute top-2.5 right-2.5 flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+<button aria-label="收藏" class="w-7 h-7 rounded-lg bg-surface/90 hover:bg-surface text-text-primary flex items-center justify-center shadow-sm backdrop-blur-sm transition-colors" type="button">
+<span class="material-symbols-outlined text-[16px]">bookmark</span>
+</button>
+</div>
+<div class="absolute bottom-2.5 right-2.5 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="flex items-center gap-1 px-2.5 py-1 rounded-md bg-bg-inverse/85 hover:bg-bg-inverse text-white font-metadata text-[12px] backdrop-blur-sm shadow-sm transition-all" onclick="event.stopPropagation(); copyPrompt(this, 'Sci-fi UI HUD interface, glowing telemetry charts, deep space dark mode --ar 1:1')" type="button">
+<span class="material-symbols-outlined text-[14px]">content_copy</span>
+<span class="">复制 Prompt</span>
+</button>
+</div>
+<span class="absolute bottom-2.5 left-2.5 px-1.5 py-0.5 rounded bg-bg-inverse/60 text-white font-code-json text-[11px] backdrop-blur-sm leading-none">1:1</span>
+</div>
+<div class="p-3.5 flex flex-col gap-1.5">
+<h3 class="font-card-title text-card-title text-text-primary line-clamp-2 leading-snug">未来主义深空全息数据交互界面</h3>
+<div class="flex items-center justify-between text-text-secondary font-metadata text-metadata pt-0.5">
+<span class="truncate">ChatGPT Image · 极简UI</span>
+<span class="text-text-muted text-[11px] font-code-json shrink-0">DALL-E 3</span>
+</div>
+</div>
+</article>
+</div>
+<!-- Infinite Scroll Loading Status & Skeletons -->
+<div class="w-full mt-space-xl flex flex-col items-center justify-center gap-space-md py-space-lg">
+<div class="flex items-center gap-2 text-text-secondary font-metadata text-metadata">
+<svg class="animate-spin h-4 w-4 text-action-primary" fill="none" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+<path class="opacity-75" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" fill="currentColor"></path>
+</svg>
+<span class="">正在加载更多精选 Prompt 架构...</span>
+</div>
+<div class="font-code-json text-[12px] text-text-muted">已呈现 10 / 2,428 个结果 · 滑动以获取灵感</div>
+</div>
+</main>
+</div>
+<!-- Inline Interaction Logic -->
+<script>
+  function copyPrompt(buttonEl, text) {
+    navigator.clipboard.writeText(text).then(() => {
+      const originalHTML = buttonEl.innerHTML;
+      buttonEl.classList.remove('bg-bg-inverse/85', 'hover:bg-bg-inverse');
+      buttonEl.classList.add('bg-status-success', 'text-white');
+      buttonEl.innerHTML = '<span class="material-symbols-outlined text-[14px]">check</span><span>已复制</span>';
+      setTimeout(() => {
+        buttonEl.innerHTML = originalHTML;
+        buttonEl.classList.remove('bg-status-success', 'text-white');
+        buttonEl.classList.add('bg-bg-inverse/85', 'hover:bg-bg-inverse');
+      }, 1500);
+    });
+  }
+</script></div></main><footer class="w-full bg-bg-surface border-t border-border-default mt-auto hidden"><div class="max-w-[1360px] mx-auto px-space-lg py-space-xl flex flex-col md:flex-row items-center justify-between gap-space-md"><div class="flex items-center gap-space-md"><span class="font-metadata text-metadata text-text-muted">PromptVault © 2024</span><span class="hidden md:inline text-border-default">•</span><span class="font-metadata text-metadata text-text-secondary">严谨高效的 Prompt 架构与生成式设计工作台</span></div><div class="flex items-center gap-space-lg"><a class="font-metadata text-metadata text-text-secondary hover:text-text-primary transition-colors" data-path="explore" href="#">探索库</a><a class="font-metadata text-metadata text-text-secondary hover:text-text-primary transition-colors" data-path="categories" href="#">主题分类</a><a class="font-metadata text-metadata text-text-secondary hover:text-text-primary transition-colors" data-path="collections" href="#">我的收藏</a></div></div></footer>
+
+</body></html>

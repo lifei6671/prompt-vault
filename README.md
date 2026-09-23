@@ -4,7 +4,7 @@ Prompt Vault 文生图 Prompt 收藏与展示应用。
 
 ## 文档
 
-- [技术方案 v0.2](docs/technical-design.md)
+- [技术方案 v0.3](docs/technical-design.md)
 
 ## Phase 1 开发
 
@@ -25,3 +25,9 @@ pnpm dev
 2. 执行 `wrangler r2 bucket create prompt-vault-images`。
 3. 为 Worker 配置 Custom Domain `vault.disign.me`，并为 R2 配置公开读取 Custom Domain `vault-pic.disign.me`；保持 `IMAGE_BASE_URL=https://vault-pic.disign.me`。
 4. 在确认 D1 备份/Time Travel 与回滚方案后，执行 `pnpm db:migrate:remote`，再执行 `pnpm deploy`。
+
+## Phase 4A 后台安全配置
+
+部署前在 Worker 环境中设置 `CF_ACCESS_ISSUER`（精确的 `https://<team>.cloudflareaccess.com`）、`CF_ACCESS_AUD`（Access 应用的单个 AUD tag）和 `ADMIN_EMAILS`（逗号分隔的管理员邮箱）。这些值通过 Cloudflare Worker secret/env 提供，不写入 `wrangler.jsonc`；本地未配置时 `/admin` 返回 503。邮箱匹配会去除配置项两侧空白并按大小写不敏感比较，配置中不允许空项。
+
+在 Cloudflare Zero Trust 中为 `vault.disign.me/admin` 和 `vault.disign.me/admin/*` 都配置 Access 应用策略，并限制为预期管理员。边缘 Access 策略必须在 Cloudflare 控制台单独完成；仓库代码只负责 Worker 内的 JWT、邮箱白名单和后台写请求同源校验。后台写请求要求 `Origin: https://vault.disign.me` 与 `Sec-Fetch-Site: same-origin`。

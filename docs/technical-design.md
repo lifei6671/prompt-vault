@@ -1,7 +1,7 @@
-# Prompt Vault 技术方案 v0.2
+# Prompt Vault 技术方案 v0.3
 
 > 状态：设计基线  
-> 日期：2026-09-22  
+> 日期：2026-09-23
 > 目标：以最少的基础设施和运行时复杂度，实现一个 SEO 友好的文生图 Prompt 收藏与展示网站。
 
 ## 1. 产品目标与边界
@@ -65,11 +65,11 @@ flowchart TB
 | /robots.txt | 爬虫规则 | 必须 |
 | /sitemap.xml | URL 索引 | 必须 |
 
-分类与标签使用固定 SEO 路由。首版筛选 UI 支持“一个 category + 一个 tag”的组合筛选，组合条件使用 query URL，并统一 `noindex,follow`、不进入 sitemap；仅 category 或仅 tag 时跳转到对应固定 SEO 路由。多标签交集筛选不进入 v0.2。未知排序或过滤参数同样不得进入索引。
+分类与标签使用固定 SEO 路由。首版筛选 UI 支持“一个 category + 一个 tag”的组合筛选，组合条件使用 query URL，并统一 `noindex,follow`、不进入 sitemap；仅 category 或仅 tag 时跳转到对应固定 SEO 路由。多标签交集筛选不进入 v0.3。未知排序或过滤参数同样不得进入索引。
 
 slug 统一小写，使用 COLLATE NOCASE UNIQUE。草稿阶段可以修改 slug；首次发布后，只要 published_at 已有值，slug 永久冻结，标题仍可修改。published_at 仅记录首次发布，撤回后再次发布不刷新；每次修改均更新 updated_at，供 sitemap lastmod 使用。
 
-删除为软删除：deleted_at 有值的公开 URL 返回 410 Gone；草稿或撤回状态返回 404。v0.2 不引入 slug_aliases；只有未来确有已发布 URL 改名需求时才增加。
+删除为软删除：deleted_at 有值的公开 URL 返回 410 Gone；草稿或撤回状态返回 404。v0.3 不引入 slug_aliases；只有未来确有已发布 URL 改名需求时才增加。
 
 ### 4.2 后台路由
 
@@ -85,111 +85,60 @@ slug 统一小写，使用 COLLATE NOCASE UNIQUE。草稿阶段可以修改 slug
 
 创建、编辑、发布、删除使用相应 React Router action；/admin/prompts/:id/preview 仅管理员可见，用于查看草稿和绕过公共缓存的最新数据。
 
+### 4.3 首版语言状态
+
+UI locale 与 Prompt 内容语言独立。UI locale 控制导航、操作文案、分类/标签展示；Prompt 内容语言控制标题、描述、正文、图片 alt、变量与选项展示及复制。首版默认 UI locale 为 `zh-CN`，服务端只接受白名单内的明确偏好（如同站 cookie），无效值回退默认值。切换 UI locale 不自动切换 Prompt 内容语言；首次详情访问默认显示 source_language，用户显式选择已有译文后才显示该版本。SSR 与 hydration 使用同一解析结果；按 cookie 变化的公开 HTML 必须区分缓存语言或不缓存。
+
+slug、公开路径、分页和 canonical 保持 4.1 与第 5 节的单一身份，不新增 locale 路由或平行 sitemap。默认可索引的 Prompt 内容使用原文；非默认语言展示也指向同一 canonical。SEO title/description 与 HTML lang 必须反映实际 SSR 展示语言，不能声明不存在的译文，也不为缺失译文创建 hreflang 目标。
+
 ## 5. 分页、瀑布流与 SEO
 
 列表使用 page=N、每页 24 条、OFFSET 分页，查询排序固定为 ORDER BY published_at DESC, id DESC，不引入 cursor。page=1 规范化为不含 page 的 URL；page>=2 的每页使用自己的 self-canonical。非正整数或超过最后一页的 page 返回 404。正常分页页可抓取和索引，不对 page>=2 设置 noindex。
 
-连续翻页期间若恰有新 Prompt 发布，OFFSET 可能造成一次重复或跳项；v0.2 为简单性接受该限制。“加载更多”可以使用 fetcher 追加，但必须保留真实的 <a href> 上一页/下一页入口，作为无 JavaScript 回退和爬虫路径。
+连续翻页期间若恰有新 Prompt 发布，OFFSET 可能造成一次重复或跳项；v0.3 为简单性接受该限制。“加载更多”可以使用 fetcher 追加，但必须保留真实的 <a href> 上一页/下一页入口，作为无 JavaScript 回退和爬虫路径。
 
 首版瀑布流使用 CSS columns 与 break-inside: avoid。这是明确取舍：DOM、Tab 和读屏顺序可能与视觉横向顺序不同；加载更多追加时列可能重新平衡。每张 img 必须输出 preview_width/preview_height 对应的尺寸以预留空间、降低 CLS。出现严格视觉顺序或虚拟化需求后，再迁移 Masonry。
 
 详情页 SSR HTML 直接包含 title、description、canonical、Open Graph、H1、图片与 alt、原始 Prompt、模型、画幅、分类、标签和发布时间。og:image 首版使用 preview，不增加第三份 OG 图片。sitemap 只包含 published 且 deleted_at IS NULL 的 Prompt，以及 published_count > 0 的分类和标签；robots 禁止 /admin/，但草稿不依赖 robots 隐藏。
 
-## 6. 数据模型
+## 6. 数据模型与语言职责
 
-所有时间统一使用 UTC ISO-8601。D1 默认强制执行外键约束，migration 和业务代码不依赖关闭 `foreign_keys` 的行为。
+所有时间统一使用 UTC ISO-8601。D1 执行外键约束；迁移依次应用 `0001_init.sql`、`0002_i18n.sql`，不重写 0001 或在业务请求中迁移。首版内容 locale 白名单为 `zh-CN`、`en-US`，其他值在写入和读取边界拒绝。新增语言时再扩展约束与校验，不新增按语言平铺字段。
 
-### 6.1 prompts
+### 6.1 原文与翻译
 
-```text
-id                      INTEGER PRIMARY KEY
-slug                    TEXT NOT NULL COLLATE NOCASE UNIQUE
-title                   TEXT NOT NULL
-description             TEXT
-prompt_template         TEXT NOT NULL
-model                   TEXT
-ratio                   TEXT
-category_id             INTEGER NOT NULL REFERENCES categories(id) ON DELETE RESTRICT
-original_image_key      TEXT NOT NULL
-preview_image_key       TEXT NOT NULL
-original_content_type   TEXT NOT NULL
-original_width          INTEGER NOT NULL
-original_height         INTEGER NOT NULL
-preview_width           INTEGER NOT NULL
-preview_height          INTEGER NOT NULL
-original_size_bytes     INTEGER NOT NULL
-preview_size_bytes      INTEGER NOT NULL
-image_alt               TEXT NOT NULL
-status                  TEXT NOT NULL CHECK(status IN ('draft', 'published'))
-published_at            TEXT NULL
-deleted_at              TEXT NULL
-created_at              TEXT NOT NULL
-updated_at              TEXT NOT NULL
+`prompts.source_language` 是原文语言。0001 的 `title`、`description`、`prompt_template`、`image_alt` 永远是该 Prompt 的原文字段；翻译只写 `prompt_translations(prompt_id, locale, title, description, prompt_template, image_alt)`，`(prompt_id, locale)` 唯一。翻译行是完整内容版本；不能把几个字段分别从不同语言拼接，也不能以翻译覆盖原文。源语言对应的翻译行不应写入，写入端必须拒绝；读取端始终优先原文字段。无目标语言翻译时整体回退原文，并把实际展示语言返回给页面和复制逻辑。
+
+`categories`、`tags` 的 0001 `name`（分类还有 `description`）是原文；0002 新增各自的 `source_language` 和 `category_translations(category_id, locale, name, description)`、`tag_translations(tag_id, locale, name)`。它们的 slug/id 是跨语言稳定身份。分类、标签按 UI locale 选择完整翻译行，缺少时回退原文；不根据展示名生成不同 slug。新增 Prompt、Category、Tag 时必须显式写入准确的 source_language；修改翻译时同步更新父行 updated_at，以保持 sitemap lastmod 有效。
+
+0002 为兼容旧行，对三个主表新增 `source_language TEXT NOT NULL DEFAULT 'zh-CN'`，旧原文字段与 URL 均保持不变。迁移前已有英文原文的行会被临时标为 `zh-CN`；部署前须审计并校正这些行的 source_language，尤其是 Prompt 变量选项的源语言标签。校正 source_language 不改写原文内容，也不生成翻译。此默认值只服务旧数据迁移，新写入不能依赖默认值猜语言。
+
+### 6.2 Prompt 与变量
+
+`prompts` 保留 0001 的 slug、状态、图片、分类关联、模型、画幅、时间字段与现有索引；`prompt_template` 是唯一原文正文，零变量时就是普通文本。`prompt_translations.prompt_template` 是派生译文。每个翻译版本的 `{{key}}` 集合必须与原文一致，发布前由服务端校验。
+
+`prompt_variables.variable_key`、`input_type`、`sort_order` 是语言无关契约，`variable_key` 在同一 Prompt 内唯一。`label`、`input_placeholder` 是原文展示字段，语言随所属 Prompt 的 source_language；`prompt_variable_translations(variable_id, locale, label, input_placeholder)` 存派生展示文案。变量文案按当前实际展示的 Prompt 内容语言选择，缺失时整体回退原文。翻译不得改变 key、类型或选项 value。
+
+`select` 的 `options_json` 使用有序 JSON 数组，格式示例：
+
+```json
+[
+  { "value": "vintage", "labels": { "zh-CN": "复古", "en-US": "Vintage" } },
+  { "value": "modern", "labels": { "zh-CN": "现代" } }
+]
 ```
 
-prompt_template 是 Prompt 正文的唯一字段；当不存在变量时，它就是普通文本。建议索引包括 (status, published_at DESC, id DESC) 与 (category_id, status, published_at DESC, id DESC)。
+`value` 是非空、唯一、语言无关的小写 ASCII 业务值，表单状态使用 value，替换正文时使用当前内容语言的 label；`labels` 用于显示及正文替换，必须包含所属 Prompt 的 source_language，允许缺少另一语言。显示 label 优先当前 Prompt 内容语言，缺少时回退源语言 label。写入与读取均校验 JSON、稳定 value、支持的 locale、非空 label 和去重。`text` 的 options_json 为空；`select` 必须至少有一个有效选项。0002 将旧字符串数组转为 `option_1`、`option_2` 等稳定 value，并保留原字符串为源语言 label；迁移后不再写旧数组格式。旧原文复制仍使用原 label；后台上线前应按真实语义人工审阅这些自动生成的 value。
 
-### 6.2 prompt_variables
+### 6.3 关联与查询
 
-```text
-id                  INTEGER PRIMARY KEY
-prompt_id           INTEGER NOT NULL REFERENCES prompts(id) ON DELETE CASCADE
-variable_key        TEXT NOT NULL
-label               TEXT NOT NULL
-input_type          TEXT NOT NULL CHECK(input_type IN ('text', 'select'))
-input_placeholder   TEXT
-options_json        TEXT
-sort_order          INTEGER NOT NULL DEFAULT 0
-created_at          TEXT NOT NULL
-updated_at          TEXT NOT NULL
-UNIQUE(prompt_id, variable_key)
-```
-
-options_json 保存 select 选项 JSON；v0.2 不单独建 option 表。应用层要求 `text` 类型的 options_json 为空，`select` 类型必须解析为至少一个非空、去重后的字符串选项。
-
-### 6.3 categories、tags 与 prompt_tags
-
-```text
-categories: id, name, slug COLLATE NOCASE UNIQUE, description, sort_order, created_at, updated_at
-tags:       id, name, slug COLLATE NOCASE UNIQUE, created_at, updated_at
-prompt_tags:
-  prompt_id INTEGER NOT NULL REFERENCES prompts(id) ON DELETE CASCADE
-  tag_id    INTEGER NOT NULL REFERENCES tags(id) ON DELETE CASCADE
-  PRIMARY KEY(prompt_id, tag_id)
-  INDEX(tag_id, prompt_id)
-```
-
-列表卡片所需分类和标签必须通过批量查询或合理 SQL 聚合获取；24 张卡片不得产生每卡片额外查询的 N+1。
+`prompt_tags` 的关联、分类/标签 slug 和 Prompt slug 保持唯一身份。翻译表以父 ID 与 locale 为复合主键，父行删除时级联清理。公开查询应只取所需字段，并批量读取目标 locale 的翻译，避免 24 张卡片逐条查询。用户填写变量值只在浏览器交互状态，不落 D1。
 
 ## 7. Prompt 参数化模板
 
-### 7.1 模板契约
+Prompt 文本允许零个或多个 `{{key}}`；key 使用小写 ASCII snake_case，建议正则 `^[a-z][a-z0-9_]{0,63}$`。变量仅有 `text`、`select` 两种，均为可选。未填写时复制保留占位符；填写后替换该 key 的全部出现位置，只执行一轮 literal substitution，输入中出现的新 `{{...}}` 不递归展开。select 表单状态保存稳定 value，界面显示并向正文填入当前内容语言的 label；缺译时回退源语言 label。页面预览与复制必须使用同一份解析结果。
 
-Prompt 文本允许零个或多个 {{key}} 占位符。key 是小写 ASCII snake_case，建议校验正则：^[a-z][a-z0-9_]{0,63}$。展示 label 可以是中文。
-
-每个占位符由后台配置为以下一种输入方式：
-
-- text：普通文本输入，可有 input_placeholder；
-- select：下拉选择，选项来自 options_json。
-
-所有变量对最终用户均可选，不设置 required。未填写或未选择时，复制结果保留原始 {{key}}；填写后替换该 key 的所有出现位置。替换只进行一轮 literal substitution：不 eval、不递归解释用户输入；输入中出现的 {{x}} 按普通文本复制。
-
-用户填写数据只存在浏览器组件 state：不写 URL、不提交服务端、不写 D1，也不进入日志或分析。select 的实际值只能从该变量配置的 options 中选择。
-
-例如模板为 `为 {{city}} 创作一张 {{style}} 风格海报`，其中 `city` 为 text、`style` 为 select。若用户只选择 `style=复古编辑设计` 而未填写 city，复制结果为 `为 {{city}} 创作一张复古编辑设计风格海报`。未填写变量继续保留 token，替换后的值不会再参与第二轮解析。
-
-无变量详情页仅显示原始 Prompt 与“一键复制 Prompt”。有变量时，SSR 仍输出原始 Prompt 与变量 label；hydration 后呈现 text/select 表单及“复制最终 Prompt”。因此参数化 UI 不改变可索引的原始 Prompt 内容。
-
-### 7.2 后台编辑与发布校验
-
-后台编辑 prompt_template 时自动扫描 token，展示变量配置面板。发布前由服务端校验：
-
-1. 每个 token 恰好存在一个变量定义；
-2. 每个变量至少在 prompt_template 出现一次；
-3. 每个 select 至少存在一个非空 option；
-4. 同一 Prompt 的 variable_key 唯一，且符合 key 约束。
-
-不能发布 token 与变量定义不一致的 Prompt。
+后台发布前扫描原文和各翻译正文的 token，校验每个 key 恰有一份变量定义、每份变量至少被正文引用、各语言 key 集合一致，并校验 select 的规范 options_json。无变量 Prompt 不展示空表单，直接复制当前显示语言的正文。用户填写值只保存在浏览器 state，不写 URL、服务端、D1 或日志；SSR 仍输出可索引的正文。
 
 ## 8. 图片与上传
 
@@ -241,7 +190,7 @@ Cloudflare Access 以 hostname/path 同时保护 `vault.disign.me/admin` 与 `va
 
 requireAdmin() 验证 Cf-Access-Jwt-Assertion 的签名、issuer 与 AUD，并使用 jose 和远程 JWKS；随后再次检查管理员 email allowlist。管理员身份相关配置使用 secrets/env，禁止写死在代码。
 
-后台写操作要求 `Origin` 精确匹配 `https://vault.disign.me`，并要求 `Sec-Fetch-Site: same-origin`；Origin 缺失、异常或跨站请求默认拒绝。若真实浏览器兼容性证明需要，再引入 CSRF token；v0.2 不提前建立复杂 token 系统。后台全部 `no-store`。
+后台写操作要求 `Origin` 精确匹配 `https://vault.disign.me`，并要求 `Sec-Fetch-Site: same-origin`；Origin 缺失、异常或跨站请求默认拒绝。若真实浏览器兼容性证明需要，再引入 CSRF token；v0.3 不提前建立复杂 token 系统。后台全部 `no-store`。
 
 ## 12. 工程结构
 
@@ -286,8 +235,10 @@ route 负责请求边界、SSR 数据装配和 action；*.server.ts 负责 D1/R2
 
 ## 13. 测试基线
 
-Phase 1 固定使用 Vitest + `@cloudflare/vitest-plugin`。至少覆盖：
+使用 Vitest + `@cloudflare/vitest-plugin`。按实施阶段至少覆盖：
 
+- zh-CN/en-US 白名单、原文/译文整体回退、select 稳定 value 与本地化 label、非法 locale/option；
+- 0001 + 0002 从空库迁移，以及旧字符串选项转换与翻译表约束；
 - slug 规范化与首次发布后冻结；
 - token 扫描、变量校验、单轮替换、空值保留 token；
 - 草稿不可公开、删除后返回 410；
@@ -343,16 +294,17 @@ Phase 1 固定使用 Vitest + `@cloudflare/vitest-plugin`。至少覆盖：
 - 页面源代码包含详情标题、描述、H1、原始 Prompt、图片及 alt；
 - sitemap 仅包含应公开内容，canonical 与分页规则正确；
 - Access 未认证用户不能进入 /admin/*，管理员可创建草稿、上传两种图片、维护变量/分类/标签、发布、撤回、编辑、软删除；
-- D1 migration 可从空库建完整 schema；
+- D1 migration 可从空库依次应用 0001、0002，旧 v0.2 行可保留原文并转换 select 选项；
 - 项目定义的 typecheck、test、build 均通过。
 
 ## 17. 实施顺序
 
 1. **Phase 1：工程骨架**：React Router v8、Cloudflare Vite Plugin、Wrangler、D1/R2 Binding、migration、Vitest + @cloudflare/vitest-plugin、本地启动/类型检查/构建；初始化时锁定兼容版本并提交 pnpm lockfile，CI 不使用浮动 latest。
-2. **Phase 2：只读前台**：数据访问、首页 SSR、瀑布流、详情、分类、标签、分页、模板复制。
-3. **Phase 3：SEO**：metadata、canonical、Open Graph、robots、sitemap、图片 alt/尺寸与无 JavaScript 检查。
-4. **Phase 4：后台**：Access/requireAdmin()、Prompt/变量 CRUD、分类/标签、流式图片上传、草稿/发布/删除与孤儿清理。
-5. **Phase 5：上线基线**：生产 D1/R2、两个 Custom Domain、Access、缓存、Observability、部署与 D1 回滚清单、提交 sitemap。
+2. **Phase 2 前：双语数据基线**：0002 forward migration、locale 与回退解析、旧数据源语言审计。
+3. **Phase 2：只读前台**：数据访问、首页 SSR、瀑布流、详情、分类、标签、分页、模板复制。
+4. **Phase 3：SEO**：metadata、canonical、Open Graph、robots、sitemap、图片 alt/尺寸与无 JavaScript 检查。
+5. **Phase 4：后台**：Access/requireAdmin()、Prompt/变量 CRUD、分类/标签、流式图片上传、草稿/发布/删除与孤儿清理。
+6. **Phase 5：上线基线**：生产 D1/R2、两个 Custom Domain、Access、缓存、Observability、部署与 D1 回滚清单、提交 sitemap。
 
 ## 18. 后续演进触发条件
 
@@ -370,4 +322,4 @@ Phase 1 固定使用 Vitest + `@cloudflare/vitest-plugin`。至少覆盖：
 | 需要已发布 URL 改名 | slug_aliases 与重定向策略 |
 | 发布风险提高 | staging + 自动 migration pipeline |
 
-v0.2 仅实现已经进入本设计基线的需求；新能力依照实际触发条件进入后续设计。
+v0.3 仅实现已经进入本设计基线的需求；新能力依照实际触发条件进入后续设计。

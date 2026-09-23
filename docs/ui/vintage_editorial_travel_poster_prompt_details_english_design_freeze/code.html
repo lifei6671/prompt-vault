@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<meta content="web_standard" name="shell-type"/>
+<title>PromptVault - Editorial Travel Poster Prompt Architecture</title>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "bg-page": "#F7F7F5",
+            "bg-surface": "#FFFFFF",
+            "text-primary": "#18181B",
+            "text-secondary": "#71717A",
+            "text-muted": "#A1A1AA",
+            "border-default": "#E4E4E7",
+            "border-hover": "#D4D4D8",
+            "action-primary": "#2563EB",
+            "action-primary-hover": "#1D4ED8",
+            "primary-container": "#EFF6FF",
+            "primary-fixed": "#DBEAFE",
+            "status-success": "#16A34A",
+            "status-danger": "#DC2626"
+          },
+          fontFamily: {
+            body: ["Inter", "sans-serif"],
+            mono: ["JetBrains Mono", "monospace"]
+          }
+        }
+      }
+    };
+  </script>
+<style>
+    body {
+      background-color: #F7F7F5;
+      color: #18181B;
+      font-family: 'Inter', sans-serif;
+    }
+    .var-chip {
+      background-color: #F4F4F5;
+      color: #27272A;
+      font-weight: 500;
+      padding: 1px 6px;
+      border-radius: 4px;
+      border: 1px solid #E4E4E7;
+      display: inline-block;
+      line-height: normal;
+    }
+    .var-chip-empty {
+      background-color: #F4F4F5;
+      color: #A1A1AA;
+      border: 1px dashed #D4D4D8;
+      font-family: 'JetBrains Mono', monospace;
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-size: 12px;
+      display: inline-block;
+      line-height: normal;
+    }
+  </style>
+</head>
+<body class="bg-bg-page text-text-primary antialiased selection:bg-primary-fixed selection:text-action-primary flex flex-col min-h-screen">
+<!-- 1. Global Header -->
+<header class="sticky top-0 z-40 w-full h-14 bg-bg-surface border-b border-border-default shrink-0">
+<div class="max-w-[1440px] h-full mx-auto px-6 flex items-center justify-between gap-6">
+<!-- Left: Brand Logo + Nav Links -->
+<div class="flex items-center gap-6 shrink-0">
+<a class="flex items-center gap-2" href="#">
+<div class="w-6 h-6 rounded bg-action-primary flex items-center justify-center text-white">
+<span class="material-symbols-outlined text-[16px]">terminal</span>
+</div>
+<span class="font-bold text-[16px] tracking-tight text-text-primary">PromptVault</span>
+</a>
+<nav class="hidden md:flex items-center gap-5 text-[14px]">
+<a class="text-text-primary font-medium hover:text-action-primary transition-colors" href="#">Explore</a>
+<a class="text-text-secondary hover:text-text-primary transition-colors font-medium" href="#">Categories</a>
+</nav>
+</div>
+<!-- Center: Search Input with shortcut -->
+<div class="flex-1 max-w-lg hidden sm:block">
+<div class="relative flex items-center w-full">
+<span class="material-symbols-outlined absolute left-2.5 text-[18px] text-text-muted pointer-events-none">search</span>
+<input class="w-full h-8 pl-8 pr-10 bg-bg-surface border border-border-default rounded-md text-[13px] placeholder:text-text-muted focus:outline-none focus:border-action-primary focus:ring-1 focus:ring-action-primary transition-all truncate" placeholder="Search prompts, styles, models, or tags" type="text"/>
+<kbd class="absolute right-2 px-1.5 py-0.5 border border-border-default rounded bg-bg-page font-mono text-[10px] text-text-muted leading-none">⌘K</kbd>
+</div>
+</div>
+<!-- Right: Language Switcher, Favorites, Sign In & Avatar -->
+<div class="flex items-center gap-3 shrink-0">
+<div class="flex items-center border border-border-default rounded-md bg-bg-surface text-[12px] p-0.5">
+<button class="px-2 py-0.5 font-medium rounded bg-bg-page text-text-primary" type="button">EN</button>
+<span class="text-text-muted text-[11px] px-0.5">/</span>
+<button class="px-2 py-0.5 text-text-secondary hover:text-text-primary transition-colors" type="button">中文</button>
+</div>
+<button class="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md border border-border-default bg-bg-surface text-[13px] text-text-secondary hover:border-border-hover hover:text-text-primary transition-colors" type="button">
+<span class="material-symbols-outlined text-[16px]">bookmark_border</span>
+<span>Favorites</span>
+</button>
+<a class="inline-flex items-center justify-center px-3.5 py-1.5 rounded-md bg-action-primary hover:bg-action-primary-hover text-[13px] font-medium text-white transition-colors" href="#">Sign In</a>
+<div class="w-7 h-7 rounded-full bg-zinc-200 border border-border-default overflow-hidden flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-[18px] text-text-muted">person</span>
+</div>
+</div>
+</div>
+</header>
+<!-- Main Container -->
+<main class="flex-1 max-w-[1440px] w-full mx-auto px-6 py-4 flex flex-col gap-4">
+<!-- 2. Top Bar (Breadcrumb & Actions) -->
+<div class="flex items-center justify-between shrink-0 flex-wrap gap-2">
+<nav class="flex items-center gap-1.5 text-[13px] text-text-secondary overflow-hidden">
+<a class="hover:text-text-primary transition-colors flex items-center gap-0.5 shrink-0" href="#">
+<span class="material-symbols-outlined text-[15px]">arrow_back</span>
+<span>Explore Library</span>
+</a>
+<span class="text-text-muted">/</span>
+<a class="hover:text-text-primary transition-colors shrink-0" href="#">Visual &amp; Graphic Design</a>
+<span class="text-text-muted">/</span>
+<span class="text-text-primary font-medium truncate">Vintage Editorial Travel Poster</span>
+</nav>
+<div class="flex items-center gap-2 shrink-0">
+<button class="h-9 px-3.5 inline-flex items-center gap-1.5 rounded-md border border-border-default bg-bg-surface text-[13px] text-text-secondary hover:text-text-primary hover:border-border-hover transition-colors shadow-xs" type="button">
+<span class="material-symbols-outlined text-[16px]">share</span>
+<span>Share</span>
+</button>
+<button class="h-9 px-3.5 inline-flex items-center gap-1.5 rounded-md border border-border-default bg-bg-surface text-[13px] text-text-secondary hover:text-text-primary hover:border-border-hover transition-colors shadow-xs" id="save-btn" type="button">
+<span class="material-symbols-outlined text-[16px]" id="save-icon">bookmark_border</span>
+<span id="save-text">Bookmark</span>
+</button>
+</div>
+</div>
+<!-- 3. Main Dual-Column Core (56% Left Visual / 44% Right Prompt) -->
+<div class="flex flex-col lg:flex-row gap-6 items-start w-full">
+<!-- Left Visual Column (56%) -->
+<div class="w-full lg:w-[56%] flex flex-col gap-3 shrink-0">
+<!-- Clean Image Viewer Container -->
+<div class="relative w-full rounded-lg bg-[#ECECE9] border border-border-default overflow-hidden flex items-center justify-center" style="max-height: 520px;">
+<div class="relative w-full flex items-center justify-center aspect-[3/4]" style="max-height: 520px;">
+<img alt="Vintage Editorial Travel Poster Master Preview" class="w-full h-full object-contain transition-opacity duration-200" id="main-preview-img" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBWyZK9HZ47kQNdZBcajsvTnSic0Uv8M6u5XXY5PEJzRroPpatCeIfjQQMdLATQWxHqc_vm1YfpBATOzGUjXx4dwB43CkAzmgK4EiUR5jhv5d6nejkhZMjQn6r3UIdcdE95t0tWSwBSA0eBcEkukLIxa87GWbpKeNsB25srABvheYVv4Snk6Is94Or85yrvm7IublVtn0RbySozCZm0d-DVyOiFQyoxuLjdeGUTELbxYgsd3p6og6Ov"/>
+<!-- Top Tags -->
+<div class="absolute top-2.5 left-2.5 px-2.5 py-1 rounded bg-bg-surface/90 border border-border-default backdrop-blur-xs font-mono text-[11px] text-text-primary flex items-center gap-1.5 shadow-xs">
+<span class="w-1.5 h-1.5 rounded-full bg-status-success"></span>
+<span>3:4</span>
+<span class="text-text-muted">|</span>
+<span id="canvas-tag">Tianjin · Early Morning Golden Hour</span>
+</div>
+<!-- Fullscreen Inspect Button -->
+<button class="absolute top-2.5 right-2.5 flex items-center gap-1 px-2.5 py-1 rounded bg-bg-surface/90 border border-border-default hover:border-border-hover text-text-primary text-[12px] backdrop-blur-xs shadow-xs transition-all focus:outline-none" id="open-lightbox-btn" title="Inspect Fullscreen" type="button">
+<span class="material-symbols-outlined text-[15px] text-text-secondary">fullscreen</span>
+<span class="font-medium text-[11px]">Fullscreen Inspect</span>
+</button>
+</div>
+</div>
+<!-- Thumbnail Gallery with subtle active border -->
+<div class="grid grid-cols-4 gap-2.5 w-full">
+<button class="thumb-btn group relative aspect-[3/4] rounded-md overflow-hidden ring-2 ring-action-primary ring-offset-1 p-0.5 bg-bg-surface transition-all focus:outline-none" data-city="Tianjin" data-img="https://lh3.googleusercontent.com/aida-public/AB6AXuAaIzHLBSccPyZvk6OTZYT3TslFAITiBeXHVS0BqOKIPclIsCvaqdjColmSyVT3g8tyQXBZ_gb0HhBd5Sb81t3t65sKctOZlVpa2yhCuuGMCj8huQsrGqcC7NfQoxrN3-XEVernnrDabZ2uXH2kxp0Q9QfhulcRs-hoBdv7QtB5BeCtnxScNxxB8U6VUZUWXGcaAluEvPJ0192EsUR6ButLwydHK_Y-EqChsQvBPbYtvsZXT7OuTFHv" data-time="Early Morning Golden Hour" type="button">
+<img alt="Tianjin Poster" class="w-full h-full object-cover rounded-[3px]" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAaIzHLBSccPyZvk6OTZYT3TslFAITiBeXHVS0BqOKIPclIsCvaqdjColmSyVT3g8tyQXBZ_gb0HhBd5Sb81t3t65sKctOZlVpa2yhCuuGMCj8huQsrGqcC7NfQoxrN3-XEVernnrDabZ2uXH2kxp0Q9QfhulcRs-hoBdv7QtB5BeCtnxScNxxB8U6VUZUWXGcaAluEvPJ0192EsUR6ButLwydHK_Y-EqChsQvBPbYtvsZXT7OuTFHv"/>
+<span class="absolute bottom-1 inset-x-1 py-0.5 text-center bg-black/60 text-white rounded font-mono text-[10px] leading-tight backdrop-blur-xs">Tianjin</span>
+</button>
+<button class="thumb-btn group relative aspect-[3/4] rounded-md overflow-hidden border border-border-default hover:border-border-hover p-0.5 bg-bg-surface transition-all focus:outline-none" data-city="Kyoto" data-img="https://lh3.googleusercontent.com/aida-public/AB6AXuBoJYicZASlTvhmrt4a1RVnDpURloStegJvuzgUYiXIMqN3K-xrjBouTbKiKEqmoIUMfLxvIUXSR1LkyzN7n0HQFoYOQF8899YBFfPaTuecE8DIMtnoDpOzmB-YioOsqqqSem_xCqkHsKFzfZytiTadPgm6VNyjlbg94ENgO-jGEUvQ6hWMzPyoZrGAJCkWwOXyR89Zh0z_zt7csRhn2GdCysdxjdqwaQQmIlhX8T3m0Fmlkj3f4755" data-time="Twilight Dusk" type="button">
+<img alt="Kyoto Poster" class="w-full h-full object-cover rounded-[3px]" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBoJYicZASlTvhmrt4a1RVnDpURloStegJvuzgUYiXIMqN3K-xrjBouTbKiKEqmoIUMfLxvIUXSR1LkyzN7n0HQFoYOQF8899YBFfPaTuecE8DIMtnoDpOzmB-YioOsqqqSem_xCqkHsKFzfZytiTadPgm6VNyjlbg94ENgO-jGEUvQ6hWMzPyoZrGAJCkWwOXyR89Zh0z_zt7csRhn2GdCysdxjdqwaQQmIlhX8T3m0Fmlkj3f4755"/>
+<span class="absolute bottom-1 inset-x-1 py-0.5 text-center bg-black/60 text-white rounded font-mono text-[10px] leading-tight backdrop-blur-xs">Kyoto</span>
+</button>
+<button class="thumb-btn group relative aspect-[3/4] rounded-md overflow-hidden border border-border-default hover:border-border-hover p-0.5 bg-bg-surface transition-all focus:outline-none" data-city="Lisbon" data-img="https://lh3.googleusercontent.com/aida-public/AB6AXuDYfXeitxs9g4Z0gKQp5ettc00bBUjbfOs3WO1t7X0hi_HXskHpqqCLXmWZQsXs_EWSkhnAyi_zmebc6V22m8bPG__svoy60pHVkw_UDxtnx6yn7ni1ToTSUwC-8rE9Lit1fqaj-xdKD6VYgiGhMPcDeai83m3_meCVMwcQ7yVD9A1Dld2V0w4w4t66oNe3HF6ajj0aqYHZ39FACDnBtB9YWf86w7IxTCxoLuFEvqyYhbhLyuNC7xux" data-time="Bright Daylight" type="button">
+<img alt="Lisbon Poster" class="w-full h-full object-cover rounded-[3px]" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDYfXeitxs9g4Z0gKQp5ettc00bBUjbfOs3WO1t7X0hi_HXskHpqqCLXmWZQsXs_EWSkhnAyi_zmebc6V22m8bPG__svoy60pHVkw_UDxtnx6yn7ni1ToTSUwC-8rE9Lit1fqaj-xdKD6VYgiGhMPcDeai83m3_meCVMwcQ7yVD9A1Dld2V0w4w4t66oNe3HF6ajj0aqYHZ39FACDnBtB9YWf86w7IxTCxoLuFEvqyYhbhLyuNC7xux"/>
+<span class="absolute bottom-1 inset-x-1 py-0.5 text-center bg-black/60 text-white rounded font-mono text-[10px] leading-tight backdrop-blur-xs">Lisbon</span>
+</button>
+<button class="thumb-btn group relative aspect-[3/4] rounded-md overflow-hidden border border-border-default hover:border-border-hover p-0.5 bg-bg-surface transition-all focus:outline-none" data-city="Taipei" data-img="https://lh3.googleusercontent.com/aida-public/AB6AXuBCtOJfK4mHVyr5CjZEq1B8gtJOLifryg91PtNiUn8ItgjP6j2Hjm5OcvfQzKo89i8AhRKtTN8uPIpTNkIFoWNu7avmA06oOK254FaSr-x8lip-oMA88Cruz8sO-L1bnqTaWekGwmqHTBkcgFSxIbblgQUkUWtlGPGeLt50o4G0PLDTlyexeEqrYnaKfylSqpZJ0Yvk8FbIaApNPrAmnklSDJWj-svYU_cxJmwCPn6n4zmPwEjVNr39" data-time="Moody Night" type="button">
+<img alt="Taipei Poster" class="w-full h-full object-cover rounded-[3px]" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBCtOJfK4mHVyr5CjZEq1B8gtJOLifryg91PtNiUn8ItgjP6j2Hjm5OcvfQzKo89i8AhRKtTN8uPIpTNkIFoWNu7avmA06oOK254FaSr-x8lip-oMA88Cruz8sO-L1bnqTaWekGwmqHTBkcgFSxIbblgQUkUWtlGPGeLt50o4G0PLDTlyexeEqrYnaKfylSqpZJ0Yvk8FbIaApNPrAmnklSDJWj-svYU_cxJmwCPn6n4zmPwEjVNr39"/>
+<span class="absolute bottom-1 inset-x-1 py-0.5 text-center bg-black/60 text-white rounded font-mono text-[10px] leading-tight backdrop-blur-xs">Taipei</span>
+</button>
+</div>
+</div>
+<!-- Right Prompt Column (44%) -->
+<div class="w-full lg:w-[44%] flex flex-col gap-3">
+<!-- Header Title & Clean Metadata Row -->
+<div class="flex flex-col gap-1.5">
+<h1 class="text-[19px] sm:text-[20px] font-bold tracking-tight text-text-primary leading-snug">
+          Create a Quiet Editorial Travel Poster Inspired by Early Morning Streets in an Historic Coastal City
+        </h1>
+<!-- Subtle Muted Text Metadata Row -->
+<div class="flex flex-wrap items-center gap-1.5 text-[12px] text-text-secondary leading-relaxed">
+<span>ChatGPT Image / DALL·E 3</span>
+<span class="text-text-muted">·</span>
+<span>Poster Design</span>
+<span class="text-text-muted">·</span>
+<span class="font-mono text-[11px]">Aspect Ratio 3:4</span>
+<span class="text-text-muted">·</span>
+<span>Source: English</span>
+<span class="text-text-muted">·</span>
+<span class="text-text-muted hover:text-text-primary cursor-pointer transition-colors">#TravelPoster</span>
+<span class="text-text-muted hover:text-text-primary cursor-pointer transition-colors">#VintageTypography</span>
+<span class="text-text-muted hover:text-text-primary cursor-pointer transition-colors">#EditorialDesign</span>
+</div>
+</div>
+<!-- Custom Prompt Variables (Clean Form, NO internal keys) -->
+<div class="rounded-lg border border-border-default bg-bg-surface p-3 flex flex-col gap-2.5">
+<div class="flex items-center justify-between border-b border-border-default pb-2">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px] text-action-primary">tune</span>
+<span class="text-[13px] font-semibold text-text-primary">Custom Prompt Variables</span>
+</div>
+<button class="text-[11px] text-text-secondary hover:text-action-primary flex items-center gap-0.5 transition-colors focus:outline-none" id="reset-variables" type="button">
+<span class="material-symbols-outlined text-[13px]">restart_alt</span>
+<span>Reset Defaults</span>
+</button>
+</div>
+<!-- 2x2 Form Input Grid without internal variable keys -->
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+<!-- Destination -->
+<div class="flex flex-col gap-1">
+<label class="text-[11px] text-text-secondary" for="var-city">
+              Primary Destination / City
+            </label>
+<input class="w-full h-8 px-2.5 rounded border border-border-default bg-bg-surface text-[13px] text-text-primary focus:outline-none focus:border-action-primary focus:ring-1 focus:ring-action-primary transition-all" id="var-city" placeholder="e.g. Tianjin, Kyoto, Lisbon" type="text" value="Tianjin"/>
+</div>
+<!-- Aesthetic & Style -->
+<div class="flex flex-col gap-1">
+<label class="text-[11px] text-text-secondary" for="var-style">
+              Visual Aesthetic &amp; Style
+            </label>
+<div class="relative flex items-center">
+<select class="w-full h-8 pl-2.5 pr-7 rounded border border-border-default bg-bg-surface text-[12.5px] text-text-primary appearance-none focus:outline-none focus:border-action-primary focus:ring-1 focus:ring-action-primary transition-all cursor-pointer truncate" id="var-style">
+<option selected="" value="Vintage Editorial Lithograph">Vintage Editorial Lithograph</option>
+<option value="Cinematic Movie Poster">Cinematic Movie Poster</option>
+<option value="Swiss Style Minimalist Graphic">Swiss Style Minimalist Graphic</option>
+<option value="Retro Risograph Magazine Print">Retro Risograph Magazine Print</option>
+</select>
+<span class="material-symbols-outlined absolute right-1.5 text-[16px] text-text-muted pointer-events-none">expand_more</span>
+</div>
+</div>
+<!-- Lighting & Time -->
+<div class="flex flex-col gap-1">
+<label class="text-[11px] text-text-secondary" for="var-time">
+              Lighting &amp; Time of Day
+            </label>
+<div class="relative flex items-center">
+<select class="w-full h-8 pl-2.5 pr-7 rounded border border-border-default bg-bg-surface text-[12.5px] text-text-primary appearance-none focus:outline-none focus:border-action-primary focus:ring-1 focus:ring-action-primary transition-all cursor-pointer truncate" id="var-time">
+<option selected="" value="Early Morning Golden Hour">Early Morning Golden Hour</option>
+<option value="Bright Daylight">Bright Daylight</option>
+<option value="Twilight Dusk">Twilight Dusk</option>
+<option value="Moody Night">Moody Night</option>
+</select>
+<span class="material-symbols-outlined absolute right-1.5 text-[16px] text-text-muted pointer-events-none">expand_more</span>
+</div>
+</div>
+<!-- Atmosphere -->
+<div class="flex flex-col gap-1">
+<label class="text-[11px] text-text-secondary" for="var-mood">
+              Emotional Atmosphere
+            </label>
+<input class="w-full h-8 px-2.5 rounded border border-border-default bg-bg-surface text-[13px] text-text-primary focus:outline-none focus:border-action-primary focus:ring-1 focus:ring-action-primary transition-all truncate" id="var-mood" placeholder="Atmosphere &amp; mood" type="text" value="Serene, Nostalgic &amp; Warm Dawn"/>
+</div>
+</div>
+</div>
+<!-- Language Tabs & Resolved Prompt Card -->
+<div class="flex flex-col gap-2">
+<div class="flex items-center justify-between">
+<div class="flex items-center p-0.5 rounded-md bg-zinc-200/60 border border-border-default">
+<button class="px-2.5 py-1 rounded text-[12px] font-semibold bg-bg-surface text-text-primary shadow-xs transition-all" id="tab-en" type="button">
+              English (Current)
+            </button>
+<button class="px-2.5 py-1 rounded text-[12px] font-medium text-text-secondary hover:text-text-primary transition-all" id="tab-zh" type="button">
+              简体中文 · Translated
+            </button>
+</div>
+<span class="font-mono text-[11px] text-text-muted" id="token-counter">~82 Tokens</span>
+</div>
+<!-- Resolved Prompt Card: Neutral Injected Variable Chips -->
+<div class="rounded-lg border border-border-default bg-bg-surface p-3.5 flex flex-col gap-2.5">
+<!-- English View -->
+<div class="text-[13.5px] leading-[1.65] text-text-primary whitespace-pre-wrap select-text font-normal font-body" id="prompt-view-en">
+A <span class="var-chip" id="token-style-en">Vintage Editorial Lithograph</span> travel poster capturing the historic architecture and European quarter of <span class="var-chip" id="token-city-en">Tianjin</span>, bathed in the soft glow of <span class="var-chip" id="token-time-en">early morning golden hour</span>, evoking an atmosphere that is <span class="var-chip" id="token-mood-en">serene, nostalgic &amp; warm dawn</span>. The composition features tactile lithographic grain, warm cream and teal undertones, with authentic mid-century serif typography at the top.
+          </div>
+<!-- Chinese View -->
+<div class="hidden text-[13.5px] leading-[1.65] text-text-primary whitespace-pre-wrap select-text font-normal font-body" id="prompt-view-zh">
+创作一张<span class="var-chip" id="token-style-zh">复古编辑石版画</span>风格的城市旅行海报，主体城市为<span class="var-chip" id="token-city-zh">天津</span>，时间设定为<span class="var-chip" id="token-time-zh">清晨黄金时刻</span>，整体氛围<span class="var-chip" id="token-mood-zh">宁静怀旧而温暖</span>。画面具备经典平版印刷颗粒与奶油色调，顶部结合典雅衬线文字排版，光影柔和，构图平衡。
+          </div>
+<!-- Model Parameters -->
+<div class="pt-2.5 border-t border-border-default/70 flex flex-wrap items-center gap-1.5 font-mono text-[11px] text-text-secondary">
+<span class="text-text-muted text-[11px] font-sans font-medium mr-0.5">Model Parameters</span>
+<span class="px-2 py-0.5 rounded bg-zinc-100 border border-zinc-200 text-zinc-700">--ar 3:4</span>
+<span class="px-2 py-0.5 rounded bg-zinc-100 border border-zinc-200 text-zinc-700">--v 6.0</span>
+<span class="px-2 py-0.5 rounded bg-zinc-100 border border-zinc-200 text-zinc-700">--style raw</span>
+</div>
+</div>
+</div>
+<!-- Primary Action: Full Width Copy Button -->
+<div class="flex flex-col gap-1.5">
+<button class="w-full h-10 px-4 rounded-md bg-action-primary hover:bg-action-primary-hover font-medium text-[14px] text-white transition-all duration-150 flex items-center justify-center gap-2 shadow-xs focus:outline-none" id="copy-prompt-btn" type="button">
+<span class="material-symbols-outlined text-[18px]" id="copy-btn-icon">content_copy</span>
+<span id="copy-btn-text">Copy Prompt</span>
+</button>
+<div class="flex items-center justify-end text-[11px] text-text-muted px-0.5">
+<span>Shortcut: <kbd class="px-1.5 py-0.5 border border-border-default rounded bg-bg-surface font-mono text-[10px]">⌘ C</kbd></span>
+</div>
+</div>
+</div>
+</div>
+<!-- 4. Secondary Content (Accordion & Related Inspirations) -->
+<div class="w-full flex flex-col gap-6 pt-4 border-t border-border-default mt-2">
+<!-- Accordion: Why this prompt works -->
+<div class="border border-border-default rounded-lg bg-bg-surface overflow-hidden">
+<button class="w-full px-4 py-3 flex items-center justify-between text-left text-[14px] text-text-primary hover:bg-bg-page transition-colors select-none" id="toggle-why-btn" type="button">
+<div class="flex items-center gap-2 font-medium">
+<span class="material-symbols-outlined text-[18px] text-action-primary">psychology</span>
+<span>Why this prompt works (Composition &amp; typography tips)</span>
+</div>
+<span class="material-symbols-outlined text-[20px] text-text-muted transition-transform duration-200" id="why-chevron">expand_more</span>
+</button>
+<div class="hidden px-4 pb-4 text-[13px] text-text-secondary border-t border-border-default/60 pt-3 space-y-2.5 leading-relaxed" id="why-body">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+<div class="p-2.5 rounded border border-border-default bg-bg-page">
+<div class="font-medium text-text-primary mb-1">Typography &amp; Layout Constraints</div>
+<p>When running through DALL-E 3 or Midjourney v6, specifying mid-century serif lettering anchors headline layout without artifact generation: <code>Title lettering: 'TIANJIN' in condensed elegant serif</code>.</p>
+</div>
+<div class="p-2.5 rounded border border-border-default bg-bg-page">
+<div class="font-medium text-text-primary mb-1">Color Palette Calibration</div>
+<p>Complementary pairing of "warm cream ochre" with "muted teal undertones" prevents hyper-saturated neon artifacts common to default digital model outputs.</p>
+</div>
+<div class="p-2.5 rounded border border-border-default bg-bg-page">
+<div class="font-medium text-text-primary mb-1">Recommended Negative Prompts</div>
+<p class="font-mono text-[12px]">3d render, plastic finish, high gloss, oversaturated, neon illumination, distorted letters, blurry vignette</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Related Inspirations: 4 PromptCards matching Explore cards -->
+<div class="flex flex-col gap-3">
+<div class="flex items-end justify-between">
+<div>
+<h2 class="text-[16px] font-bold text-text-primary">Related Inspirations</h2>
+<p class="text-[12px] text-text-secondary mt-0.5">Curated production-ready prompts sharing vintage editorial design architectures</p>
+</div>
+<a class="text-[13px] text-action-primary hover:text-action-primary-hover flex items-center gap-1 transition-colors font-medium" href="#">
+<span>Browse all poster styles</span>
+<span class="material-symbols-outlined text-[15px]">arrow_forward</span>
+</a>
+</div>
+<!-- 4 Column Card Grid -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+<!-- Card 1 -->
+<a class="group flex flex-col rounded-lg border border-border-default bg-bg-surface overflow-hidden hover:border-border-hover transition-colors" href="#">
+<div class="w-full aspect-[3/4] bg-[#ECECE9] overflow-hidden">
+<img alt="Nordic Fjord Minimalist Geographical Gazette" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.02]" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD8W8M5mBjHRETLJ9ohFPj-ZrJh7LqqdPYeB9GEVpFt8dLrcRYipHQTB9zQX6EeoBoFCY_8Ec7JBzsSe-XqdZU7RjYCcQwlWfYoT8rM_JuUNrbY_u-e644CjBgkolWix_X2mVOMToaba6IPETL4XQf7tflFuqiSGha7LyFU-t0aEm85oHHZEfa2rBLk0M0J6TtxxbIHPt5iKelWy0W3I0hDHpsKwhgrfmKf8BndD7T6ZXBxCvGfCrap"/>
+</div>
+<div class="p-3 flex flex-col gap-1">
+<h3 class="text-[13px] font-semibold text-text-primary line-clamp-1 group-hover:text-action-primary transition-colors">Nordic Fjord Minimalist Geographical Gazette</h3>
+<div class="flex items-center gap-1.5 text-[11px] text-text-secondary">
+<span>Midjourney v6</span>
+<span>•</span>
+<span class="font-mono">3:4</span>
+</div>
+</div>
+</a>
+<!-- Card 2 -->
+<a class="group flex flex-col rounded-lg border border-border-default bg-bg-surface overflow-hidden hover:border-border-hover transition-colors" href="#">
+<div class="w-full aspect-[3/4] bg-[#ECECE9] overflow-hidden">
+<img alt="70s Showa Era Street Architecture Chronicles" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.02]" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAuU8WZlsJ9T3beEXGornrKj_i9FbTJg8egjSItU_fdbQMB5LL2v9p2TgHsO-S-52hhfXFriYjjsF5X3cxXaxy-vF_--q0Z0GaZAtnMbqPTG6e04xgyALVoQpdCVTJxZrr1RGt5N0p_l7CYRX9d425wSwHxSV2Nv68BLq2YXOH-p_HwIfOcFgptS8SArDxkNNiJyZVDync8O7GyLbUy5IualqSA0e_LTah3SvDtZ49M-mdOFcOOy-oM"/>
+</div>
+<div class="p-3 flex flex-col gap-1">
+<h3 class="text-[13px] font-semibold text-text-primary line-clamp-1 group-hover:text-action-primary transition-colors">70s Showa Era Street Architecture Chronicles</h3>
+<div class="flex items-center gap-1.5 text-[11px] text-text-secondary">
+<span>DALL·E 3</span>
+<span>•</span>
+<span class="font-mono">3:4</span>
+</div>
+</div>
+</a>
+<!-- Card 3 -->
+<a class="group flex flex-col rounded-lg border border-border-default bg-bg-surface overflow-hidden hover:border-border-hover transition-colors" href="#">
+<div class="w-full aspect-[3/4] bg-[#ECECE9] overflow-hidden">
+<img alt="Mid-Century Mediterranean Aviation Travel" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.02]" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD5utBXvUQ8AuYyRc67gBHowAZB_NQD_wP8gHw3GGAnahh2TEsHLrA6wS7rswMgCag_-gknwbQYpHAgQkWdiSxDzmdFh015a6m26YPJICWg4q0VizYnkUzZw11JiKwbCFIDAxJb0sXyAmIyrXNF_oasi08YD-X2HR7sJ6_F8yzks5dUaAC3bo8-R5oe3thuYin03v2zG7v5joITgUIkOX0oeInLxSEICr4xjcjkgbkY2hPmsuULDHiJ"/>
+</div>
+<div class="p-3 flex flex-col gap-1">
+<h3 class="text-[13px] font-semibold text-text-primary line-clamp-1 group-hover:text-action-primary transition-colors">Mid-Century Mediterranean Aviation Travel</h3>
+<div class="flex items-center gap-1.5 text-[11px] text-text-secondary">
+<span>Midjourney v6</span>
+<span>•</span>
+<span class="font-mono">3:4</span>
+</div>
+</div>
+</a>
+<!-- Card 4 -->
+<a class="group flex flex-col rounded-lg border border-border-default bg-bg-surface overflow-hidden hover:border-border-hover transition-colors" href="#">
+<div class="w-full aspect-[3/4] bg-[#ECECE9] overflow-hidden">
+<img alt="Wong Kar-wai Style Cinematic Atmospheric Night" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.02]" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDKbtkytEKekkY5kHt_0okSrDVg9xusbNLvdOxjM8D7gTmQIwrOVEy8Of5_XUcfjSBYkzrVZJnx9n2sgKTZWAlp4qKf0Yxou65gnojxefDcTuKIEnPF_-NjTb7c2EuV5us_caBz3FWNucDXXuvFFIfuGuk3ZmwnT_1yQZvAEaXBqRwBXbDu3Se6c3NWjNk9zwtS4qLb8sU4dAyHf8ayAtZTrGtjenaC3rglWk21zm4DBKF-vFSuuMnJ"/>
+</div>
+<div class="p-3 flex flex-col gap-1">
+<h3 class="text-[13px] font-semibold text-text-primary line-clamp-1 group-hover:text-action-primary transition-colors">Wong Kar-wai Style Cinematic Atmospheric Night</h3>
+<div class="flex items-center gap-1.5 text-[11px] text-text-secondary">
+<span>ChatGPT Image</span>
+<span>•</span>
+<span class="font-mono">3:4</span>
+</div>
+</div>
+</a>
+</div>
+</div>
+</div>
+</main>
+<!-- Fullscreen Lightbox Modal -->
+<div class="fixed inset-0 z-50 bg-[#111111]/95 hidden flex-col items-center justify-center p-4 backdrop-blur-sm" id="lightbox-modal">
+<div class="absolute top-4 inset-x-6 flex items-center justify-between text-white z-10">
+<div class="flex items-center gap-3">
+<span class="text-[14px] font-medium text-white" id="lightbox-title">Vintage Editorial Travel Poster · Fullscreen Inspection</span>
+<span class="text-[11px] px-2 py-0.5 rounded bg-white/10 font-mono text-white/80">3:4 Native Aspect</span>
+</div>
+<button class="w-8 h-8 rounded bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors focus:outline-none" id="close-lightbox-btn" type="button">
+<span class="material-symbols-outlined text-[18px]">close</span>
+</button>
+</div>
+<div class="max-w-4xl max-h-[85vh] flex items-center justify-center">
+<img alt="Fullscreen Poster Inspection" class="max-w-full max-h-[85vh] object-contain rounded shadow-2xl" id="lightbox-img" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBWyZK9HZ47kQNdZBcajsvTnSic0Uv8M6u5XXY5PEJzRroPpatCeIfjQQMdLATQWxHqc_vm1YfpBATOzGUjXx4dwB43CkAzmgK4EiUR5jhv5d6nejkhZMjQn6r3UIdcdE95t0tWSwBSA0eBcEkukLIxa87GWbpKeNsB25srABvheYVv4Snk6Is94Or85yrvm7IublVtn0RbySozCZm0d-DVyOiFQyoxuLjdeGUTELbxYgsd3p6og6Ov"/>
+</div>
+<div class="absolute bottom-4 text-center font-mono text-[12px] text-white/50">
+    Press <kbd class="px-1.5 py-0.5 rounded bg-white/10 text-white/80">ESC</kbd> to exit fullscreen inspection
+  </div>
+</div>
+<!-- 5. Footer -->
+<footer class="w-full bg-bg-surface border-t border-border-default mt-8 shrink-0">
+<div class="max-w-[1440px] mx-auto px-6 py-4 flex flex-col md:flex-row items-center justify-between gap-3 text-[12px] text-text-secondary">
+<div class="flex items-center gap-2">
+<span class="font-medium text-text-primary">© 2026 PromptVault</span>
+</div>
+<div class="flex items-center gap-4">
+<a class="hover:text-text-primary transition-colors" href="#">Explore</a>
+<span class="text-text-muted">·</span>
+<a class="hover:text-text-primary transition-colors" href="#">Categories</a>
+<span class="text-text-muted">·</span>
+<a class="hover:text-text-primary transition-colors" href="#">My Favorites</a>
+</div>
+</div>
+</footer>
+<!-- Interactive Scripts -->
+<script>
+  (function() {
+    const cityInput = document.getElementById('var-city');
+    const styleSelect = document.getElementById('var-style');
+    const timeSelect = document.getElementById('var-time');
+    const moodInput = document.getElementById('var-mood');
+
+    const tokenCityEn = document.getElementById('token-city-en');
+    const tokenStyleEn = document.getElementById('token-style-en');
+    const tokenTimeEn = document.getElementById('token-time-en');
+    const tokenMoodEn = document.getElementById('token-mood-en');
+
+    const tokenCityZh = document.getElementById('token-city-zh');
+    const tokenStyleZh = document.getElementById('token-style-zh');
+    const tokenTimeZh = document.getElementById('token-time-zh');
+    const tokenMoodZh = document.getElementById('token-mood-zh');
+
+    const promptViewZh = document.getElementById('prompt-view-zh');
+    const promptViewEn = document.getElementById('prompt-view-en');
+    const tabZh = document.getElementById('tab-zh');
+    const tabEn = document.getElementById('tab-en');
+
+    const copyBtn = document.getElementById('copy-prompt-btn');
+    const copyBtnIcon = document.getElementById('copy-btn-icon');
+    const copyBtnText = document.getElementById('copy-btn-text');
+
+    const resetBtn = document.getElementById('reset-variables');
+    const canvasTag = document.getElementById('canvas-tag');
+    const mainPreviewImg = document.getElementById('main-preview-img');
+    const lightboxImg = document.getElementById('lightbox-img');
+    const thumbBtns = document.querySelectorAll('.thumb-btn');
+
+    const toggleWhyBtn = document.getElementById('toggle-why-btn');
+    const whyBody = document.getElementById('why-body');
+    const whyChevron = document.getElementById('why-chevron');
+
+    const openLightboxBtn = document.getElementById('open-lightbox-btn');
+    const closeLightboxBtn = document.getElementById('close-lightbox-btn');
+    const lightboxModal = document.getElementById('lightbox-modal');
+
+    const saveBtn = document.getElementById('save-btn');
+    const saveIcon = document.getElementById('save-icon');
+    const saveText = document.getElementById('save-text');
+
+    let currentLang = 'en';
+
+    const zhMap = {
+      city: { 'Tianjin': '天津', 'Kyoto': '京都', 'Lisbon': '里斯本', 'Taipei': '台北' },
+      style: {
+        'Vintage Editorial Lithograph': '复古编辑石版画',
+        'Cinematic Movie Poster': '电影海报',
+        'Swiss Style Minimalist Graphic': '瑞士极简平面',
+        'Retro Risograph Magazine Print': '复古孔版杂志印刷'
+      },
+      time: {
+        'Early Morning Golden Hour': '清晨黄金时刻',
+        'Bright Daylight': '晴朗日光',
+        'Twilight Dusk': '黄昏余晖',
+        'Moody Night': '深邃夜景'
+      },
+      mood: {
+        'Serene, Nostalgic & Warm Dawn': '宁静怀旧而温暖',
+        'quiet and warm': '安静、温暖'
+      }
+    };
+
+    function updateTokens() {
+      const city = cityInput.value.trim();
+      const style = styleSelect.value;
+      const time = timeSelect.value;
+      const mood = moodInput.value.trim();
+
+      // City
+      if (city) {
+        tokenCityEn.textContent = city;
+        tokenCityEn.className = 'var-chip';
+        tokenCityZh.textContent = zhMap.city[city] || city;
+        tokenCityZh.className = 'var-chip';
+      } else {
+        tokenCityEn.textContent = 'city';
+        tokenCityEn.className = 'var-chip-empty';
+        tokenCityZh.textContent = '城市';
+        tokenCityZh.className = 'var-chip-empty';
+      }
+
+      // Style
+      tokenStyleEn.textContent = style;
+      tokenStyleZh.textContent = zhMap.style[style] || style;
+
+      // Time
+      tokenTimeEn.textContent = time.toLowerCase();
+      tokenTimeZh.textContent = zhMap.time[time] || time;
+
+      // Mood
+      if (mood) {
+        tokenMoodEn.textContent = mood.toLowerCase();
+        tokenMoodEn.className = 'var-chip';
+        tokenMoodZh.textContent = zhMap.mood[mood] || mood;
+        tokenMoodZh.className = 'var-chip';
+      } else {
+        tokenMoodEn.textContent = 'atmosphere';
+        tokenMoodEn.className = 'var-chip-empty';
+        tokenMoodZh.textContent = '氛围';
+        tokenMoodZh.className = 'var-chip-empty';
+      }
+
+      if (canvasTag) {
+        canvasTag.textContent = `${city || 'Unknown City'} · ${time}`;
+      }
+    }
+
+    cityInput.addEventListener('input', updateTokens);
+    moodInput.addEventListener('input', updateTokens);
+    styleSelect.addEventListener('change', updateTokens);
+    timeSelect.addEventListener('change', updateTokens);
+
+    resetBtn.addEventListener('click', () => {
+      cityInput.value = 'Tianjin';
+      styleSelect.value = 'Vintage Editorial Lithograph';
+      timeSelect.value = 'Early Morning Golden Hour';
+      moodInput.value = 'Serene, Nostalgic & Warm Dawn';
+      updateTokens();
+    });
+
+    tabEn.addEventListener('click', () => {
+      currentLang = 'en';
+      tabEn.className = 'px-2.5 py-1 rounded text-[12px] font-semibold bg-bg-surface text-text-primary shadow-xs transition-all';
+      tabZh.className = 'px-2.5 py-1 rounded text-[12px] font-medium text-text-secondary hover:text-text-primary transition-all';
+      promptViewEn.classList.remove('hidden');
+      promptViewZh.classList.add('hidden');
+    });
+
+    tabZh.addEventListener('click', () => {
+      currentLang = 'zh';
+      tabZh.className = 'px-2.5 py-1 rounded text-[12px] font-semibold bg-bg-surface text-text-primary shadow-xs transition-all';
+      tabEn.className = 'px-2.5 py-1 rounded text-[12px] font-medium text-text-secondary hover:text-text-primary transition-all';
+      promptViewZh.classList.remove('hidden');
+      promptViewEn.classList.add('hidden');
+    });
+
+    let copyTimer = null;
+    copyBtn.addEventListener('click', () => {
+      const text = (currentLang === 'en' ? promptViewEn.innerText : promptViewZh.innerText).trim();
+      const fullPrompt = `${text} --ar 3:4 --v 6.0 --style raw`;
+
+      navigator.clipboard.writeText(fullPrompt).then(() => {
+        copyBtn.classList.replace('bg-action-primary', 'bg-status-success');
+        copyBtn.classList.replace('hover:bg-action-primary-hover', 'bg-status-success');
+        copyBtnIcon.textContent = 'check';
+        copyBtnText.textContent = 'Copied!';
+
+        if (copyTimer) clearTimeout(copyTimer);
+        copyTimer = setTimeout(() => {
+          copyBtn.classList.replace('bg-status-success', 'bg-action-primary');
+          copyBtn.classList.replace('bg-status-success', 'hover:bg-action-primary-hover');
+          copyBtnIcon.textContent = 'content_copy';
+          copyBtnText.textContent = 'Copy Prompt';
+        }, 1800);
+      });
+    });
+
+    thumbBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        thumbBtns.forEach(b => {
+          b.classList.remove('ring-2', 'ring-action-primary', 'ring-offset-1');
+          b.classList.add('border', 'border-border-default');
+        });
+        btn.classList.remove('border', 'border-border-default');
+        btn.classList.add('ring-2', 'ring-action-primary', 'ring-offset-1');
+
+        const newImg = btn.dataset.img;
+        const newCity = btn.dataset.city;
+        const newTime = btn.dataset.time;
+
+        if (newImg) {
+          mainPreviewImg.style.opacity = '0.3';
+          setTimeout(() => {
+            mainPreviewImg.src = newImg;
+            lightboxImg.src = newImg;
+            mainPreviewImg.style.opacity = '1';
+          }, 100);
+        }
+        if (newCity) cityInput.value = newCity;
+        if (newTime) timeSelect.value = newTime;
+        updateTokens();
+      });
+    });
+
+    let whyOpen = false;
+    toggleWhyBtn.addEventListener('click', () => {
+      whyOpen = !whyOpen;
+      if (whyOpen) {
+        whyBody.classList.remove('hidden');
+        whyChevron.style.transform = 'rotate(180deg)';
+      } else {
+        whyBody.classList.add('hidden');
+        whyChevron.style.transform = 'rotate(0deg)';
+      }
+    });
+
+    openLightboxBtn.addEventListener('click', () => {
+      lightboxModal.classList.remove('hidden');
+      lightboxModal.classList.add('flex');
+      document.body.style.overflow = 'hidden';
+    });
+
+    function closeLightbox() {
+      lightboxModal.classList.add('hidden');
+      lightboxModal.classList.remove('flex');
+      document.body.style.overflow = '';
+    }
+
+    closeLightboxBtn.addEventListener('click', closeLightbox);
+    lightboxModal.addEventListener('click', (e) => {
+      if (e.target === lightboxModal) closeLightbox();
+    });
+
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !lightboxModal.classList.contains('hidden')) {
+        closeLightbox();
+      }
+    });
+
+    let saved = false;
+    saveBtn.addEventListener('click', () => {
+      saved = !saved;
+      if (saved) {
+        saveIcon.textContent = 'bookmark';
+        saveIcon.classList.add('text-action-primary');
+        saveText.textContent = 'Bookmarked';
+      } else {
+        saveIcon.textContent = 'bookmark_border';
+        saveIcon.classList.remove('text-action-primary');
+        saveText.textContent = 'Bookmark';
+      }
+    });
+
+    updateTokens();
+  })();
+</script>
+</body></html>

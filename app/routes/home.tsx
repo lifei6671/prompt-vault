@@ -1,26 +1,65 @@
+import { env } from "cloudflare:workers";
+import { redirect } from "react-router";
 import type { Route } from "./+types/home";
-import { Button } from "~/components/ui/button";
+import { SiteHeader } from "~/components/site-header";
+import { ExploreFiltersBar } from "~/components/explore-filters";
+import { PromptGrid } from "~/components/prompt-grid";
+import { Pagination } from "~/components/pagination";
+import { uiCopy } from "~/lib/ui-copy";
+import { pageHref, readExploreFilters, readPage, readUiLocale } from "~/lib/explore";
+import { listExplorePrompts } from "~/services/prompt.server";
+import { canonicalUrl, isDiscoveryQuery } from "~/lib/seo";
 
-export function meta({}: Route.MetaArgs) {
+export function meta({ loaderData }: Route.MetaArgs) {
+  const t = uiCopy(loaderData?.locale ?? "zh-CN");
   return [
-    { title: "Prompt Vault" },
-    { name: "description", content: "Prompt Vault 工程骨架已就绪。" },
+    { title: t.metaTitle },
+    { name: "description", content: t.metaDescription },
+    { tagName: "link", rel: "canonical", href: canonicalUrl("/", loaderData?.page) },
+    { name: "robots", content: loaderData && !loaderData.filtered ? "index,follow" : "noindex,follow" },
   ];
 }
+export async function loader({ request }: Route.LoaderArgs) {
+  const url = new URL(request.url);
+  const page = readPage(url.searchParams);
+  if (url.searchParams.has("page") && page === 1) {
+    throw redirect(pageHref(url, 1));
+  }
+  const locale = readUiLocale(request);
+  const filters = readExploreFilters(url.searchParams);
+  const result = await listExplorePrompts(env.DB, filters, locale, page);
+  const category = result.categories.find((item) =>
+    item.slug.toLowerCase() === filters.category.toLowerCase());
+  if (filters.category && !filters.q && !filters.model && !filters.ratio && !filters.sourceLanguage
+    && [...url.searchParams.keys()].every((key) =>
+      ["category", "page", "ui_locale", "prompt_locale"].includes(key)) && category) {
+    const target = new URL(`/category/${encodeURIComponent(category.slug)}`, url);
+    if (page >= 2) target.searchParams.set("page", String(page));
+    if (url.searchParams.has("ui_locale")) target.searchParams.set("ui_locale", locale);
+    throw redirect(`${target.pathname}${target.search}`);
+  }
+  return { ...result, page, locale, filters, filtered: isDiscoveryQuery(url.searchParams),
+    pageUrl: `${url.pathname}${url.search}`, imageBaseUrl: env.IMAGE_BASE_URL };
+}
 
-export default function Home() {
+export default function Home({ loaderData }: Route.ComponentProps) {
+  const { cards, page, totalPages, categories, models, ratios, locale, filters, pageUrl, imageBaseUrl } = loaderData;
+  const t = uiCopy(locale);
+  const url = new URL(pageUrl, "https://vault.disign.me");
   return (
-    <main className="mx-auto flex min-h-screen max-w-3xl items-center px-6 py-16">
-      <section className="flex flex-col gap-5">
-        <p className="text-sm font-medium text-muted-foreground">Phase 1</p>
-        <h1 className="text-4xl font-semibold tracking-tight">Prompt Vault</h1>
-        <p className="max-w-xl text-muted-foreground">
-          工程骨架已就绪：React Router SSR、Cloudflare Workers、D1、R2 与本地测试环境均已配置。
-        </p>
-        <div>
-          <Button type="button">工程骨架就绪</Button>
-        </div>
-      </section>
-    </main>
+    <>
+      <SiteHeader locale={locale} filters={filters} url={url} />
+      <main className="explore-main">
+        <ExploreFiltersBar locale={locale} filters={filters} categories={categories} models={models} ratios={ratios} />
+        {cards.length
+          ? <PromptGrid prompts={cards} imageBaseUrl={imageBaseUrl} />
+          : <section className="empty-state">
+              <h2>{t.emptyTitle}</h2>
+              <p>{t.emptyDescription}</p>
+              <a href={`/?ui_locale=${locale}`}>{t.clear}</a>
+            </section>}
+        <Pagination url={url} page={page} totalPages={totalPages} locale={locale} />
+      </main>
+    </>
   );
 }

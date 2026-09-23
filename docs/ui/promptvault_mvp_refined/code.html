@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+
+<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><meta content="mobile_tab" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{width:100vw;margin:0;padding:0;background-color:#F7F7F5;}body{overscroll-behavior:none;-webkit-tap-highlight-color:transparent;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,0px);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { colors: { "border-default": "#E4E4E7", "surface-bright": "#fbf8fc", "outline-variant": "#c3c6d7", "inverse-on-surface": "#f3f0f4", "secondary-fixed-dim": "#b7c4ff", "bg-page": "#F7F7F5", "on-secondary-container": "#fffbff", "on-surface-variant": "#434655", "primary": "#004ac6", "primary-fixed": "#dbe1ff", "tertiary-fixed": "#ffdbcd", "tertiary": "#943700", "on-secondary-fixed": "#001551", "error-container": "#ffdad6", "on-tertiary": "#ffffff", "surface-container-low": "#f6f2f7", "inverse-surface": "#303033", "bg-inverse": "#111111", "surface-variant": "#e4e1e6", "action-primary-hover": "#1D4ED8", "status-danger": "#DC2626", "on-tertiary-container": "#ffede6", "surface-container-lowest": "#ffffff", "surface": "#fbf8fc", "action-primary": "#2563EB", "bg-surface": "#FFFFFF", "text-secondary": "#71717A", "border-hover": "#D4D4D8", "on-error-container": "#93000a", "surface-container": "#f0edf1", "on-surface": "#1b1b1e", "error": "#ba1a1a", "on-error": "#ffffff", "primary-fixed-dim": "#b4c5ff", "on-background": "#1b1b1e", "surface-dim": "#dcd9dd", "background": "#fbf8fc", "secondary-fixed": "#dce1ff", "on-primary-container": "#eeefff", "on-secondary": "#ffffff", "on-secondary-fixed-variant": "#0039b5", "surface-container-highest": "#e4e1e6", "status-success": "#16A34A", "on-primary": "#ffffff", "tertiary-fixed-dim": "#ffb596", "tertiary-container": "#bc4800", "on-tertiary-fixed-variant": "#7d2d00", "text-primary": "#18181B", "primary-container": "#2563eb", "on-primary-fixed-variant": "#003ea8", "outline": "#737686", "on-tertiary-fixed": "#360f00", "text-muted": "#A1A1AA", "secondary": "#1d4ed8", "surface-tint": "#0053db", "secondary-container": "#4069f2", "on-primary-fixed": "#00174b", "surface-container-high": "#eae7eb", "inverse-primary": "#b4c5ff" }, borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, spacing: { "margin": "2rem", "gutter": "1.5rem", "gutter-mobile": "1rem", "space-lg": "1.5rem", "space-md": "1rem", "space-xs": "0.25rem", "space-xl": "2rem", "space-sm": "0.5rem", "margin-mobile": "1rem" }, fontFamily: { "section-title": ["Inter"], "metadata": ["Inter"], "detail-title": ["Inter"], "page-title": ["Inter"], "prompt-text": ["Inter"], "card-title": ["Inter"], "body": ["Inter"], "page-title-mobile": ["Inter"], "code-json": ["JetBrains Mono"] }, fontSize: { "section-title": ["16px", { lineHeight: "22px", letterSpacing: "-0.005em", fontWeight: "600" }], "metadata": ["13px", { lineHeight: "18px", letterSpacing: "0.01em", fontWeight: "500" }], "detail-title": ["24px", { lineHeight: "31px", letterSpacing: "-0.01em", fontWeight: "600" }], "page-title": ["32px", { lineHeight: "38px", letterSpacing: "-0.02em", fontWeight: "700" }], "prompt-text": ["15px", { lineHeight: "25px", letterSpacing: "0em", fontWeight: "400" }], "card-title": ["15px", { lineHeight: "21px", letterSpacing: "0em", fontWeight: "600" }], "body": ["15px", { lineHeight: "24px", letterSpacing: "0em", fontWeight: "400" }], "page-title-mobile": ["26px", { lineHeight: "32px", letterSpacing: "-0.01em", fontWeight: "700" }], "code-json": ["13px", { lineHeight: "20px", letterSpacing: "0em", fontWeight: "400" }] } } } };</script><style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head><body class="bg-bg-page font-body text-text-primary antialiased flex flex-col min-h-screen selection:bg-primary-fixed selection:text-on-primary-fixed"><header class="fixed top-0 w-full z-50 pt-safe bg-bg-surface/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.03)]"><div class="h-14 px-margin-mobile flex items-center justify-between gap-space-sm"><div class="flex items-center gap-space-sm min-w-0"><img alt="Brand logo. - Primary color: #2563eb
+- Font: inter
+- Mode: light
+- Roundness: rounded-md
+" class="h-8 w-auto object-contain shrink-0" src="https://lh3.googleusercontent.com/aida/AEtjO1U8-i-xDxT68ZTXWeCLTmtPVW__dNjnx8PeqxxxKDdxWbrQmyCffp8Fx0Yk9lPWIsPfNtq74le7CbPpW5i_EyZGlAGwP7OoTRzjmNPWOdDTiznOKgNsZtl0qerfsp2VhLDL53t4wcLrelPGHE27VsCVCw6KOujTgf30nxZR803UxiKh-nTvOud6-8cF1kuiUIP6uoOIP-Zm2LLTiysqQC0kBt9Ux2P34TSV2aUjzgVXbXEyTDDemyERXUY"/><span class="font-card-title text-card-title text-text-primary truncate tracking-tight">PromptVault</span></div><div class="flex items-center gap-1.5 shrink-0"><button aria-label="Language switch" class="h-9 px-3 flex items-center justify-center rounded-lg border border-border-default bg-bg-surface text-text-secondary hover:text-text-primary active:bg-surface-container transition-colors"><span class="font-metadata text-metadata font-medium tracking-wide uppercase">EN</span></button></div></div></header><main class="flex flex-col relative w-full pt-14 bg-bg-page min-h-screen pb-8 pb-safe"><div class="flex flex-col w-full">
+<!-- Search & Filter Controls Sticky Toolbar -->
+<div class="sticky top-14 z-30 bg-bg-page/95 backdrop-blur-md px-margin-mobile pt-space-sm pb-space-sm space-y-space-sm border-b border-border-default">
+<!-- Integrated Search Bar -->
+<div class="relative flex items-center w-full">
+<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-text-muted">
+<span class="material-symbols-outlined text-[20px]">search</span>
+</div>
+<input class="w-full h-11 pl-10 pr-10 bg-bg-surface border border-border-default rounded-lg font-body text-prompt-text text-text-primary placeholder:text-text-muted focus:outline-none focus:border-action-primary focus:ring-1 focus:ring-action-primary transition-all duration-150" placeholder="搜索 Prompt、风格、模型或标签..." type="text"/>
+<button aria-label="Clear or voice search" class="absolute inset-y-0 right-0 w-11 h-11 flex items-center justify-center text-text-muted active:text-text-primary">
+<span class="material-symbols-outlined text-[18px]">cancel</span>
+</button>
+</div>
+<!-- Horizontal Category Chips -->
+<div class="flex items-center gap-2 overflow-x-auto no-scrollbar -mx-margin-mobile px-margin-mobile py-0.5">
+<button class="shrink-0 h-8 px-3.5 rounded-full bg-text-primary text-bg-surface font-metadata text-metadata font-medium flex items-center gap-1 shadow-sm transition-transform active:scale-95">
+<span>全部</span>
+<span class="text-[11px] opacity-75 font-normal">All</span>
+</button>
+<button class="shrink-0 h-8 px-3.5 rounded-full bg-bg-surface border border-border-default text-text-primary hover:border-border-hover font-metadata text-metadata font-medium flex items-center gap-1 active:bg-surface-container transition-all">
+<span>摄影写真</span>
+<span class="text-[11px] text-text-muted font-normal">Photo</span>
+</button>
+<button class="shrink-0 h-8 px-3.5 rounded-full bg-bg-surface border border-border-default text-text-primary hover:border-border-hover font-metadata text-metadata font-medium flex items-center gap-1 active:bg-surface-container transition-all">
+<span>海报设计</span>
+<span class="text-[11px] text-text-muted font-normal">Poster</span>
+</button>
+<button class="shrink-0 h-8 px-3.5 rounded-full bg-bg-surface border border-border-default text-text-primary hover:border-border-hover font-metadata text-metadata font-medium flex items-center gap-1 active:bg-surface-container transition-all">
+<span>3D 渲染</span>
+<span class="text-[11px] text-text-muted font-normal">3D</span>
+</button>
+<button class="shrink-0 h-8 px-3.5 rounded-full bg-bg-surface border border-border-default text-text-primary hover:border-border-hover font-metadata text-metadata font-medium flex items-center gap-1 active:bg-surface-container transition-all">
+<span>UI 界面</span>
+<span class="text-[11px] text-text-muted font-normal">UI/UX</span>
+</button>
+<button class="shrink-0 h-8 px-3.5 rounded-full bg-bg-surface border border-border-default text-text-primary hover:border-border-hover font-metadata text-metadata font-medium flex items-center gap-1 active:bg-surface-container transition-all">
+<span>插画绘本</span>
+<span class="text-[11px] text-text-muted font-normal">Illustration</span>
+</button>
+<button class="shrink-0 h-8 px-3.5 rounded-full bg-bg-surface border border-border-default text-text-primary hover:border-border-hover font-metadata text-metadata font-medium flex items-center gap-1 active:bg-surface-container transition-all">
+<span>赛博朋克</span>
+<span class="text-[11px] text-text-muted font-normal">Cyber</span>
+</button>
+</div>
+<!-- Active Filter Strip & Sorting Bar -->
+<div class="flex items-center justify-between gap-2 pt-0.5">
+<div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5 min-w-0">
+<!-- Filter sheet toggle button -->
+<button class="shrink-0 h-7 px-2.5 rounded-md bg-action-primary/10 border border-action-primary/30 text-action-primary font-metadata text-metadata font-medium flex items-center gap-1 active:bg-action-primary/20 transition-colors" id="openFilterBtn">
+<span class="material-symbols-outlined text-[15px]">tune</span>
+<span>筛选 · 2</span>
+</button>
+<!-- Quick filter pills -->
+<span class="inline-flex shrink-0 items-center gap-1 h-7 px-2 bg-bg-surface border border-border-default rounded-md font-metadata text-[12px] text-text-secondary">
+<span>Midjourney v6</span>
+<button aria-label="Remove filter" class="text-text-muted hover:text-text-primary">
+<span class="material-symbols-outlined text-[14px]">close</span>
+</button>
+</span>
+<span class="inline-flex shrink-0 items-center gap-1 h-7 px-2 bg-bg-surface border border-border-default rounded-md font-metadata text-[12px] text-text-secondary">
+<span>3:4 竖版</span>
+<button aria-label="Remove filter" class="text-text-muted hover:text-text-primary">
+<span class="material-symbols-outlined text-[14px]">close</span>
+</button>
+</span>
+</div>
+<!-- Compact Sort Trigger -->
+<button class="shrink-0 h-7 px-2 bg-bg-surface border border-border-default rounded-md text-text-primary font-metadata text-[12px] font-medium flex items-center gap-0.5 hover:border-border-hover active:bg-surface-container transition-all">
+<span>推荐</span>
+<span class="material-symbols-outlined text-[15px] text-text-muted">keyboard_arrow_down</span>
+</button>
+</div>
+</div>
+<!-- Editorial Subheader Status -->
+<div class="px-margin-mobile pt-3 pb-1 flex items-center justify-between">
+<div class="flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 rounded-full bg-status-success animate-pulse"></span>
+<span class="font-metadata text-metadata text-text-secondary">今日精选 · 共 148 条验证 Prompt</span>
+</div>
+</div>
+<!-- 2-Column Responsive Masonry Grid (Mobile Natural Aspect Ratios) -->
+<div class="px-margin-mobile py-space-sm grid grid-cols-2 gap-3 items-start">
+<!-- Left Column -->
+<div class="flex flex-col gap-3 min-w-0">
+<!-- Card 1: 3:4 Aspect Ratio -->
+<article class="group flex flex-col bg-bg-surface rounded-xl border border-border-default overflow-hidden transition-all duration-200 active:scale-[0.985]">
+<div class="relative w-full aspect-[3/4] bg-surface-container-high overflow-hidden"><img class="w-full h-full max-h-[260px] object-cover" data-alt="Award-winning editorial portrait photograph of an East Asian female designer in a minimalist concrete architectural studio, illuminated by soft directional morning sunlight, sharp focus, natural skin texture, Kodak Portra 400 aesthetic, muted natural tones with crisp depth." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCyCv3XmXQxZfIPmReWPHzEuSGMgbJqeMs53PtoB9uF1mKSpEfQyKZDnxRfevAliNOKvN_AX0Tt55FxnVZoACxevwufHb8qOfZ0IkTEcC09S69X0UJ8OUOQWvpzEc4-7fqAA0cjfHb6nAcu63HPLjpp61MOAQMhcJzoGhSZciQsdQATvuTOCbKTVb_kEsGZFgQKPJL-8LVYGCgdHWWT-5BmJGrAEZMsvjGm8Ttevw5tKgqbDu1ReStn"/><div class="absolute bottom-1.5 left-1.5 px-1.5 py-0.5 rounded bg-bg-inverse/70 backdrop-blur-sm text-bg-surface font-code-json text-[10px]">3:4</div></div>
+<div class="p-2.5 flex flex-col gap-1">
+<h3 class="font-card-title text-card-title text-text-primary line-clamp-2 leading-tight">
+            极简自然光肖像 · 建筑空间质感
+          </h3>
+<div class="flex items-center justify-between text-text-muted font-metadata text-[11px] pt-0.5">
+<span class="truncate">Midjourney v6 · 摄影</span>
+<span class="shrink-0 flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[12px] text-action-primary">file_copy</span>
+<span>2.4k</span>
+</span>
+</div>
+</div>
+</article>
+<!-- Card 2: 1:1 Aspect Ratio -->
+<article class="group flex flex-col bg-bg-surface rounded-xl border border-border-default overflow-hidden transition-all duration-200 active:scale-[0.985]">
+<div class="relative w-full aspect-square bg-surface-container-high overflow-hidden"><img class="w-full h-full max-h-[260px] object-cover" data-alt="High-end studio product render of a sleek titanium espresso machine with brushed gunmetal textures and clean warm backlit geometric elements, architectural composition, octane render style, minimal editorial aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAO4g_lhtgjIk3UJ16ys39JLRW9Q86E3SBs4U2ktLkk5YR2ooznI4TOzNWukSBwWKF3NRkmi3O7hrUYXoGYakSMNcxeov94cezm7-gprPq3bX3P0oiyvwrC52lEl-7_K0QI7XY_RSMHT-xu0xZKoAeFnWeJdlAH0grukiReE9O7uvDa8qeDraJJRQNEvyg_FKjEpNj0fbb1h6_M17wrke46DPkMVmiiu4CwfLrZGnX8MAgIy5HSttz8"/><div class="absolute bottom-1.5 left-1.5 px-1.5 py-0.5 rounded bg-bg-inverse/70 backdrop-blur-sm text-bg-surface font-code-json text-[10px]">1:1</div></div>
+<div class="p-2.5 flex flex-col gap-1">
+<h3 class="font-card-title text-card-title text-text-primary line-clamp-2 leading-tight">
+            哑光钛金工业设计 · 胶囊特写渲染
+          </h3>
+<div class="flex items-center justify-between text-text-muted font-metadata text-[11px] pt-0.5">
+<span class="truncate">Flux.1 Dev · 3D</span>
+<span class="shrink-0 flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[12px] text-action-primary">file_copy</span>
+<span>1.8k</span>
+</span>
+</div>
+</div>
+</article>
+<!-- Card 3: 2:3 Aspect Ratio (Tall) -->
+<article class="group flex flex-col bg-bg-surface rounded-xl border border-border-default overflow-hidden transition-all duration-200 active:scale-[0.985]">
+<div class="relative w-full aspect-[2/3] bg-surface-container-high overflow-hidden"><img class="w-full h-full max-h-[260px] object-cover" data-alt="Swiss typographic exhibition poster for a modern generative art symposium, international typographic style, bold grid layout, striking blue and neutral stone tones, clean geometric shapes, high print fidelity." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBSqwv6OoICQWkozs_6Ne-QRcighTfeODvrBSGV2ZeMscyrtvCon3LT_n_7ygGuhaAu74sd4vKAMwQqCOpgD3pKvXDqjzQqeLb_uPFhYrHoDVGCQw_kVzoJesOnV7Cj53zGOZmsJmxj1TLgFnzmf8ymAluMesixbKxYf1LoPkqL78B3RMyc_oWHeQ4LBJ6I9O3vp8KNcqYmVojCt20cNa2vBFkKzm1ahJ4FNitG0A-Gw9zZrIlhUKog"/><div class="absolute bottom-1.5 left-1.5 px-1.5 py-0.5 rounded bg-bg-inverse/70 backdrop-blur-sm text-bg-surface font-code-json text-[10px]">2:3</div></div>
+<div class="p-2.5 flex flex-col gap-1">
+<h3 class="font-card-title text-card-title text-text-primary line-clamp-2 leading-tight">
+            瑞士网格国际平面海报 · 艺术展视觉
+          </h3>
+<div class="flex items-center justify-between text-text-muted font-metadata text-[11px] pt-0.5">
+<span class="truncate">Midjourney v6 · 平面</span>
+<span class="shrink-0 flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[12px] text-action-primary">file_copy</span>
+<span>960</span>
+</span>
+</div>
+</div>
+</article>
+<!-- Skeleton Placeholder 1 -->
+<div class="w-full rounded-xl border border-border-default bg-bg-surface p-2 flex flex-col gap-2 opacity-60 animate-pulse">
+<div class="w-full aspect-[4/5] bg-surface-container rounded-lg"></div>
+<div class="h-3 w-4/5 bg-surface-container rounded"></div>
+<div class="h-2.5 w-1/2 bg-surface-container rounded"></div>
+</div>
+</div>
+<!-- Right Column -->
+<div class="flex flex-col gap-3 min-w-0">
+<!-- Card 4: 2:3 Aspect Ratio (Tall) -->
+<article class="group flex flex-col bg-bg-surface rounded-xl border border-border-default overflow-hidden transition-all duration-200 active:scale-[0.985]">
+<div class="relative w-full aspect-[2/3] bg-surface-container-high overflow-hidden"><img class="w-full h-full max-h-[260px] object-cover" data-alt="Cinematic neo-tokyo rainy alley scene at twilight, moody atmospheric reflection in puddles, cinematic framing, 35mm anamorphic lens flare, subdued cobalt and warm amber street lanterns." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCqTYV2znEbZ1HdWNddHT54hn7e9GZhLorjM5PT6PUC_RQ7vq0vk-z9vh4wZocZnDvjBcWZ1ZcifD5aU9i2LXR1rUJq1pZjUTPcAbXdu_yqtqez-UPgsRyCxOj-x64ctpKZLgfUa2Zv3J4JvdQDbJ-IXz0gbgP5EtHxojpA4MUxg15X6nKrpumG8qn26EkLAykdlCGDc44cLmLChAtymnv69eY922kUvnksSfr3-3U2-qRAMnjf04so"/><div class="absolute bottom-1.5 left-1.5 px-1.5 py-0.5 rounded bg-bg-inverse/70 backdrop-blur-sm text-bg-surface font-code-json text-[10px]">2:3</div></div>
+<div class="p-2.5 flex flex-col gap-1">
+<h3 class="font-card-title text-card-title text-text-primary line-clamp-2 leading-tight">
+            雨夜电影感街道 · 变形镜头光晕
+          </h3>
+<div class="flex items-center justify-between text-text-muted font-metadata text-[11px] pt-0.5">
+<span class="truncate">Midjourney v6.1 · 电影</span>
+<span class="shrink-0 flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[12px] text-action-primary">file_copy</span>
+<span>4.1k</span>
+</span>
+</div>
+</div>
+</article>
+<!-- Card 5: 16:9 Aspect Ratio (Horizontal) -->
+<article class="group flex flex-col bg-bg-surface rounded-xl border border-border-default overflow-hidden transition-all duration-200 active:scale-[0.985]">
+<div class="relative w-full aspect-[16/9] bg-surface-container-high overflow-hidden"><img class="w-full h-full max-h-[260px] object-cover" data-alt="Brutalist desert concrete villa overlooking tranquil dunes, golden hour shadows, clear skies, clean architectural photography, serene meditative landscape with pristine light balance." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAAzu8BiqMzGxuvTZxX_aCYF1RyEygVZBImmfGJSllQ_PaIJUWVBo63pucbRVEpmmTNybwDgZ70aPzR5T47EcLKtE-juCrZdvr001IsjlOlnVCUjRanxj6hq3G-okeEtkFdPIZH90AObdDFQzAQmtw2geyBc4JpO3sSgaTWPFF830ooPWFkdY3pIqg8wHHUp1m0cUwhHxXXUwB5AEI0pB6i7PJIq0Y6_4VdP2s3Kz18PvflLdXLU1eL"/><div class="absolute bottom-1.5 left-1.5 px-1.5 py-0.5 rounded bg-bg-inverse/70 backdrop-blur-sm text-bg-surface font-code-json text-[10px]">16:9</div></div>
+<div class="p-2.5 flex flex-col gap-1">
+<h3 class="font-card-title text-card-title text-text-primary line-clamp-2 leading-tight">
+            粗野派沙漠石室 · 空间与光影
+          </h3>
+<div class="flex items-center justify-between text-text-muted font-metadata text-[11px] pt-0.5">
+<span class="truncate">DALL·E 3 · 建筑</span>
+<span class="shrink-0 flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[12px] text-action-primary">file_copy</span>
+<span>1.5k</span>
+</span>
+</div>
+</div>
+</article>
+<!-- Card 6: 1:1 Aspect Ratio -->
+<article class="group flex flex-col bg-bg-surface rounded-xl border border-border-default overflow-hidden transition-all duration-200 active:scale-[0.985]">
+<div class="relative w-full aspect-square bg-surface-container-high overflow-hidden"><img class="w-full h-full max-h-[260px] object-cover" data-alt="Modern high-density fintech dashboard UI design system, clean typography, dark slate and subtle electric cobalt accents, data visualization charts, clean mobile cards interface mockup." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDHo1YVaXzJhEEa4BOc4FInlBzudpjXcg-TlS_IrY8Y2cSGfNfbHZQ38di-RIsem8A2VV6Fru4K6fwco2XVX1DaCV_1WnCBggW06OD_AYDzu9LWkh-Xvm9LEOD93WklGKVZ1CHrFL2dsbj1zhfsQESyODtfdxLNJ6GCz4g6PVSBfKGasjX_6tj3Yb7KouDDPkPECKJ5Vo_DzeIu7LkyIVetP_a0YfNf0rfThP1xo5DW1QfbiDUJ2PeY"/><div class="absolute bottom-1.5 left-1.5 px-1.5 py-0.5 rounded bg-bg-inverse/70 backdrop-blur-sm text-bg-surface font-code-json text-[10px]">1:1</div></div>
+<div class="p-2.5 flex flex-col gap-1">
+<h3 class="font-card-title text-card-title text-text-primary line-clamp-2 leading-tight">
+            极简金融数据看板 · UI 构图基底
+          </h3>
+<div class="flex items-center justify-between text-text-muted font-metadata text-[11px] pt-0.5">
+<span class="truncate">Midjourney v6 · 界面</span>
+<span class="shrink-0 flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[12px] text-action-primary">file_copy</span>
+<span>3.2k</span>
+</span>
+</div>
+</div>
+</article>
+<!-- Skeleton Placeholder 2 -->
+<div class="w-full rounded-xl border border-border-default bg-bg-surface p-2 flex flex-col gap-2 opacity-60 animate-pulse">
+<div class="w-full aspect-[3/4] bg-surface-container rounded-lg"></div>
+<div class="h-3 w-4/5 bg-surface-container rounded"></div>
+<div class="h-2.5 w-1/2 bg-surface-container rounded"></div>
+</div>
+</div>
+</div>
+<!-- Subtle Infinite Scroll Indicator -->
+<div class="flex flex-col items-center justify-center py-6 gap-2 text-text-muted">
+<div class="flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 rounded-full bg-text-muted animate-ping"></span>
+<span class="w-1.5 h-1.5 rounded-full bg-text-muted"></span>
+<span class="w-1.5 h-1.5 rounded-full bg-text-muted"></span>
+</div>
+<span class="font-metadata text-[12px] tracking-wide">正在加载更多精选 Prompt...</span>
+</div>
+<!-- Filter Bottom Sheet Drawer Overlay (Interactive Preview State) -->
+<div class="fixed inset-0 z-50 bg-bg-inverse/40 backdrop-blur-xs flex flex-col justify-end transition-opacity duration-300 opacity-0 pointer-events-none" id="filterDrawerBackdrop">
+<div class="w-full bg-bg-surface rounded-t-2xl shadow-xl max-h-[724px] flex flex-col transform translate-y-full transition-transform duration-300 ease-out border-t border-border-default" id="filterDrawerContent">
+<!-- Drag Handle -->
+<div class="w-full pt-3 pb-1 flex justify-center">
+<div class="w-10 h-1 bg-border-hover rounded-full"></div>
+</div>
+<!-- Drawer Header -->
+<div class="px-margin-mobile py-2.5 flex items-center justify-between border-b border-border-default">
+<div class="flex items-center gap-2">
+<span class="font-section-title text-section-title text-text-primary">筛选条件 (Filters)</span>
+<span class="px-1.5 py-0.5 rounded bg-action-primary/10 text-action-primary font-metadata text-[11px] font-semibold">2 项已选</span>
+</div>
+<button aria-label="Close filters" class="w-9 h-9 flex items-center justify-center rounded-full text-text-muted hover:text-text-primary active:bg-surface-container" id="closeFilterBtn">
+<span class="material-symbols-outlined text-[20px]">close</span>
+</button>
+</div>
+<!-- Drawer Scrollable Body -->
+<div class="flex-1 overflow-y-auto px-margin-mobile py-space-sm space-y-5">
+<!-- Filter Section: Model -->
+<div class="space-y-2.5">
+<div class="flex items-center justify-between">
+<span class="font-card-title text-[13px] text-text-secondary tracking-wide uppercase">生成模型 Model</span>
+<span class="text-[11px] text-text-muted">已选 1</span>
+</div>
+<div class="grid grid-cols-3 gap-2">
+<button class="h-9 px-2 rounded-lg bg-text-primary text-bg-surface font-metadata text-metadata font-medium flex items-center justify-center shadow-xs">
+              Midjourney
+            </button>
+<button class="h-9 px-2 rounded-lg bg-bg-surface border border-border-default text-text-primary font-metadata text-metadata font-medium flex items-center justify-center hover:border-border-hover">
+              DALL·E 3
+            </button>
+<button class="h-9 px-2 rounded-lg bg-bg-surface border border-border-default text-text-primary font-metadata text-metadata font-medium flex items-center justify-center hover:border-border-hover">
+              Flux.1
+            </button>
+<button class="h-9 px-2 rounded-lg bg-bg-surface border border-border-default text-text-primary font-metadata text-metadata font-medium flex items-center justify-center hover:border-border-hover">
+              Stable Diff.
+            </button>
+<button class="h-9 px-2 rounded-lg bg-bg-surface border border-border-default text-text-primary font-metadata text-metadata font-medium flex items-center justify-center hover:border-border-hover">
+              Ideogram
+            </button>
+<button class="h-9 px-2 rounded-lg bg-bg-surface border border-border-default text-text-muted font-metadata text-metadata font-medium flex items-center justify-center">
+              全部模型
+            </button>
+</div>
+</div>
+<!-- Filter Section: Aspect Ratio -->
+<div class="space-y-2.5">
+<div class="flex items-center justify-between">
+<span class="font-card-title text-[13px] text-text-secondary tracking-wide uppercase">画面比例 Aspect Ratio</span>
+<span class="text-[11px] text-text-muted">已选 1</span>
+</div>
+<div class="grid grid-cols-5 gap-1.5">
+<button class="h-9 rounded-lg bg-bg-surface border border-border-default text-text-secondary font-metadata text-metadata flex items-center justify-center">
+              全部
+            </button>
+<button class="h-9 rounded-lg bg-text-primary text-bg-surface font-metadata text-metadata font-medium flex items-center justify-center shadow-xs">
+              3:4
+            </button>
+<button class="h-9 rounded-lg bg-bg-surface border border-border-default text-text-secondary font-metadata text-metadata flex items-center justify-center">
+              1:1
+            </button>
+<button class="h-9 rounded-lg bg-bg-surface border border-border-default text-text-secondary font-metadata text-metadata flex items-center justify-center">
+              16:9
+            </button>
+<button class="h-9 rounded-lg bg-bg-surface border border-border-default text-text-secondary font-metadata text-metadata flex items-center justify-center">
+              2:3
+            </button>
+</div>
+</div>
+<!-- Filter Section: Language -->
+<div class="space-y-2.5">
+<div class="flex items-center justify-between">
+<span class="font-card-title text-[13px] text-text-secondary tracking-wide uppercase">Prompt 语言 Language</span>
+</div>
+<div class="grid grid-cols-3 gap-2">
+<button class="h-9 rounded-lg bg-text-primary text-bg-surface font-metadata text-metadata font-medium flex items-center justify-center">
+              全部 (双语)
+            </button>
+<button class="h-9 rounded-lg bg-bg-surface border border-border-default text-text-secondary font-metadata text-metadata flex items-center justify-center">
+              纯英文
+            </button>
+<button class="h-9 rounded-lg bg-bg-surface border border-border-default text-text-secondary font-metadata text-metadata flex items-center justify-center">
+              中英对照
+            </button>
+</div>
+</div>
+<!-- Filter Section: Quality Modifier -->
+<div class="space-y-2.5">
+<span class="font-card-title text-[13px] text-text-secondary tracking-wide uppercase">参数开关 Parameters</span>
+<div class="flex flex-wrap gap-2">
+<label class="h-8 px-3 rounded-full bg-surface-container border border-border-default flex items-center gap-1.5 font-metadata text-metadata text-text-primary active:bg-border-hover cursor-pointer">
+<input checked="" class="w-3.5 h-3.5 accent-action-primary rounded" type="checkbox"/>
+<span>包含负面词 (No/Negative)</span>
+</label>
+<label class="h-8 px-3 rounded-full bg-surface-container border border-border-default flex items-center gap-1.5 font-metadata text-metadata text-text-primary active:bg-border-hover cursor-pointer">
+<input checked="" class="w-3.5 h-3.5 accent-action-primary rounded" type="checkbox"/>
+<span>提供可变槽位 ({{变量}})</span>
+</label>
+</div>
+</div>
+</div>
+<!-- Drawer Sticky Action Footer -->
+<div class="p-margin-mobile border-t border-border-default bg-bg-surface flex items-center gap-3">
+<button class="h-11 px-5 rounded-lg border border-border-default text-text-secondary hover:text-text-primary font-body text-prompt-text font-medium active:bg-surface-container transition-colors">
+          重置
+        </button>
+<button class="flex-1 h-11 px-4 rounded-lg bg-action-primary hover:bg-action-primary-hover active:scale-[0.99] text-on-primary font-body text-prompt-text font-medium flex items-center justify-center gap-1.5 shadow-sm transition-all" id="applyFilterBtn">
+<span>应用筛选</span>
+<span class="text-[13px] opacity-80">(148 条结果)</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<script>
+  // Simple bottom sheet micro-interaction logic
+  const openFilterBtn = document.getElementById('openFilterBtn');
+  const closeFilterBtn = document.getElementById('closeFilterBtn');
+  const applyFilterBtn = document.getElementById('applyFilterBtn');
+  const filterDrawerBackdrop = document.getElementById('filterDrawerBackdrop');
+  const filterDrawerContent = document.getElementById('filterDrawerContent');
+
+  function openDrawer() {
+    filterDrawerBackdrop.classList.remove('opacity-0', 'pointer-events-none');
+    filterDrawerContent.classList.remove('translate-y-full');
+  }
+
+  function closeDrawer() {
+    filterDrawerBackdrop.classList.add('opacity-0', 'pointer-events-none');
+    filterDrawerContent.classList.add('translate-y-full');
+  }
+
+  if (openFilterBtn && closeFilterBtn && applyFilterBtn && filterDrawerBackdrop) {
+    openFilterBtn.addEventListener('click', openDrawer);
+    closeFilterBtn.addEventListener('click', closeDrawer);
+    applyFilterBtn.addEventListener('click', closeDrawer);
+    
+    // Close when tapping backdrop area
+    filterDrawerBackdrop.addEventListener('click', (e) => {
+      if (e.target === filterDrawerBackdrop) {
+        closeDrawer();
+      }
+    });
+  }
+</script></main></body></html>

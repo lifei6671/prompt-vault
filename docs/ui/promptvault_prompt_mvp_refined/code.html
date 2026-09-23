@@ -1,0 +1,415 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"><meta content="mobile_stack" name="shell-type"><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;display=swap" rel="stylesheet"><style>@layer base{html,body{width:100vw;margin:0;padding:0;background-color:#F7F7F5;}body{overscroll-behavior:none;-webkit-tap-highlight-color:transparent;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,0px);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { colors: { "border-default": "#E4E4E7", "surface-bright": "#fbf8fc", "outline-variant": "#c3c6d7", "inverse-on-surface": "#f3f0f4", "secondary-fixed-dim": "#b7c4ff", "bg-page": "#F7F7F5", "on-secondary-container": "#fffbff", "on-surface-variant": "#434655", "primary": "#004ac6", "primary-fixed": "#dbe1ff", "tertiary-fixed": "#ffdbcd", "tertiary": "#943700", "on-secondary-fixed": "#001551", "error-container": "#ffdad6", "on-tertiary": "#ffffff", "surface-container-low": "#f6f2f7", "inverse-surface": "#303033", "bg-inverse": "#111111", "surface-variant": "#e4e1e6", "action-primary-hover": "#1D4ED8", "status-danger": "#DC2626", "on-tertiary-container": "#ffede6", "surface-container-lowest": "#ffffff", "surface": "#fbf8fc", "action-primary": "#2563EB", "bg-surface": "#FFFFFF", "text-secondary": "#71717A", "border-hover": "#D4D4D8", "on-error-container": "#93000a", "surface-container": "#f0edf1", "on-surface": "#1b1b1e", "error": "#ba1a1a", "on-error": "#ffffff", "primary-fixed-dim": "#b4c5ff", "on-background": "#1b1b1e", "surface-dim": "#dcd9dd", "background": "#fbf8fc", "secondary-fixed": "#dce1ff", "on-primary-container": "#eeefff", "on-secondary": "#ffffff", "on-secondary-fixed-variant": "#0039b5", "surface-container-highest": "#e4e1e6", "status-success": "#16A34A", "on-primary": "#ffffff", "tertiary-fixed-dim": "#ffb596", "tertiary-container": "#bc4800", "on-tertiary-fixed-variant": "#7d2d00", "text-primary": "#18181B", "primary-container": "#2563eb", "on-primary-fixed-variant": "#003ea8", "outline": "#737686", "on-tertiary-fixed": "#360f00", "text-muted": "#A1A1AA", "secondary": "#1d4ed8", "surface-tint": "#0053db", "secondary-container": "#4069f2", "on-primary-fixed": "#00174b", "surface-container-high": "#eae7eb", "inverse-primary": "#b4c5ff" }, borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, spacing: { "margin": "2rem", "gutter": "1.5rem", "gutter-mobile": "1rem", "space-lg": "1.5rem", "space-md": "1rem", "space-xs": "0.25rem", "space-xl": "2rem", "space-sm": "0.5rem", "margin-mobile": "1rem" }, fontFamily: { "section-title": ["Inter"], "metadata": ["Inter"], "detail-title": ["Inter"], "page-title": ["Inter"], "prompt-text": ["Inter"], "card-title": ["Inter"], "body": ["Inter"], "page-title-mobile": ["Inter"], "code-json": ["JetBrains Mono"] }, fontSize: { "section-title": ["16px", { lineHeight: "22px", letterSpacing: "-0.005em", fontWeight: "600" }], "metadata": ["13px", { lineHeight: "18px", letterSpacing: "0.01em", fontWeight: "500" }], "detail-title": ["24px", { lineHeight: "31px", letterSpacing: "-0.01em", fontWeight: "600" }], "page-title": ["32px", { lineHeight: "38px", letterSpacing: "-0.02em", fontWeight: "700" }], "prompt-text": ["15px", { lineHeight: "25px", letterSpacing: "0em", fontWeight: "400" }], "card-title": ["15px", { lineHeight: "21px", letterSpacing: "0em", fontWeight: "600" }], "body": ["15px", { lineHeight: "24px", letterSpacing: "0em", fontWeight: "400" }], "page-title-mobile": ["26px", { lineHeight: "32px", letterSpacing: "-0.01em", fontWeight: "700" }], "code-json": ["13px", { lineHeight: "20px", letterSpacing: "0em", fontWeight: "400" }] } } } };</script><style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+</head><body class="bg-bg-page font-body text-text-primary antialiased flex flex-col min-h-screen selection:bg-primary-fixed selection:text-on-primary-fixed"><header class="fixed top-0 w-full z-50 pt-safe bg-bg-surface/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.03)]"><div class="h-14 px-margin-mobile flex items-center justify-between gap-space-xs"><div class="flex items-center min-w-[44px]"><button aria-label="Go back" class="w-11 h-11 flex items-center justify-center -ml-2 rounded-lg text-text-primary active:bg-bg-page transition-colors" onclick="history.back()"><span class="material-symbols-outlined text-[24px]">arrow_back_ios_new</span></button></div><div class="flex-1 text-center px-space-xs min-w-0"><h1 class="font-card-title text-card-title text-text-primary truncate">Prompt 详情</h1></div><div class="flex items-center justify-end min-w-[44px]"><button aria-label="Share prompt" class="w-11 h-11 flex items-center justify-center rounded-lg text-text-secondary hover:text-text-primary active:bg-bg-page transition-colors" onclick="triggerNativeShare()"><span class="material-symbols-outlined text-[22px]">share</span></button></div></div></header><main class="flex flex-col relative w-full pt-14 pb-safe bg-bg-page min-h-screen"><div class="flex flex-col w-full pb-28">
+<!-- Top Navigation Pill / Title & Metadata Block -->
+<section class="px-gutter-mobile pt-3 pb-2 flex flex-col gap-2">
+<!-- Breadcrumb Context & Quick Badges -->
+<div class="flex items-center justify-between gap-2">
+<div class="flex items-center gap-1.5 min-w-0">
+<span class="text-secondary text-metadata font-metadata">提示词库</span>
+<span class="text-text-muted text-metadata font-metadata">/</span>
+<span class="text-text-secondary text-metadata font-metadata truncate">旅行海报</span>
+</div>
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-surface-container-high text-text-primary text-metadata font-metadata shrink-0">
+<span class="w-1.5 h-1.5 rounded-full bg-status-success inline-block"></span>
+        v6.1 验证通过
+      </span>
+</div>
+<!-- Title Wrapping Natural -->
+<h1 class="text-page-title-mobile font-page-title-mobile text-text-primary tracking-tight leading-tight">
+      复古编辑设计风格的城市旅行海报
+    </h1>
+<!-- Metadata Details -->
+<div class="flex items-center flex-wrap gap-x-2 gap-y-1 text-metadata font-metadata text-text-secondary">
+<span class="text-text-primary font-semibold">Midjourney v6.1</span>
+<span class="text-text-muted">•</span>
+<span class="">海报设计</span>
+<span class="text-text-muted">•</span>
+<span class="">比例 3:4</span>
+<span class="text-text-muted">•</span>
+<span class="text-action-primary">原文: 中文</span>
+</div>
+<!-- Scrollable Topic Tags Strip -->
+<div class="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-1 -mx-gutter-mobile px-gutter-mobile">
+<span class="shrink-0 px-2.5 py-1 rounded-full bg-surface-container text-text-primary text-metadata font-metadata">#城市旅行</span>
+<span class="shrink-0 px-2.5 py-1 rounded-full bg-surface-container text-text-primary text-metadata font-metadata">#复古排版</span>
+<span class="shrink-0 px-2.5 py-1 rounded-full bg-surface-container text-text-primary text-metadata font-metadata">#胶片颗粒</span>
+<span class="shrink-0 px-2.5 py-1 rounded-full bg-surface-container text-text-primary text-metadata font-metadata">#包豪斯版式</span>
+<span class="shrink-0 px-2.5 py-1 rounded-full bg-surface-container text-text-primary text-metadata font-metadata">#建筑美学</span>
+<span class="shrink-0 px-2.5 py-1 rounded-full bg-surface-container text-text-primary text-metadata font-metadata">#海报设计</span>
+</div>
+</section>
+<!-- Visual Asset Canvas Section (3:4 ratio container) -->
+<section class="px-gutter-mobile pt-1 pb-3 flex flex-col gap-2.5">
+<div class="relative w-full aspect-[3/4] max-h-[388px] rounded-xl overflow-hidden bg-bg-inverse shadow-sm group">
+<img alt="Vintage travel poster preview" class="w-full h-full object-cover select-none transition-transform duration-300" data-alt="Editorial vintage mid-century travel poster depicting early morning Tianjin architecture with warm golden sunrise lighting, muted terracotta, deep cobalt, cream paper texture, subtle risograph halftones, retro serif typography aesthetic, Swiss grid composition, fine film grain, art exhibition catalog photography." id="heroPosterImg" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBPDAgDbG5hLgdEe_4g3r5ueL1cuEiFALQqfVS3a4Bc_lDCHGRhysXUord6eXTmgIEp3Ye-ax2Bk6igV34IFYrecicYlrgmUazrbXRzdmIiIgkBBWMyiUki9S9c63FjECnDEuzW8KBhUtUYdpLags9HJKth2cvCTedocsHbFWjGg9gCr5ZvH2rTTk53XUOJreKHNED_huHiddcFR3IiyedivPf6ygjcB4PZyEroEZ3ySB17Fc6XMJCT">
+<!-- Image Lightbox Action Pill (44px tap target) -->
+<button aria-label="Inspect Fullscreen" class="absolute top-3 right-3 h-11 px-3.5 rounded-full bg-bg-inverse/70 backdrop-blur-md text-surface text-metadata font-metadata flex items-center gap-1.5 active:bg-bg-inverse transition-colors shadow-sm cursor-pointer" id="fullscreenTriggerBtn" type="button">
+<span class="material-symbols-outlined text-[18px]">fullscreen</span>
+<span class="">⛶ 点击全屏检视</span>
+</button>
+<!-- Aspect Ratio Badge -->
+<div class="absolute bottom-3 left-3 px-2 py-0.5 rounded bg-bg-inverse/60 backdrop-blur-sm text-surface text-metadata font-metadata">
+        3:4 · 1536×2048
+      </div>
+</div>
+<!-- Thumbnail Variants Reel -->
+<div class="flex items-center gap-1.5 pt-0.5 text-metadata font-metadata text-text-muted"><span class="material-symbols-outlined text-[16px] text-action-primary">auto_awesome</span><span class="font-medium text-text-secondary">快速预设 Presets</span></div><div class="flex items-center gap-2 overflow-x-auto no-scrollbar py-0.5">
+<!-- Variant 1 (Active) -->
+<button class="variant-btn shrink-0 flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-bg-surface text-action-primary shadow-sm" onclick="switchVariant('tianjin', this)" type="button">
+<span class="w-2 h-2 rounded-full bg-action-primary"></span>
+<span class="font-metadata text-metadata font-semibold">天津 (主案)</span>
+</button>
+<!-- Variant 2 -->
+<button class="variant-btn shrink-0 flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-surface-container text-text-secondary active:bg-surface-container-high" onclick="switchVariant('kyoto', this)" type="button">
+<span class="w-2 h-2 rounded-full bg-text-muted"></span>
+<span class="font-metadata text-metadata">京都 (和风秋)</span>
+</button>
+<!-- Variant 3 -->
+<button class="variant-btn shrink-0 flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-surface-container text-text-secondary active:bg-surface-container-high" onclick="switchVariant('lisbon', this)" type="button">
+<span class="w-2 h-2 rounded-full bg-text-muted"></span>
+<span class="font-metadata text-metadata">里斯本 (瓷砖黄)</span>
+</button>
+<!-- Variant 4 -->
+<button class="variant-btn shrink-0 flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-surface-container text-text-secondary active:bg-surface-container-high" onclick="switchVariant('taipei', this)" type="button">
+<span class="w-2 h-2 rounded-full bg-text-muted"></span>
+<span class="font-metadata text-metadata">台北 (雨夜霓虹)</span>
+</button>
+</div>
+</section>
+<!-- Prompt Variables Card (Interactive Studio) -->
+<section class="px-gutter-mobile py-2">
+<div class="bg-bg-surface rounded-xl p-4 shadow-sm flex flex-col gap-3.5"><div class="flex flex-col gap-1 pb-1 border-b border-border-default/60"><div class="flex items-center justify-between"><div class="flex items-center gap-2"><span class="material-symbols-outlined text-action-primary text-[20px]">tune</span><h2 class="text-section-title font-section-title text-text-primary">自定义 Prompt</h2></div><button class="h-9 px-2.5 rounded-lg text-metadata font-metadata text-text-secondary hover:text-text-primary active:bg-surface-container flex items-center gap-1 shrink-0" onclick="resetVariables()" type="button"><span class="material-symbols-outlined text-[16px]">restart_alt</span>重置</button></div><p class="text-metadata font-metadata text-text-muted">4 个变量 · 4 个已填写</p></div><div class="flex flex-col gap-3"><div class="flex flex-col gap-1.5"><label class="text-metadata font-metadata text-text-primary font-medium flex items-center gap-1.5" for="varCityInput"><span class="">目标城市</span><span class="text-action-primary font-code-json text-metadata">{{city}}</span><span class="text-text-muted font-normal">· 可选</span></label><div class="relative flex items-center"><input class="w-full h-11 px-3 rounded-lg bg-bg-page text-body font-body text-text-primary focus:bg-bg-surface focus:outline-none" id="varCityInput" oninput="handleVariableChange()" placeholder="输入城市名称..." type="text" value="天津"><span class="material-symbols-outlined absolute right-3 text-text-muted text-[18px] pointer-events-none">location_city</span></div></div><div class="flex flex-col gap-1.5"><label class="text-metadata font-metadata text-text-primary font-medium flex items-center gap-1.5" for="varStyleSelect"><span class="">视觉美学</span><span class="text-action-primary font-code-json text-metadata">{{style}}</span><span class="text-text-muted font-normal">· 可选</span></label><div class="relative flex items-center"><select class="w-full h-11 px-3 pr-9 rounded-lg bg-bg-page text-body font-body text-text-primary appearance-none focus:bg-bg-surface focus:outline-none" id="varStyleSelect" onchange="handleVariableChange()"><option selected="" value="复古编辑设计">复古编辑设计 (Vintage Editorial)</option><option value="包豪斯极简">包豪斯极简 (Bauhaus Minimalist)</option><option value="瑞士国际主义排版">瑞士国际主义排版 (Swiss Typographic)</option><option value="1970s 胶片丝网印">1970s 胶片丝网印 (Risograph Silkscreen)</option></select><span class="material-symbols-outlined absolute right-3 text-text-secondary text-[20px] pointer-events-none">expand_more</span></div></div><div class="flex flex-col gap-1.5"><label class="text-metadata font-metadata text-text-primary font-medium flex items-center gap-1.5" for="varLightSelect"><span class="">光照时段</span><span class="text-action-primary font-code-json text-metadata">{{lighting}}</span><span class="text-text-muted font-normal">· 可选</span></label><div class="relative flex items-center"><select class="w-full h-11 px-3 pr-9 rounded-lg bg-bg-page text-body font-body text-text-primary appearance-none focus:bg-bg-surface focus:outline-none" id="varLightSelect" onchange="handleVariableChange()"><option selected="" value="清晨柔和暖金">清晨柔和暖金 (Soft Morning Golden Hour)</option><option value="正午高对比硬光">正午高对比硬光 (High Noon Architectural Sun)</option><option value="黄昏蓝调暮色">黄昏蓝调暮色 (Dusk Blue Hour Ambient)</option><option value="雨后湿漉反光">雨后湿漉反光 (Wet Rainy Reflections)</option></select><span class="material-symbols-outlined absolute right-3 text-text-secondary text-[20px] pointer-events-none">wb_sunny</span></div></div><div class="flex flex-col gap-1.5"><label class="text-metadata font-metadata text-text-primary font-medium flex items-center gap-1.5" for="varMoodInput"><span class="">情感基调</span><span class="text-action-primary font-code-json text-metadata">{{mood}}</span><span class="text-text-muted font-normal">· 可选</span></label><div class="relative flex items-center"><input class="w-full h-11 px-3 rounded-lg bg-bg-page text-body font-body text-text-primary focus:bg-bg-surface focus:outline-none" id="varMoodInput" oninput="handleVariableChange()" placeholder="输入氛围词..." type="text" value="安静、温暖"><span class="material-symbols-outlined absolute right-3 text-text-muted text-[18px] pointer-events-none">sentiment_satisfied</span></div></div></div><button class="w-full h-12 rounded-lg bg-action-primary text-on-primary font-card-title text-card-title flex items-center justify-center gap-2 hover:bg-action-primary-hover active:bg-secondary transition-all shadow-sm cursor-pointer" id="cardCopyBtn" onclick="copyConfiguredPrompt(this)" type="button"><span class="material-symbols-outlined text-[20px]">content_copy</span><span class="">复制 Prompt</span></button></div>
+</section>
+<!-- Resolved Prompt Content Panel -->
+<section class="px-gutter-mobile py-2">
+<div class="bg-bg-surface rounded-xl p-4 shadow-sm flex flex-col gap-3">
+<!-- Tabs & Meta Header -->
+<div class="flex items-center justify-between gap-2">
+<!-- Language Switch Tabs -->
+<div class="flex items-center p-0.5 rounded-lg bg-surface-container">
+<button class="px-3 py-1.5 rounded-md text-metadata font-metadata font-semibold bg-bg-surface text-text-primary shadow-sm transition-all" id="tabCnBtn" onclick="switchPromptLang('cn')" type="button">
+            中文 (当前)
+          </button>
+<button class="px-3 py-1.5 rounded-md text-metadata font-metadata text-text-secondary hover:text-text-primary transition-all" id="tabEnBtn" onclick="switchPromptLang('en')" type="button">
+            English · 原文
+          </button>
+</div>
+<!-- Token count indicator -->
+<div class="flex items-center gap-1 text-metadata font-metadata text-text-secondary font-code-json">
+<span class="material-symbols-outlined text-[16px] text-action-primary">data_object</span>
+<span id="tokenCountLabel" class="">~78 Tokens</span>
+</div>
+</div>
+<!-- Live Resolved Prompt Typography -->
+<div class="text-prompt-text font-prompt-text text-text-primary leading-relaxed p-3.5 rounded-lg bg-bg-page select-text selection:bg-primary-fixed" id="resolvedPromptDisplay">创作一张 <mark class="bg-surface-container text-text-primary font-medium rounded px-1.5 py-0.5 mx-0.5" id="pillStyle">复古编辑设计</mark> 风格的城市旅行海报，主体城市为 <mark class="bg-surface-container text-text-primary font-medium rounded px-1.5 py-0.5 mx-0.5" id="pillCity">天津</mark>，时间设定为 <mark class="bg-surface-container text-text-primary font-medium rounded px-1.5 py-0.5 mx-0.5" id="pillLighting">清晨柔和暖金</mark>，整体氛围 <mark class="bg-surface-container text-text-primary font-medium rounded px-1.5 py-0.5 mx-0.5" id="pillMood">安静、温暖</mark>。画面具备经典胶片颗粒与手工丝网印刷触感，结合瑞士网格排版结构，精美衬线体城市标题留白，包豪斯现代主义构图与建筑立体几何剪影。</div>
+<!-- Model Execution Parameters Neutral Chips -->
+<div class="flex flex-wrap items-center gap-1.5 pt-1">
+<span class="px-2 py-1 rounded bg-surface-container font-code-json text-code-json text-text-primary">--ar 3:4</span>
+<span class="px-2 py-1 rounded bg-surface-container font-code-json text-code-json text-text-primary">--v 6.1</span>
+<span class="px-2 py-1 rounded bg-surface-container font-code-json text-code-json text-text-primary">--style raw</span>
+<span class="px-2 py-1 rounded bg-surface-container font-code-json text-code-json text-text-primary">--stylize 250</span>
+<span class="px-2 py-1 rounded bg-surface-container font-code-json text-code-json text-text-muted">--q 2</span>
+</div>
+</div>
+</section>
+<!-- Collapsible Instructions Accordion -->
+<section class="px-gutter-mobile py-2">
+<div class="bg-bg-surface rounded-xl overflow-hidden shadow-sm">
+<button class="w-full p-4 flex items-center justify-between text-left active:bg-surface-container transition-colors" onclick="toggleAccordion('adviceContent', 'adviceChevron')" type="button">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-action-primary text-[20px]">lightbulb</span>
+<span class="font-section-title text-section-title text-text-primary">架构师出图建议与排版避坑</span>
+</div>
+<span class="material-symbols-outlined text-text-secondary text-[22px] transition-transform duration-200" id="adviceChevron">expand_more</span>
+</button>
+<div class="hidden px-4 pb-4 pt-1 flex flex-col gap-2.5 text-body font-body text-text-secondary" id="adviceContent">
+<div class="p-3 rounded-lg bg-bg-page flex flex-col gap-1.5">
+<div class="flex items-center gap-1.5 text-text-primary font-semibold text-metadata font-metadata">
+<span class="material-symbols-outlined text-status-success text-[16px]">check_circle</span>
+            出图核心技巧
+          </div>
+<p class="text-metadata font-metadata leading-relaxed">
+            建议保留 <code class="font-code-json text-action-primary">--style raw</code> 避免过饱和商业滤镜，保留印刷丝网噪点感；若希望强化留白用于后期填排中文标题，可在提示词尾追加 <code class="font-code-json text-action-primary">negative space in sky, minimalist editorial copy space</code>。
+          </p>
+</div>
+<div class="p-3 rounded-lg bg-bg-page flex flex-col gap-1.5">
+<div class="flex items-center gap-1.5 text-text-primary font-semibold text-metadata font-metadata">
+<span class="material-symbols-outlined text-status-danger text-[16px]">warning</span>
+            字体避坑指南
+          </div>
+<p class="text-metadata font-metadata leading-relaxed">
+            Midjourney 渲染中文文字仍可能产生形变，建议将直出海报图导入 Figma 或 Illustrator 进行中英文排版叠加，主体建筑与光影交界处能获得更精确的视觉纵深。
+          </p>
+</div>
+</div>
+</div>
+</section>
+<!-- Related Prompts Carousel / 2-Column Grid -->
+<section class="px-gutter-mobile pt-3 pb-4 flex flex-col gap-3">
+<div class="flex items-center justify-between">
+<h3 class="font-section-title text-section-title text-text-primary">相关灵感推荐</h3>
+<a class="font-metadata text-metadata text-action-primary flex items-center gap-0.5" href="#more">
+        查看全部
+        <span class="material-symbols-outlined text-[16px]">chevron_right</span>
+</a>
+</div>
+<div class="grid grid-cols-2 gap-3">
+<!-- Related Card 1 -->
+<article class="bg-bg-surface rounded-xl overflow-hidden shadow-sm flex flex-col group cursor-pointer">
+<div class="relative aspect-[3/4] w-full overflow-hidden bg-surface-container">
+<img alt="Related poster Tokyo" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" data-alt="Retro Swiss style typography travel poster of Tokyo Shinjuku street at night, neon reflections, risograph grain, minimalist geometry, high aesthetic vintage palette, cream border, deep navy and vermilion red." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCp-Atqkb0IUo2SM872Wc-qcvHXd2lDQcEaGlJdBiQhG_3Yk8wZ2ErmXodEpagKgsebOD_q5GWeutGTUM8lHJ-mcKIgP2-0cv0-knaw-zOQYpvpO8gmkKfs4VhHt11fajbRR1zT7Vy-SQPf3EyLVIDdVA5QBOYvMrrUaKK9wmUQkYFwPwpEVw6r3ERjxMuZVZ_7vKZdWKm-laKISjSOEiRct6Ba-suDQjyPhOLEz2lFaT_BfXl5C_XZ">
+<span class="absolute top-2 left-2 px-1.5 py-0.5 rounded bg-bg-inverse/70 text-surface text-metadata font-metadata font-code-json">3:4</span>
+</div>
+<div class="p-2.5 flex flex-col gap-1">
+<h4 class="font-card-title text-card-title text-text-primary truncate">东京雨夜复古瑞士排版</h4>
+<div class="flex items-center justify-between text-metadata font-metadata text-text-secondary">
+<span class="">MJ v6.1</span>
+<span class="flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[14px] text-text-secondary">content_copy</span>
+              842
+            </span>
+</div>
+</div>
+</article>
+<!-- Related Card 2 -->
+<article class="bg-bg-surface rounded-xl overflow-hidden shadow-sm flex flex-col group cursor-pointer">
+<div class="relative aspect-[3/4] w-full overflow-hidden bg-surface-container">
+<img alt="Related poster Amalfi" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" data-alt="Vintage Mediterranean architectural travel poster of Amalfi Coast with lemon groves, pastel stone arches, sun-drenched terraced hills, screenprinted flat colors, serif typographic masthead, textured parchment paper aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCceaS5QKz0vzR5uzZeqSF8-Vff773ts9r_sBDPjvDNJnISq5JnyvhCJ6zrT_oicKA4kh3YUcHc3CyWBjQS6r7z8Cb8tnRnyGHaXax7IJUZGaC65ap_R4YTUO3JHMcNfEmWrx7hMWJA2M6jo79fWJwYYZAjc0jGfil4uv9-Owwnwi1YvN0zy7D2wzDK7VwUaM07_C4MPmeVqkIhtO2MYZqkNzIUyl-SdZ7z7oTBYGqnJS8E2zkwSbDS">
+<span class="absolute top-2 left-2 px-1.5 py-0.5 rounded bg-bg-inverse/70 text-surface text-metadata font-metadata font-code-json">3:4</span>
+</div>
+<div class="p-2.5 flex flex-col gap-1">
+<h4 class="font-card-title text-card-title text-text-primary truncate">阿玛菲日光建筑假日</h4>
+<div class="flex items-center justify-between text-metadata font-metadata text-text-secondary">
+<span class="">MJ v6.1</span>
+<span class="flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[14px] text-text-secondary">content_copy</span>
+              1.2k
+            </span>
+</div>
+</div>
+</article>
+</div>
+</section>
+<!-- Sticky Bottom Execution Bar (Mobile Essential) -->
+<aside class="fixed bottom-0 left-0 right-0 z-40 bg-bg-surface/95 backdrop-blur-xl pb-safe shadow-[0_-4px_20px_rgba(0,0,0,0.06)]"><div class="h-16 px-gutter-mobile flex items-center gap-2"><button aria-label="Share prompt" class="w-11 h-11 rounded-lg flex items-center justify-center text-text-secondary active:bg-bg-page transition-colors shrink-0" id="stickyShareBtn" onclick="triggerNativeShare()" type="button"><span class="material-symbols-outlined text-[24px]">share</span></button><button class="flex-1 h-11 px-4 rounded-lg bg-action-primary text-on-primary font-card-title text-card-title flex items-center justify-center gap-2 hover:bg-action-primary-hover active:bg-secondary transition-all shadow-sm" id="stickyCopyBtn" onclick="copyConfiguredPrompt(this)" type="button"><span class="material-symbols-outlined text-[20px]">content_copy</span><span id="stickyBtnText" class="">复制 Prompt</span></button></div></aside>
+<!-- Lightweight Toast Feedback Notification -->
+<div aria-live="polite" class="fixed bottom-20 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-full bg-inverse-surface text-inverse-on-surface shadow-xl flex items-center gap-2 text-metadata font-metadata pointer-events-none opacity-0 transition-opacity duration-200" id="copyToast" role="status">
+<span class="material-symbols-outlined text-status-success text-[18px]">check_circle</span>
+<span id="toastMsg" class="">已复制到剪贴板！</span>
+</div>
+</div>
+<!-- Inline Interactive Micro-Interactions Script -->
+<script>
+  let currentLang = 'cn';
+  const defaultVars = {
+    city: '天津',
+    style: '复古编辑设计',
+    lighting: '清晨柔和暖金',
+    mood: '安静、温暖'
+  };
+
+  const englishTranslations = {
+    '天津': 'Tianjin',
+    '京都': 'Kyoto',
+    '里斯本': 'Lisbon',
+    '台北': 'Taipei',
+    '复古编辑设计': 'Vintage Editorial Design',
+    '包豪斯极简': 'Bauhaus Minimalist',
+    '瑞士国际主义排版': 'Swiss Typographic',
+    '1970s 胶片丝网印': '1970s Risograph Silkscreen',
+    '清晨柔和暖金': 'Soft Morning Golden Hour',
+    '正午高对比硬光': 'High Noon Architectural Sun',
+    '黄昏蓝调暮色': 'Dusk Blue Hour Ambient',
+    '雨后湿漉反光': 'Wet Rainy Reflections',
+    '安静、温暖': 'Quiet, Warm Serenity'
+  };
+
+  function handleVariableChange() {
+    const city = document.getElementById('varCityInput').value.trim() || '某座城市';
+    const style = document.getElementById('varStyleSelect').value;
+    const lighting = document.getElementById('varLightSelect').value;
+    const mood = document.getElementById('varMoodInput').value.trim() || '沉静';
+
+    if (currentLang === 'cn') {
+      document.getElementById('pillStyle').innerText = style;
+      document.getElementById('pillCity').innerText = city;
+      document.getElementById('pillLighting').innerText = lighting;
+      document.getElementById('pillMood').innerText = mood;
+      document.getElementById('tokenCountLabel').innerText = '~' + Math.max(68, 60 + city.length + mood.length) + ' Tokens';
+    } else {
+      renderEnglishPrompt(city, style, lighting, mood);
+    }
+  }
+
+  function renderEnglishPrompt(city, style, lighting, mood) {
+    const enCity = englishTranslations[city] || city;
+    const enStyle = englishTranslations[style] || style;
+    const enLighting = englishTranslations[lighting] || lighting;
+    const enMood = englishTranslations[mood] || mood;
+
+    const container = document.getElementById('resolvedPromptDisplay');
+    container.innerHTML = `Create an editorial travel poster in <mark class="bg-primary-fixed text-on-primary-fixed font-medium rounded px-1.5 py-0.5 mx-0.5">${enStyle}</mark> aesthetics, showcasing architectural landmarks of <mark class="bg-primary-fixed text-on-primary-fixed font-medium rounded px-1.5 py-0.5 mx-0.5">${enCity}</mark>, captured during <mark class="bg-primary-fixed text-on-primary-fixed font-medium rounded px-1.5 py-0.5 mx-0.5">${enLighting}</mark> with a <mark class="bg-primary-fixed text-on-primary-fixed font-medium rounded px-1.5 py-0.5 mx-0.5">${enMood}</mark> atmosphere. Swiss modernist layout, tactile risograph screenprint texture, subtle film grain, refined serif masthead headline, elegant negative space --ar 3:4 --v 6.1 --style raw --stylize 250`;
+    document.getElementById('tokenCountLabel').innerText = '~94 Tokens';
+  }
+
+  function switchPromptLang(lang) {
+    currentLang = lang;
+    const tabCn = document.getElementById('tabCnBtn');
+    const tabEn = document.getElementById('tabEnBtn');
+
+    if (lang === 'cn') {
+      tabCn.className = 'px-3 py-1.5 rounded-md text-metadata font-metadata font-semibold bg-bg-surface text-text-primary shadow-sm transition-all';
+      tabEn.className = 'px-3 py-1.5 rounded-md text-metadata font-metadata text-text-secondary hover:text-text-primary transition-all';
+      const container = document.getElementById('resolvedPromptDisplay');
+      container.innerHTML = `创作一张 <mark id="pillStyle" class="bg-primary-fixed text-on-primary-fixed font-medium rounded px-1.5 py-0.5 mx-0.5">复古编辑设计</mark> 风格的城市旅行海报，主体城市为 <mark id="pillCity" class="bg-primary-fixed text-on-primary-fixed font-medium rounded px-1.5 py-0.5 mx-0.5">天津</mark>，时间设定为 <mark id="pillLighting" class="bg-primary-fixed text-on-primary-fixed font-medium rounded px-1.5 py-0.5 mx-0.5">清晨柔和暖金</mark>，整体氛围 <mark id="pillMood" class="bg-primary-fixed text-on-primary-fixed font-medium rounded px-1.5 py-0.5 mx-0.5">安静、温暖</mark>。画面具备经典胶片颗粒与手工丝网印刷触感，结合瑞士网格排版结构，精美衬线体城市标题留白，包豪斯现代主义构图与建筑立体几何剪影。`;
+      handleVariableChange();
+    } else {
+      tabEn.className = 'px-3 py-1.5 rounded-md text-metadata font-metadata font-semibold bg-bg-surface text-text-primary shadow-sm transition-all';
+      tabCn.className = 'px-3 py-1.5 rounded-md text-metadata font-metadata text-text-secondary hover:text-text-primary transition-all';
+      handleVariableChange();
+    }
+  }
+
+  function resetVariables() {
+    document.getElementById('varCityInput').value = defaultVars.city;
+    document.getElementById('varStyleSelect').value = defaultVars.style;
+    document.getElementById('varLightSelect').value = defaultVars.lighting;
+    document.getElementById('varMoodInput').value = defaultVars.mood;
+    handleVariableChange();
+    showToast('已重置为默认提示词参数');
+  }
+
+  function switchVariant(variantKey, btnElement) {
+    document.querySelectorAll('.variant-btn').forEach(btn => {
+      btn.className = 'variant-btn shrink-0 flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-surface-container text-text-secondary active:bg-surface-container-high';
+      const dot = btn.querySelector('span');
+      if (dot) dot.className = 'w-2 h-2 rounded-full bg-text-muted';
+      const text = btn.querySelectorAll('span')[1];
+      if (text) text.className = 'font-metadata text-metadata';
+    });
+
+    btnElement.className = 'variant-btn shrink-0 flex items-center gap-2 px-2.5 py-1.5 rounded-lg bg-bg-surface text-action-primary shadow-sm';
+    const dot = btnElement.querySelector('span');
+    if (dot) dot.className = 'w-2 h-2 rounded-full bg-action-primary';
+    const text = btnElement.querySelectorAll('span')[1];
+    if (text) text.className = 'font-metadata text-metadata font-semibold';
+
+    if (variantKey === 'tianjin') {
+      document.getElementById('varCityInput').value = '天津';
+      document.getElementById('varLightSelect').value = '清晨柔和暖金';
+    } else if (variantKey === 'kyoto') {
+      document.getElementById('varCityInput').value = '京都';
+      document.getElementById('varLightSelect').value = '黄昏蓝调暮色';
+    } else if (variantKey === 'lisbon') {
+      document.getElementById('varCityInput').value = '里斯本';
+      document.getElementById('varLightSelect').value = '正午高对比硬光';
+    } else if (variantKey === 'taipei') {
+      document.getElementById('varCityInput').value = '台北';
+      document.getElementById('varLightSelect').value = '雨后湿漉反光';
+    }
+    handleVariableChange();
+  }
+
+  function toggleAccordion(contentId, chevronId) {
+    const el = document.getElementById(contentId);
+    const chevron = document.getElementById(chevronId);
+    if (el.classList.contains('hidden')) {
+      el.classList.remove('hidden');
+      chevron.style.transform = 'rotate(180deg)';
+    } else {
+      el.classList.add('hidden');
+      chevron.style.transform = 'rotate(0deg)';
+    }
+  }
+
+  function toggleFavorite(btn) {
+    const icon = btn.querySelector('.material-symbols-outlined');
+    const isFilled = icon.style.fontVariationSettings && icon.style.fontVariationSettings.includes("'FILL' 1");
+    if (isFilled) {
+      icon.style.fontVariationSettings = "'FILL' 0";
+      icon.classList.remove('text-status-danger');
+      showToast('已取消收藏');
+    } else {
+      icon.style.fontVariationSettings = "'FILL' 1";
+      icon.classList.add('text-status-danger');
+      showToast('已收藏至「我的灵感库」');
+    }
+  }
+
+  function triggerNativeShare() {
+    if (navigator.share) {
+      navigator.share({
+        title: '复古编辑设计风格的城市旅行海报 - PromptVault',
+        text: '在 PromptVault 上发现优质 Midjourney v6.1 提示词模板',
+        url: window.location.href
+      }).catch(() => {});
+    } else {
+      showToast('已复制分享链接到剪贴板');
+    }
+  }
+
+  function copyConfiguredPrompt(btn) {
+    const textToCopy = document.getElementById('resolvedPromptDisplay').innerText + ' --ar 3:4 --v 6.1 --style raw --stylize 250';
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(textToCopy).then(() => {
+        onCopySuccess(btn);
+      });
+    } else {
+      onCopySuccess(btn);
+    }
+  }
+
+  function onCopySuccess(btn) {
+    showToast('已成功复制完整 Prompt 词句！');
+    
+    // Animate target button states
+    const originalHtml = btn.innerHTML;
+    btn.classList.add('bg-status-success');
+    btn.classList.remove('bg-action-primary', 'hover:bg-action-primary-hover');
+    btn.innerHTML = `<span class="material-symbols-outlined text-[20px]">check</span><span>已复制 Copied!</span>`;
+
+    // Also update sticky button if card button was tapped
+    const stickyBtn = document.getElementById('stickyCopyBtn');
+    if (stickyBtn && stickyBtn !== btn) {
+      stickyBtn.classList.add('bg-status-success');
+      stickyBtn.classList.remove('bg-action-primary');
+      document.getElementById('stickyBtnText').innerText = '已复制 Copied!';
+    }
+
+    setTimeout(() => {
+      btn.innerHTML = originalHtml;
+      btn.classList.remove('bg-status-success');
+      btn.classList.add('bg-action-primary', 'hover:bg-action-primary-hover');
+      if (stickyBtn) {
+        stickyBtn.classList.remove('bg-status-success');
+        stickyBtn.classList.add('bg-action-primary');
+        document.getElementById('stickyBtnText').innerText = '复制 Prompt';
+      }
+    }, 1500);
+  }
+
+  function showToast(msg) {
+    const toast = document.getElementById('copyToast');
+    const msgEl = document.getElementById('toastMsg');
+    msgEl.innerText = msg;
+    toast.classList.remove('opacity-0');
+    toast.classList.add('opacity-100');
+    setTimeout(() => {
+      toast.classList.remove('opacity-100');
+      toast.classList.add('opacity-0');
+    }, 1800);
+  }
+
+  // Fullscreen trigger simple preview feedback
+  document.getElementById('fullscreenTriggerBtn')?.addEventListener('click', () => {
+    showToast('已进入全屏纯净检视模式');
+  });
+</script></main>
+
+</body></html>

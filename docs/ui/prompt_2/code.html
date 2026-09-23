@@ -1,0 +1,575 @@
+<!DOCTYPE html><html lang="zh-CN"><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<meta content="web_standard" name="shell-type">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "bg-page": "#F7F7F5",
+            "bg-surface": "#FFFFFF",
+            "text-primary": "#18181B",
+            "text-secondary": "#71717A",
+            "text-muted": "#A1A1AA",
+            "border-default": "#E4E4E7",
+            "border-hover": "#D4D4D8",
+            "action-primary": "#2563EB",
+            "action-primary-hover": "#1D4ED8",
+            "primary-container": "#EFF6FF",
+            "primary-fixed": "#DBEAFE",
+            "status-success": "#16A34A",
+            "status-danger": "#DC2626"
+          },
+          fontFamily: {
+            body: ["Inter", "sans-serif"],
+            mono: ["JetBrains Mono", "monospace"]
+          }
+        }
+      }
+    };
+  </script>
+<style>
+    body {
+      background-color: #F7F7F5;
+      color: #18181B;
+      font-family: 'Inter', sans-serif;
+    }
+    .var-chip {
+      background-color: #EFF6FF;
+      color: #1D4ED8;
+      font-weight: 500;
+      padding: 1px 5px;
+      border-radius: 4px;
+      border-bottom: 1.5px solid #2563EB;
+    }
+    .var-chip-empty {
+      background-color: #F4F4F5;
+      color: #A1A1AA;
+      border-bottom: 1.5px dashed #A1A1AA;
+      font-family: 'JetBrains Mono', monospace;
+      padding: 1px 4px;
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body class="bg-bg-page text-text-primary antialiased selection:bg-primary-fixed selection:text-action-primary flex flex-col min-h-screen">
+<!-- 顶部 Header: 统一 PromptVault 导航 -->
+<header class="sticky top-0 z-40 w-full h-14 bg-bg-surface border-b border-border-default shrink-0">
+<div class="max-w-[1440px] h-full mx-auto px-6 flex items-center justify-between gap-6">
+<!-- Left: Logo & Nav -->
+<div class="flex items-center gap-6 shrink-0">
+<a class="flex items-center gap-2" href="#">
+<div class="w-6 h-6 rounded bg-action-primary flex items-center justify-center text-white">
+<span class="material-symbols-outlined text-[16px]">terminal</span>
+</div>
+<span class="font-bold text-[16px] tracking-tight text-text-primary">PromptVault</span>
+</a>
+<nav class="hidden md:flex items-center gap-5 text-[14px]">
+<a class="text-text-primary font-semibold" href="#">探索</a>
+<a class="text-text-secondary hover:text-text-primary transition-colors" href="#">分类</a>
+</nav>
+</div>
+<!-- Center: Search -->
+<div class="flex-1 max-w-lg hidden sm:block">
+<div class="relative flex items-center w-full">
+<span class="material-symbols-outlined absolute left-2.5 text-[18px] text-text-muted pointer-events-none">search</span>
+<input class="w-full h-8 pl-8 pr-12 bg-bg-surface border border-border-default rounded-md text-[13px] placeholder:text-text-muted focus:outline-none focus:border-action-primary focus:ring-1 focus:ring-action-primary transition-all" placeholder="搜索 Prompt、风格、模型或标签" type="text">
+<kbd class="absolute right-2 px-1.5 py-0.5 border border-border-default rounded bg-bg-page font-mono text-[10px] text-text-muted leading-none">⌘K</kbd>
+</div>
+</div>
+<!-- Right: Lang, Collections, Login -->
+<div class="flex items-center gap-3 shrink-0"><div class="hidden lg:flex items-center border border-border-default rounded-md bg-bg-surface text-[12px] p-0.5"><button class="px-2 py-0.5 font-medium rounded bg-bg-page text-text-primary" type="button">中文</button><span class="text-text-muted text-[11px] px-0.5">/</span><button class="px-2 py-0.5 text-text-secondary hover:text-text-primary transition-colors" type="button">EN</button></div><a class="hidden md:flex items-center gap-1.5 px-2.5 py-1.5 rounded-md border border-border-default bg-bg-surface text-[13px] text-text-secondary hover:border-border-hover hover:text-text-primary transition-colors" href="#"><span class="material-symbols-outlined text-[16px]">bookmark_border</span><span class="">收藏</span></a><a class="inline-flex items-center justify-center px-3 py-1.5 rounded-md bg-action-primary hover:bg-action-primary-hover text-[13px] font-medium text-white transition-colors" href="#">登录</a><div class="w-8 h-8 rounded-full bg-zinc-200 border border-border-default overflow-hidden flex items-center justify-center cursor-pointer hover:border-border-hover transition-colors shrink-0" title="用户头像"><span class="material-symbols-outlined text-text-secondary text-[18px]">person</span></div></div>
+</div>
+</header>
+<!-- 主内容区 -->
+<main class="flex-1 max-w-[1440px] w-full mx-auto px-6 py-4 flex flex-col gap-4">
+<!-- 面包屑与快捷动作条 -->
+<div class="flex items-center justify-between shrink-0">
+<nav class="flex items-center gap-1.5 text-[13px] text-text-secondary">
+<a class="hover:text-text-primary transition-colors flex items-center gap-0.5" href="#">
+<span class="material-symbols-outlined text-[15px]">arrow_back</span>
+<span class="">探索库</span>
+</a>
+<span class="text-text-muted">/</span>
+<a class="hover:text-text-primary transition-colors" href="#">视觉设计</a>
+<span class="text-text-muted">/</span>
+<a class="hover:text-text-primary transition-colors" href="#">海报设计</a>
+<span class="text-text-muted">/</span>
+<span class="text-text-primary font-medium">复古城市旅行海报</span>
+</nav>
+<div class="flex items-center gap-2"><button class="inline-flex items-center gap-1.5 h-9 px-3 rounded-md border border-border-default bg-bg-surface text-[13px] text-text-primary hover:bg-bg-page hover:border-border-hover transition-colors shadow-xs" type="button"><span class="material-symbols-outlined text-[16px] text-text-secondary">share</span><span class="">分享</span></button><button class="inline-flex items-center gap-1.5 h-9 px-3 rounded-md border border-border-default bg-bg-surface text-[13px] text-text-primary hover:bg-bg-page hover:border-border-hover transition-colors shadow-xs" id="save-btn" type="button"><span class="material-symbols-outlined text-[16px] text-text-secondary" id="save-icon">bookmark_border</span><span id="save-text" class="">收藏</span></button></div>
+</div>
+<!-- 主双栏核心区域 (56% 左侧 Visual Column / 44% 右侧 Prompt Column) -->
+<!-- 优化适配 1440x900 首屏无滚动完全呈现 -->
+<div class="flex flex-col lg:flex-row gap-6 items-start w-full">
+<!-- 左侧 Visual Column (56%) -->
+<div class="w-full lg:w-[56%] flex flex-col gap-3 shrink-0">
+<!-- ImageViewer: 保持 3:4 原始比例，优雅浅灰中性容器，最大高度受控适应 1440x900 -->
+<div class="relative w-full rounded-lg bg-[#ECECE9] border border-border-default overflow-hidden flex items-center justify-center" style="max-height: 520px;">
+<!-- 3:4 比例控制容器 -->
+<div class="relative w-full flex items-center justify-center aspect-[3/4]" style="max-height: 520px;">
+<img alt="复古城市旅行海报主预览" class="w-full h-full object-contain transition-opacity duration-200" id="main-preview-img" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBWyZK9HZ47kQNdZBcajsvTnSic0Uv8M6u5XXY5PEJzRroPpatCeIfjQQMdLATQWxHqc_vm1YfpBATOzGUjXx4dwB43CkAzmgK4EiUR5jhv5d6nejkhZMjQn6r3UIdcdE95t0tWSwBSA0eBcEkukLIxa87GWbpKeNsB25srABvheYVv4Snk6Is94Or85yrvm7IublVtn0RbySozCZm0d-DVyOiFQyoxuLjdeGUTELbxYgsd3p6og6Ov">
+<!-- 左上角轻量比例胶囊 -->
+<div class="absolute top-2.5 left-2.5 px-2 py-0.5 rounded bg-bg-surface/90 border border-border-default backdrop-blur-xs font-mono text-[11px] text-text-primary flex items-center gap-1.5 shadow-xs">
+<span class="w-1.5 h-1.5 rounded-full bg-status-success"></span>
+<span class="">3:4</span>
+<span class="text-text-muted">|</span>
+<span id="canvas-tag" class="">天津 · 清晨</span>
+</div>
+<!-- 右上角轻量「⛶ 点击全屏 / Lightbox」图标 -->
+<button class="absolute top-2.5 right-2.5 flex items-center gap-1 px-2 py-1 rounded bg-bg-surface/90 border border-border-default hover:border-border-hover text-text-primary text-[12px] backdrop-blur-xs shadow-xs transition-all focus:outline-none" id="open-lightbox-btn" title="点击全屏检视" type="button">
+<span class="material-symbols-outlined text-[15px] text-text-secondary">fullscreen</span>
+<span class="font-medium text-[11px]">全屏检视</span>
+</button>
+</div>
+</div>
+<!-- ImageGallery 缩略图栏：4 张同系列变体卡片 -->
+<div class="grid grid-cols-4 gap-2.5 w-full">
+<button class="thumb-btn group relative aspect-[3/4] rounded-md overflow-hidden border-2 border-action-primary p-0.5 bg-bg-surface transition-all focus:outline-none" data-city="天津" data-img="https://lh3.googleusercontent.com/aida-public/AB6AXuAaIzHLBSccPyZvk6OTZYT3TslFAITiBeXHVS0BqOKIPclIsCvaqdjColmSyVT3g8tyQXBZ_gb0HhBd5Sb81t3t65sKctOZlVpa2yhCuuGMCj8huQsrGqcC7NfQoxrN3-XEVernnrDabZ2uXH2kxp0Q9QfhulcRs-hoBdv7QtB5BeCtnxScNxxB8U6VUZUWXGcaAluEvPJ0192EsUR6ButLwydHK_Y-EqChsQvBPbYtvsZXT7OuTFHv" data-time="清晨" type="button">
+<img alt="天津海报" class="w-full h-full object-cover rounded-[3px]" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAaIzHLBSccPyZvk6OTZYT3TslFAITiBeXHVS0BqOKIPclIsCvaqdjColmSyVT3g8tyQXBZ_gb0HhBd5Sb81t3t65sKctOZlVpa2yhCuuGMCj8huQsrGqcC7NfQoxrN3-XEVernnrDabZ2uXH2kxp0Q9QfhulcRs-hoBdv7QtB5BeCtnxScNxxB8U6VUZUWXGcaAluEvPJ0192EsUR6ButLwydHK_Y-EqChsQvBPbYtvsZXT7OuTFHv">
+<span class="absolute bottom-1 inset-x-1 py-0.5 text-center bg-black/60 text-white rounded font-mono text-[10px] leading-tight backdrop-blur-xs">天津</span>
+</button>
+<button class="thumb-btn group relative aspect-[3/4] rounded-md overflow-hidden border border-border-default hover:border-border-hover p-0.5 bg-bg-surface transition-all focus:outline-none" data-city="京都" data-img="https://lh3.googleusercontent.com/aida-public/AB6AXuBoJYicZASlTvhmrt4a1RVnDpURloStegJvuzgUYiXIMqN3K-xrjBouTbKiKEqmoIUMfLxvIUXSR1LkyzN7n0HQFoYOQF8899YBFfPaTuecE8DIMtnoDpOzmB-YioOsqqqSem_xCqkHsKFzfZytiTadPgm6VNyjlbg94ENgO-jGEUvQ6hWMzPyoZrGAJCkWwOXyR89Zh0z_zt7csRhn2GdCysdxjdqwaQQmIlhX8T3m0Fmlkj3f4755" data-time="黄昏" type="button">
+<img alt="京都海报" class="w-full h-full object-cover rounded-[3px]" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBoJYicZASlTvhmrt4a1RVnDpURloStegJvuzgUYiXIMqN3K-xrjBouTbKiKEqmoIUMfLxvIUXSR1LkyzN7n0HQFoYOQF8899YBFfPaTuecE8DIMtnoDpOzmB-YioOsqqqSem_xCqkHsKFzfZytiTadPgm6VNyjlbg94ENgO-jGEUvQ6hWMzPyoZrGAJCkWwOXyR89Zh0z_zt7csRhn2GdCysdxjdqwaQQmIlhX8T3m0Fmlkj3f4755">
+<span class="absolute bottom-1 inset-x-1 py-0.5 text-center bg-black/60 text-white rounded font-mono text-[10px] leading-tight backdrop-blur-xs">京都</span>
+</button>
+<button class="thumb-btn group relative aspect-[3/4] rounded-md overflow-hidden border border-border-default hover:border-border-hover p-0.5 bg-bg-surface transition-all focus:outline-none" data-city="里斯本" data-img="https://lh3.googleusercontent.com/aida-public/AB6AXuDYfXeitxs9g4Z0gKQp5ettc00bBUjbfOs3WO1t7X0hi_HXskHpqqCLXmWZQsXs_EWSkhnAyi_zmebc6V22m8bPG__svoy60pHVkw_UDxtnx6yn7ni1ToTSUwC-8rE9Lit1fqaj-xdKD6VYgiGhMPcDeai83m3_meCVMwcQ7yVD9A1Dld2V0w4w4t66oNe3HF6ajj0aqYHZ39FACDnBtB9YWf86w7IxTCxoLuFEvqyYhbhLyuNC7xux" data-time="白天" type="button">
+<img alt="里斯本海报" class="w-full h-full object-cover rounded-[3px]" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDYfXeitxs9g4Z0gKQp5ettc00bBUjbfOs3WO1t7X0hi_HXskHpqqCLXmWZQsXs_EWSkhnAyi_zmebc6V22m8bPG__svoy60pHVkw_UDxtnx6yn7ni1ToTSUwC-8rE9Lit1fqaj-xdKD6VYgiGhMPcDeai83m3_meCVMwcQ7yVD9A1Dld2V0w4w4t66oNe3HF6ajj0aqYHZ39FACDnBtB9YWf86w7IxTCxoLuFEvqyYhbhLyuNC7xux">
+<span class="absolute bottom-1 inset-x-1 py-0.5 text-center bg-black/60 text-white rounded font-mono text-[10px] leading-tight backdrop-blur-xs">里斯本</span>
+</button>
+<button class="thumb-btn group relative aspect-[3/4] rounded-md overflow-hidden border border-border-default hover:border-border-hover p-0.5 bg-bg-surface transition-all focus:outline-none" data-city="台北" data-img="https://lh3.googleusercontent.com/aida-public/AB6AXuBCtOJfK4mHVyr5CjZEq1B8gtJOLifryg91PtNiUn8ItgjP6j2Hjm5OcvfQzKo89i8AhRKtTN8uPIpTNkIFoWNu7avmA06oOK254FaSr-x8lip-oMA88Cruz8sO-L1bnqTaWekGwmqHTBkcgFSxIbblgQUkUWtlGPGeLt50o4G0PLDTlyexeEqrYnaKfylSqpZJ0Yvk8FbIaApNPrAmnklSDJWj-svYU_cxJmwCPn6n4zmPwEjVNr39" data-time="夜晚" type="button">
+<img alt="台北海报" class="w-full h-full object-cover rounded-[3px]" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBCtOJfK4mHVyr5CjZEq1B8gtJOLifryg91PtNiUn8ItgjP6j2Hjm5OcvfQzKo89i8AhRKtTN8uPIpTNkIFoWNu7avmA06oOK254FaSr-x8lip-oMA88Cruz8sO-L1bnqTaWekGwmqHTBkcgFSxIbblgQUkUWtlGPGeLt50o4G0PLDTlyexeEqrYnaKfylSqpZJ0Yvk8FbIaApNPrAmnklSDJWj-svYU_cxJmwCPn6n4zmPwEjVNr39">
+<span class="absolute bottom-1 inset-x-1 py-0.5 text-center bg-black/60 text-white rounded font-mono text-[10px] leading-tight backdrop-blur-xs">台北</span>
+</button>
+</div>
+</div>
+<!-- 右侧 Prompt Column (44%) -->
+<div class="w-full lg:w-[44%] flex flex-col gap-3">
+<!-- Header & 标题与 Metadata 微标 -->
+<div class="flex flex-col gap-1.5">
+<h1 class="text-[20px] font-bold tracking-tight text-text-primary leading-tight">
+            复古编辑设计风格的城市旅行海报
+          </h1>
+<!-- 一行轻量微标 (紧凑优雅) -->
+<div class="flex flex-wrap items-center gap-1.5 text-[11px]"><span class="inline-flex items-center gap-1.5 font-medium text-text-primary"><span class="">ChatGPT Image / DALL·E 3</span></span><span class="text-text-muted">·</span><span class="text-text-secondary">海报设计</span><span class="text-text-muted">·</span><span class="text-text-secondary font-mono">比例 3:4</span><span class="text-text-muted">·</span><span class="text-text-secondary">源语言: 中文</span><span class="text-text-muted">·</span><span class="text-text-muted text-[11px]">#城市旅行</span><span class="text-text-muted text-[11px]">#复古排版</span></div>
+</div>
+<!-- VariableGroup 动态变量调优 (清晰紧凑表单) -->
+<div class="rounded-lg border border-border-default bg-bg-surface p-3 flex flex-col gap-2.5"><div class="flex items-center justify-between border-b border-border-default pb-1.5"><div class="flex items-center gap-1.5"><span class="material-symbols-outlined text-[16px] text-action-primary">tune</span><span class="text-[13px] font-semibold text-text-primary">自定义 Prompt 变量</span></div><button class="text-[11px] text-text-secondary hover:text-action-primary flex items-center gap-0.5 transition-colors" id="reset-variables" type="button"><span class="material-symbols-outlined text-[13px]">restart_alt</span><span class="">重置</span></button></div><div class="grid grid-cols-2 gap-2.5"><div class="flex flex-col gap-1"><label class="text-[11px] font-medium text-text-secondary" for="var-city">目标城市</label><input class="w-full h-8 px-2.5 rounded border border-border-default bg-bg-surface text-[13px] text-text-primary focus:outline-none focus:border-action-primary focus:ring-1 focus:ring-action-primary transition-all" id="var-city" placeholder="输入城市名称" type="text" value="天津"></div><div class="flex flex-col gap-1"><label class="text-[11px] font-medium text-text-secondary" for="var-style">视觉美学</label><div class="relative flex items-center"><select class="w-full h-8 pl-2.5 pr-7 rounded border border-border-default bg-bg-surface text-[13px] text-text-primary appearance-none focus:outline-none focus:border-action-primary focus:ring-1 focus:ring-action-primary transition-all cursor-pointer" id="var-style"><option selected="" value="复古编辑设计">复古编辑设计</option><option value="电影海报">电影海报</option><option value="极简主义">极简主义</option><option value="日系杂志">日系杂志</option></select><span class="material-symbols-outlined absolute right-1.5 text-[16px] text-text-muted pointer-events-none">expand_more</span></div></div><div class="flex flex-col gap-1"><label class="text-[11px] font-medium text-text-secondary" for="var-time">光照时段</label><div class="relative flex items-center"><select class="w-full h-8 pl-2.5 pr-7 rounded border border-border-default bg-bg-surface text-[13px] text-text-primary appearance-none focus:outline-none focus:border-action-primary focus:ring-1 focus:ring-action-primary transition-all cursor-pointer" id="var-time"><option selected="" value="清晨">清晨</option><option value="白天">白天</option><option value="黄昏">黄昏</option><option value="夜晚">夜晚</option></select><span class="material-symbols-outlined absolute right-1.5 text-[16px] text-text-muted pointer-events-none">expand_more</span></div></div><div class="flex flex-col gap-1"><label class="text-[11px] font-medium text-text-secondary" for="var-mood">情感基调</label><input class="w-full h-8 px-2.5 rounded border border-border-default bg-bg-surface text-[13px] text-text-primary focus:outline-none focus:border-action-primary focus:ring-1 focus:ring-action-primary transition-all" id="var-mood" placeholder="输入基调风格" type="text" value="安静、温暖"></div></div></div>
+<!-- Prompt 语言 Tabs 与 Resolved Prompt 内容卡片 -->
+<div class="flex flex-col gap-2">
+<!-- 语言 Tabs & 高亮控制 -->
+<div class="flex items-center justify-between">
+<div class="flex items-center p-0.5 rounded-md bg-zinc-200/60 border border-border-default">
+<button class="px-2.5 py-1 rounded text-[12px] font-semibold bg-bg-surface text-text-primary shadow-xs transition-all" id="tab-zh" type="button">
+                中文（当前）
+              </button>
+<button class="px-2.5 py-1 rounded text-[12px] font-medium text-text-secondary hover:text-text-primary transition-all" id="tab-en" type="button">
+                English · 原文
+              </button>
+</div>
+<div class="flex items-center gap-2">
+<span class="font-mono text-[11px] text-text-muted" id="token-counter">约 78 Tokens</span>
+</div>
+</div>
+<!-- Resolved Prompt 卡片: 自然无衬线字体，优雅行高，替换变量浅蓝微高亮，未填变量保留占位符 -->
+<div class="rounded-lg border border-border-default bg-bg-surface p-3.5 flex flex-col gap-2.5">
+<!-- 中文展示 -->
+<div class="text-[13.5px] leading-[1.65] text-text-primary whitespace-pre-wrap select-text font-normal" id="prompt-view-zh">
+              创作一张<span class="var-chip" id="token-style">复古编辑设计</span>风格的城市旅行海报，主体城市为<span class="var-chip" id="token-city">天津</span>，时间设定为<span class="var-chip" id="token-time">清晨</span>，整体氛围<span class="var-chip" id="token-mood">安静、温暖</span>。画面具备经典胶片颗粒与手工丝网印刷触感，结合优雅日文排版与极简网格排版美学，色调以温润奶油白、复古赤褐色与水洗青蓝色为主，光影柔和，构图平衡。
+            </div>
+<!-- 英文展示 (默认隐藏) -->
+<div class="hidden text-[13.5px] leading-[1.65] text-text-primary whitespace-pre-wrap select-text font-normal" id="prompt-view-en">
+              Create an editorial vintage travel poster for the city of <span class="var-chip" id="token-city-en">Tianjin</span>, rendered in a refined <span class="var-chip" id="token-style-en">vintage editorial design</span> style. The setting is <span class="var-chip" id="token-time-en">early morning</span> with a <span class="var-chip" id="token-mood-en">quiet and warm</span> ambiance. Subtle film grain and risograph texture, elegant Japanese editorial typography layout, muted cream ochre and faded indigo palette, soft atmospheric illumination.
+            </div>
+<!-- 模型参数胶囊 -->
+<div class="pt-2 border-t border-border-default/70 flex flex-wrap items-center gap-1.5 font-mono text-[11px] text-text-secondary"><span class="text-[11px] font-medium text-text-muted font-sans mr-0.5">模型参数</span><span class="px-1.5 py-0.5 rounded bg-zinc-100 text-zinc-600 border border-border-default/70 font-mono text-[11px]">--ar 3:4</span><span class="px-1.5 py-0.5 rounded bg-zinc-100 text-zinc-600 border border-border-default/70 font-mono text-[11px]">--v 6.0</span><span class="px-1.5 py-0.5 rounded bg-zinc-100 text-zinc-600 border border-border-default/70 font-mono text-[11px]">--style raw</span></div>
+</div>
+</div>
+<!-- Copy Prompt 主操作：全宽醒目蓝色主按钮 -->
+<div class="flex flex-col gap-1.5"><button class="w-full h-10 px-4 rounded-lg bg-action-primary hover:bg-action-primary-hover font-medium text-[14px] text-white transition-all duration-150 flex items-center justify-center gap-2 shadow-xs focus:outline-none" id="copy-prompt-btn" type="button"><span class="material-symbols-outlined text-[18px]" id="copy-btn-icon">content_copy</span><span id="copy-btn-text" class="">复制 Prompt</span></button><div class="flex items-center justify-end text-[11px] text-text-muted px-0.5"><span class="">快捷键: <kbd class="px-1 py-0.5 border border-border-default rounded bg-bg-surface font-mono text-[10px]">⌘ C</kbd></span></div></div>
+</div>
+</div>
+<!-- 次级内容 (Secondary Content，位于双栏下方) -->
+<div class="w-full flex flex-col gap-6 pt-4 border-t border-border-default mt-2">
+<!-- 「为什么这个 Prompt 有效？（架构师出图建议与排版避坑）」可折叠组件，默认折叠收起 -->
+<div class="border border-border-default rounded-lg bg-bg-surface overflow-hidden">
+<button class="w-full px-4 py-3 flex items-center justify-between text-left text-[14px] text-text-primary hover:bg-bg-page transition-colors select-none" id="toggle-why-btn" type="button">
+<div class="flex items-center gap-2 font-medium">
+<span class="material-symbols-outlined text-[18px] text-action-primary">psychology</span>
+<span class="">为什么这个 Prompt 有效？（架构师出图建议与排版避坑）</span>
+</div>
+<span class="material-symbols-outlined text-[20px] text-text-muted transition-transform duration-200" id="why-chevron">expand_more</span>
+</button>
+<div class="hidden px-4 pb-4 text-[13px] text-text-secondary border-t border-border-default/60 pt-3 space-y-2.5 leading-relaxed" id="why-body">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+<div class="p-2.5 rounded border border-border-default bg-bg-page">
+<div class="font-medium text-text-primary mb-1">文字排版兼容机制</div>
+<p class="">若在 DALL-E 3 中使用，建议在末尾补充具体标题排版要求，如 <code>Title text: 'TIANJIN' in elegant serif</code> 即可保证字体稳定出现。</p>
+</div>
+<div class="p-2.5 rounded border border-border-default bg-bg-page">
+<div class="font-medium text-text-primary mb-1">色彩倾斜度控制</div>
+<p class="">“水洗青蓝”与“复古赤褐”的经典对撞色彩词，能强力抑制模型默认生成高饱和、油腻的现代数码插画质感。</p>
+</div>
+<div class="p-2.5 rounded border border-border-default bg-bg-page">
+<div class="font-medium text-text-primary mb-1">排坑负向提示词 (Negative)</div>
+<p class="font-mono text-[12px]">3d render, glossy, oversaturated, neon glow, distorted typography, blurry edges</p>
+</div>
+</div>
+</div>
+</div>
+<!-- 「相关灵感推荐」使用 Masonry 风格 PromptCard 瀑布流卡片 (与 Explore 完全一致) -->
+<div class="flex flex-col gap-3">
+<div class="flex items-end justify-between">
+<div>
+<h2 class="text-[16px] font-bold text-text-primary">相关灵感推荐</h2>
+<p class="text-[12px] text-text-secondary mt-0.5">同属复古排版与旅行视觉设计架构的精选工程 Prompt</p>
+</div>
+<a class="text-[13px] text-action-primary hover:text-action-primary-hover flex items-center gap-1 transition-colors font-medium" href="#">
+<span class="">浏览全部海报风格</span>
+<span class="material-symbols-outlined text-[15px]">arrow_forward</span>
+</a>
+</div>
+<!-- 瀑布流风格卡片网格 (4列) -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+<!-- Card 1 -->
+<a class="group flex flex-col rounded-lg border border-border-default bg-bg-surface overflow-hidden hover:border-border-hover transition-colors" href="#">
+<div class="w-full aspect-[3/4] bg-[#ECECE9] overflow-hidden">
+<img alt="北欧极光海报" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.02]" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD8W8M5mBjHRETLJ9ohFPj-ZrJh7LqqdPYeB9GEVpFt8dLrcRYipHQTB9zQX6EeoBoFCY_8Ec7JBzsSe-XqdZU7RjYCcQwlWfYoT8rM_JuUNrbY_u-e644CjBgkolWix_X2mVOMToaba6IPETL4XQf7tflFuqiSGha7LyFU-t0aEm85oHHZEfa2rBLk0M0J6TtxxbIHPt5iKelWy0W3I0hDHpsKwhgrfmKf8BndD7T6ZXBxCvGfCrap">
+</div>
+<div class="p-3 flex flex-col gap-1">
+<h3 class="text-[13px] font-semibold text-text-primary line-clamp-1 group-hover:text-action-primary transition-colors">北欧峡湾极简主义地理画报</h3>
+<div class="flex items-center gap-1.5 text-[11px] text-text-secondary">
+<span class="">Midjourney v6</span>
+<span class="">•</span>
+<span class="font-mono">3:4</span>
+</div>
+</div>
+</a>
+<!-- Card 2 -->
+<a class="group flex flex-col rounded-lg border border-border-default bg-bg-surface overflow-hidden hover:border-border-hover transition-colors" href="#">
+<div class="w-full aspect-[3/4] bg-[#ECECE9] overflow-hidden">
+<img alt="昭和建筑画报" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.02]" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAuU8WZlsJ9T3beEXGornrKj_i9FbTJg8egjSItU_fdbQMB5LL2v9p2TgHsO-S-52hhfXFriYjjsF5X3cxXaxy-vF_--q0Z0GaZAtnMbqPTG6e04xgyALVoQpdCVTJxZrr1RGt5N0p_l7CYRX9d425wSwHxSV2Nv68BLq2YXOH-p_HwIfOcFgptS8SArDxkNNiJyZVDync8O7GyLbUy5IualqSA0e_LTah3SvDtZ49M-mdOFcOOy-oM">
+</div>
+<div class="p-3 flex flex-col gap-1">
+<h3 class="text-[13px] font-semibold text-text-primary line-clamp-1 group-hover:text-action-primary transition-colors">70年代昭和建筑与街道纪实</h3>
+<div class="flex items-center gap-1.5 text-[11px] text-text-secondary">
+<span class="">DALL-E 3</span>
+<span class="">•</span>
+<span class="font-mono">3:4</span>
+</div>
+</div>
+</a>
+<!-- Card 3 -->
+<a class="group flex flex-col rounded-lg border border-border-default bg-bg-surface overflow-hidden hover:border-border-hover transition-colors" href="#">
+<div class="w-full aspect-[3/4] bg-[#ECECE9] overflow-hidden">
+<img alt="地中海复古航空海报" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.02]" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD5utBXvUQ8AuYyRc67gBHowAZB_NQD_wP8gHw3GGAnahh2TEsHLrA6wS7rswMgCag_-gknwbQYpHAgQkWdiSxDzmdFh015a6m26YPJICWg4q0VizYnkUzZw11JiKwbCFIDAxJb0sXyAmIyrXNF_oasi08YD-X2HR7sJ6_F8yzks5dUaAC3bo8-R5oe3thuYin03v2zG7v5joITgUIkOX0oeInLxSEICr4xjcjkgbkY2hPmsuULDHiJ">
+</div>
+<div class="p-3 flex flex-col gap-1">
+<h3 class="text-[13px] font-semibold text-text-primary line-clamp-1 group-hover:text-action-primary transition-colors">地中海复古航空旅行复刻</h3>
+<div class="flex items-center gap-1.5 text-[11px] text-text-secondary">
+<span class="">Midjourney v6</span>
+<span class="">•</span>
+<span class="font-mono">3:4</span>
+</div>
+</div>
+</a>
+<!-- Card 4 -->
+<a class="group flex flex-col rounded-lg border border-border-default bg-bg-surface overflow-hidden hover:border-border-hover transition-colors" href="#">
+<div class="w-full aspect-[3/4] bg-[#ECECE9] overflow-hidden">
+<img alt="港风电影海报" class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-[1.02]" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDKbtkytEKekkY5kHt_0okSrDVg9xusbNLvdOxjM8D7gTmQIwrOVEy8Of5_XUcfjSBYkzrVZJnx9n2sgKTZWAlp4qKf0Yxou65gnojxefDcTuKIEnPF_-NjTb7c2EuV5us_caBz3FWNucDXXuvFFIfuGuk3ZmwnT_1yQZvAEaXBqRwBXbDu3Se6c3NWjNk9zwtS4qLb8sU4dAyHf8ayAtZTrGtjenaC3rglWk21zm4DBKF-vFSuuMnJ">
+</div>
+<div class="p-3 flex flex-col gap-1">
+<h3 class="text-[13px] font-semibold text-text-primary line-clamp-1 group-hover:text-action-primary transition-colors">王家卫式复古胶片街头夜景</h3>
+<div class="flex items-center gap-1.5 text-[11px] text-text-secondary">
+<span class="">ChatGPT Image</span>
+<span class="">•</span>
+<span class="font-mono">3:4</span>
+</div>
+</div>
+</a>
+</div>
+</div>
+</div>
+</main>
+<!-- 全屏 Lightbox 弹窗 -->
+<div class="fixed inset-0 z-50 bg-[#111111]/95 hidden flex-col items-center justify-center p-4 backdrop-blur-sm" id="lightbox-modal">
+<div class="absolute top-4 inset-x-6 flex items-center justify-between text-white z-10">
+<div class="flex items-center gap-3">
+<span class="text-[14px] font-medium text-white" id="lightbox-title">复古城市旅行海报 · 原图全屏检视</span>
+<span class="text-[11px] px-2 py-0.5 rounded bg-white/10 font-mono text-white/80">3:4 原始比例</span>
+</div>
+<button class="w-8 h-8 rounded bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors" id="close-lightbox-btn" type="button">
+<span class="material-symbols-outlined text-[18px]">close</span>
+</button>
+</div>
+<div class="max-w-4xl max-h-[85vh] flex items-center justify-center">
+<img alt="全屏大图" class="max-w-full max-h-[85vh] object-contain rounded shadow-2xl" id="lightbox-img" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBWyZK9HZ47kQNdZBcajsvTnSic0Uv8M6u5XXY5PEJzRroPpatCeIfjQQMdLATQWxHqc_vm1YfpBATOzGUjXx4dwB43CkAzmgK4EiUR5jhv5d6nejkhZMjQn6r3UIdcdE95t0tWSwBSA0eBcEkukLIxa87GWbpKeNsB25srABvheYVv4Snk6Is94Or85yrvm7IublVtn0RbySozCZm0d-DVyOiFQyoxuLjdeGUTELbxYgsd3p6og6Ov">
+</div>
+<div class="absolute bottom-4 text-center font-mono text-[12px] text-white/50">
+      按 <kbd class="px-1.5 py-0.5 rounded bg-white/10 text-white/80">ESC</kbd> 退出全屏检视
+    </div>
+</div>
+<!-- 底部 Footer -->
+<footer class="w-full bg-bg-surface border-t border-border-default mt-8 shrink-0">
+<div class="max-w-[1440px] mx-auto px-6 py-4 flex flex-col md:flex-row items-center justify-between gap-3 text-[12px] text-text-secondary"><div class="flex items-center gap-2"><span class="font-medium text-text-primary">© 2026 PromptVault</span></div><div class="flex items-center gap-4"><a class="hover:text-text-primary transition-colors" href="#">探索</a><span class="text-border-default">·</span><a class="hover:text-text-primary transition-colors" href="#">分类</a><span class="text-border-default">·</span><a class="hover:text-text-primary transition-colors" href="#">我的收藏</a></div></div>
+</footer>
+<!-- 交互脚本 -->
+<script>
+    (function() {
+      // DOM Elements
+      const cityInput = document.getElementById('var-city');
+      const styleSelect = document.getElementById('var-style');
+      const timeSelect = document.getElementById('var-time');
+      const moodInput = document.getElementById('var-mood');
+
+      const tokenCity = document.getElementById('token-city');
+      const tokenStyle = document.getElementById('token-style');
+      const tokenTime = document.getElementById('token-time');
+      const tokenMood = document.getElementById('token-mood');
+
+      const tokenCityEn = document.getElementById('token-city-en');
+      const tokenStyleEn = document.getElementById('token-style-en');
+      const tokenTimeEn = document.getElementById('token-time-en');
+      const tokenMoodEn = document.getElementById('token-mood-en');
+
+      const promptViewZh = document.getElementById('prompt-view-zh');
+      const promptViewEn = document.getElementById('prompt-view-en');
+      const tabZh = document.getElementById('tab-zh');
+      const tabEn = document.getElementById('tab-en');
+
+      const copyBtn = document.getElementById('copy-prompt-btn');
+      const copyBtnIcon = document.getElementById('copy-btn-icon');
+      const copyBtnText = document.getElementById('copy-btn-text');
+
+      const resetBtn = document.getElementById('reset-variables');
+      const canvasTag = document.getElementById('canvas-tag');
+      const mainPreviewImg = document.getElementById('main-preview-img');
+      const lightboxImg = document.getElementById('lightbox-img');
+      const thumbBtns = document.querySelectorAll('.thumb-btn');
+
+      // Collapsible Architect Notes
+      const toggleWhyBtn = document.getElementById('toggle-why-btn');
+      const whyBody = document.getElementById('why-body');
+      const whyChevron = document.getElementById('why-chevron');
+
+      // Lightbox
+      const openLightboxBtn = document.getElementById('open-lightbox-btn');
+      const closeLightboxBtn = document.getElementById('close-lightbox-btn');
+      const lightboxModal = document.getElementById('lightbox-modal');
+
+      // Bookmark
+      const saveBtn = document.getElementById('save-btn');
+      const saveIcon = document.getElementById('save-icon');
+      const saveText = document.getElementById('save-text');
+
+      let currentLang = 'zh';
+
+      const enMap = {
+        city: { '天津': 'Tianjin', '京都': 'Kyoto', '里斯本': 'Lisbon', '台北': 'Taipei' },
+        style: {
+          '复古编辑设计': 'vintage editorial design',
+          '电影海报': 'cinematic movie poster',
+          '极简主义': 'minimalist Swiss design',
+          '日系杂志': 'retro Japanese magazine'
+        },
+        time: {
+          '清晨': 'early morning',
+          '白天': 'bright daylight',
+          '黄昏': 'twilight dusk',
+          '夜晚': 'moody night'
+        },
+        mood: {
+          '安静、温暖': 'quiet and warm'
+        }
+      };
+
+      function updateTokens() {
+        const city = cityInput.value.trim();
+        const style = styleSelect.value;
+        const time = timeSelect.value;
+        const mood = moodInput.value.trim();
+
+        // City token update
+        if (city) {
+          tokenCity.textContent = city;
+          tokenCity.className = 'var-chip';
+          tokenCityEn.textContent = enMap.city[city] || city;
+          tokenCityEn.className = 'var-chip';
+        } else {
+          tokenCity.textContent = '{{city}}';
+          tokenCity.className = 'var-chip-empty';
+          tokenCityEn.textContent = '{{city}}';
+          tokenCityEn.className = 'var-chip-empty';
+        }
+
+        // Style token
+        tokenStyle.textContent = style;
+        tokenStyleEn.textContent = enMap.style[style] || style;
+
+        // Time token
+        tokenTime.textContent = time;
+        tokenTimeEn.textContent = enMap.time[time] || time;
+
+        // Mood token
+        if (mood) {
+          tokenMood.textContent = mood;
+          tokenMood.className = 'var-chip';
+          tokenMoodEn.textContent = enMap.mood[mood] || mood;
+          tokenMoodEn.className = 'var-chip';
+        } else {
+          tokenMood.textContent = '{{mood}}';
+          tokenMood.className = 'var-chip-empty';
+          tokenMoodEn.textContent = '{{mood}}';
+          tokenMoodEn.className = 'var-chip-empty';
+        }
+
+        if (canvasTag) {
+          canvasTag.textContent = `${city || '未知城市'} · ${time}`;
+        }
+      }
+
+      cityInput.addEventListener('input', updateTokens);
+      moodInput.addEventListener('input', updateTokens);
+      styleSelect.addEventListener('change', updateTokens);
+      timeSelect.addEventListener('change', updateTokens);
+
+      // Reset
+      resetBtn.addEventListener('click', () => {
+        cityInput.value = '天津';
+        styleSelect.value = '复古编辑设计';
+        timeSelect.value = '清晨';
+        moodInput.value = '安静、温暖';
+        updateTokens();
+      });
+
+      // Tabs
+      tabZh.addEventListener('click', () => {
+        currentLang = 'zh';
+        tabZh.className = 'px-2.5 py-1 rounded text-[12px] font-semibold bg-bg-surface text-text-primary shadow-xs transition-all';
+        tabEn.className = 'px-2.5 py-1 rounded text-[12px] font-medium text-text-secondary hover:text-text-primary transition-all';
+        promptViewZh.classList.remove('hidden');
+        promptViewEn.classList.add('hidden');
+      });
+
+      tabEn.addEventListener('click', () => {
+        currentLang = 'en';
+        tabEn.className = 'px-2.5 py-1 rounded text-[12px] font-semibold bg-bg-surface text-text-primary shadow-xs transition-all';
+        tabZh.className = 'px-2.5 py-1 rounded text-[12px] font-medium text-text-secondary hover:text-text-primary transition-all';
+        promptViewEn.classList.remove('hidden');
+        promptViewZh.classList.add('hidden');
+      });
+
+      // Copy Prompt
+      let copyTimer = null;
+      copyBtn.addEventListener('click', () => {
+        const text = (currentLang === 'zh' ? promptViewZh.innerText : promptViewEn.innerText).trim();
+        const fullPrompt = `${text} --ar 3:4 --v 6.0 --style raw`;
+
+        navigator.clipboard.writeText(fullPrompt).then(() => {
+          copyBtn.classList.replace('bg-action-primary', 'bg-status-success');
+          copyBtn.classList.replace('hover:bg-action-primary-hover', 'bg-status-success');
+          copyBtnIcon.textContent = 'check';
+          copyBtnText.textContent = '已成功复制完整 Prompt！';
+
+          if (copyTimer) clearTimeout(copyTimer);
+          copyTimer = setTimeout(() => {
+            copyBtn.classList.replace('bg-status-success', 'bg-action-primary');
+            copyBtn.classList.replace('bg-status-success', 'hover:bg-action-primary-hover');
+            copyBtnIcon.textContent = 'content_copy';
+            copyBtnText.textContent = '复制完整 Prompt';
+          }, 1800);
+        });
+      });
+
+      // Thumbs Selection
+      thumbBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          thumbBtns.forEach(b => {
+            b.classList.remove('border-2', 'border-action-primary');
+            b.classList.add('border', 'border-border-default');
+          });
+          btn.classList.remove('border', 'border-border-default');
+          btn.classList.add('border-2', 'border-action-primary');
+
+          const newImg = btn.dataset.img;
+          const newCity = btn.dataset.city;
+          const newTime = btn.dataset.time;
+
+          if (newImg) {
+            mainPreviewImg.style.opacity = '0.3';
+            setTimeout(() => {
+              mainPreviewImg.src = newImg;
+              lightboxImg.src = newImg;
+              mainPreviewImg.style.opacity = '1';
+            }, 100);
+          }
+          if (newCity) cityInput.value = newCity;
+          if (newTime) timeSelect.value = newTime;
+          updateTokens();
+        });
+      });
+
+      // Accordion for Architect Notes (Collapsed by default)
+      let whyOpen = false;
+      toggleWhyBtn.addEventListener('click', () => {
+        whyOpen = !whyOpen;
+        if (whyOpen) {
+          whyBody.classList.remove('hidden');
+          whyChevron.style.transform = 'rotate(180deg)';
+        } else {
+          whyBody.classList.add('hidden');
+          whyChevron.style.transform = 'rotate(0deg)';
+        }
+      });
+
+      // Lightbox Modal
+      openLightboxBtn.addEventListener('click', () => {
+        lightboxModal.classList.remove('hidden');
+        lightboxModal.classList.add('flex');
+        document.body.style.overflow = 'hidden';
+      });
+
+      function closeLightbox() {
+        lightboxModal.classList.add('hidden');
+        lightboxModal.classList.remove('flex');
+        document.body.style.overflow = '';
+      }
+
+      closeLightboxBtn.addEventListener('click', closeLightbox);
+      lightboxModal.addEventListener('click', (e) => {
+        if (e.target === lightboxModal) closeLightbox();
+      });
+
+      window.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && !lightboxModal.classList.contains('hidden')) {
+          closeLightbox();
+        }
+      });
+
+      // Bookmark Toggle
+      let saved = false;
+      saveBtn.addEventListener('click', () => {
+        saved = !saved;
+        if (saved) {
+          saveIcon.textContent = 'bookmark';
+          saveIcon.classList.add('text-action-primary');
+          saveText.textContent = '已收藏';
+        } else {
+          saveIcon.textContent = 'bookmark_border';
+          saveIcon.classList.remove('text-action-primary');
+          saveText.textContent = '收藏';
+        }
+      });
+
+      // Initialize tokens
+      updateTokens();
+    })();
+  </script>
+
+
+</body></html>
