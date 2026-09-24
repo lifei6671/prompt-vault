@@ -24,9 +24,12 @@ export async function buildSitemap(db: D1Database): Promise<string> {
   ]);
   const entries = [
     { url: canonicalUrl("/"), lastmod: null },
+    { url: canonicalUrl("/image"), lastmod: null },
     ...prompts.results.map((row) => ({ url: canonicalUrl(`/prompt/${encodeURIComponent(row.slug)}`), lastmod: row.updated_at })),
     ...categories.results.map((row) => ({ url: canonicalUrl(`/category/${encodeURIComponent(row.slug)}`), lastmod: row.updated_at })),
+    ...categories.results.map((row) => ({ url: canonicalUrl(`/image/category/${encodeURIComponent(row.slug)}`), lastmod: row.updated_at })),
     ...tags.results.map((row) => ({ url: canonicalUrl(`/tag/${encodeURIComponent(row.slug)}`), lastmod: row.updated_at })),
+    ...tags.results.map((row) => ({ url: canonicalUrl(`/image/tag/${encodeURIComponent(row.slug)}`), lastmod: row.updated_at })),
   ];
   return `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">

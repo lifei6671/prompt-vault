@@ -8,6 +8,8 @@ import migration4 from "../migrations/0004_reference_image_requirement.sql?raw";
 import { ExplorePage, taxonomyMeta } from "../app/routes/explore-page";
 import { loadExplore } from "../app/routes/explore-page.server";
 import { exploreHref, pageHref } from "../app/lib/explore";
+import { loader as imageCategoryLoader } from "../app/routes/image-category";
+import { loader as imageTagLoader } from "../app/routes/image-tag";
 
 async function applyMigration(sql: string) {
   for (const statement of sql.split(";").map((part) =>
@@ -75,6 +77,9 @@ describe("Category and Tag Explore routes", () => {
       ["/?tag=cinematic", "/tag/cinematic"],
       ["/?category=poster&tag=cinematic&model=Flux", "/category/poster?tag=cinematic&model=Flux"],
       ["/?category=POSTER", "/category/poster"],
+      ["/?category=poster&content_type=image", "/image/category/poster"],
+      ["/?tag=cinematic&content_type=image", "/image/tag/cinematic"],
+      ["/image?category=poster&content_type=all", "/image/category/poster"],
     ]) {
       const response = await redirected(input);
       expect(response).toBeInstanceOf(Response);
@@ -82,6 +87,66 @@ describe("Category and Tag Explore routes", () => {
       expect((response as Response).headers.get("Location")).toBe(location);
     }
     await expect(loadExplore(request("/?category=missing"))).rejects.toMatchObject({ status: 404 });
+  });
+
+  it("keeps image Path authoritative in taxonomy loaders and legacy redirects", async () => {
+    const imageCategory = await imageCategoryLoader({
+      request: request("/image/category/poster?ui_locale=en-US"), params: { slug: "poster" },
+    } as Parameters<typeof imageCategoryLoader>[0]);
+    const imageTag = await imageTagLoader({
+      request: request("/image/tag/cinematic?ui_locale=en-US"), params: { slug: "cinematic" },
+    } as Parameters<typeof imageTagLoader>[0]);
+    expect(imageCategory.filters).toMatchObject({ contentType: "image", category: "poster" });
+    expect(imageTag.filters).toMatchObject({ contentType: "image", tag: "cinematic" });
+    expect(taxonomyMeta(imageCategory)).toContainEqual({ name: "robots", content: "index,follow" });
+    expect(taxonomyMeta(imageCategory)).toContainEqual({ tagName: "link", rel: "canonical",
+      href: "https://vault.disign.me/image/category/poster" });
+    expect(taxonomyMeta(imageTag)).toContainEqual({ tagName: "link", rel: "canonical",
+      href: "https://vault.disign.me/image/tag/cinematic" });
+    const imagePage2 = await loadExplore(request("/image/category/poster?page=2"),
+      { kind: "category", slug: "poster" });
+    expect(taxonomyMeta(imagePage2)).toContainEqual({ tagName: "link", rel: "canonical",
+      href: "https://vault.disign.me/image/category/poster?page=2" });
+    for (const [path, scope] of [
+      ["/image/category/poster?tag=cinematic", { kind: "category", slug: "poster" }],
+      ["/image/tag/cinematic?category=poster", { kind: "tag", slug: "cinematic" }],
+    ] as const) {
+      const data = await loadExplore(request(path), scope);
+      expect(taxonomyMeta(data)).toContainEqual({ name: "robots", content: "noindex,follow" });
+      expect(taxonomyMeta(data)).toContainEqual({ tagName: "link", rel: "canonical",
+        href: "https://vault.disign.me" + path.split("?")[0] });
+    }
+    for (const [path, scope, location] of [
+      ["/category/poster?content_type=image", { kind: "category", slug: "poster" }, "/image/category/poster"],
+      ["/tag/cinematic?content_type=image", { kind: "tag", slug: "cinematic" }, "/image/tag/cinematic"],
+      ["/image/category/poster?content_type=all&model=Flux", { kind: "category", slug: "poster" }, "/image/category/poster?model=Flux"],
+      ["/image/tag/cinematic?content_type=image", { kind: "tag", slug: "cinematic" }, "/image/tag/cinematic"],
+      ["/image/category/poster?content_type=video", { kind: "category", slug: "poster" }, "/image/category/poster"],
+      ["/IMAGE/category/poster", { kind: "category", slug: "poster" }, "/image/category/poster"],
+      ["/image/CATEGORY/poster", { kind: "category", slug: "poster" }, "/image/category/poster"],
+      ["/IMAGE/TAG/cinematic", { kind: "tag", slug: "cinematic" }, "/image/tag/cinematic"],
+      ["/category/poster?content_type=all&model=Flux", { kind: "category", slug: "poster" }, "/category/poster?model=Flux"],
+      ["/tag/cinematic?content_type=&ratio=1%3A1", { kind: "tag", slug: "cinematic" }, "/tag/cinematic?ratio=1%3A1"],
+      ["/category/poster?content_type=video&sort=popular", { kind: "category", slug: "poster" }, "/category/poster?sort=popular"],
+    ] as const) {
+      const response = await loadExplore(request(path), scope).catch((error: Response) => error);
+      expect((response as Response).status).toBe(302);
+      expect((response as Response).headers.get("Location")).toBe(location);
+    }
+    const html = renderToStaticMarkup(createElement(ExplorePage, { loaderData: imageCategory }));
+    expect(html).toContain('action="/image/category/poster"');
+    expect(html).toContain('href="/image/category/poster?ui_locale=en-US&amp;page=2"');
+    expect(html).toContain('href="/image/category/poster?ui_locale=zh-CN"');
+    expect(html).toMatch(/href="\/image\/category\/poster[^"]*" aria-current="true">Images <small>/);
+    expect(html).not.toContain("content_type");
+    expect(html).toContain('class="clear-filters" href="/image?ui_locale=en-US"');
+    const empty = await loadExplore(request("/image/category/empty?ui_locale=en-US"),
+      { kind: "category", slug: "empty" });
+    expect(renderToStaticMarkup(createElement(ExplorePage, { loaderData: empty })))
+      .toContain('href="/image?ui_locale=en-US"');
+    const tagHtml = renderToStaticMarkup(createElement(ExplorePage, { loaderData: imageTag }));
+    expect(tagHtml).toContain('action="/image/tag/cinematic"');
+    expect(tagHtml).not.toContain("content_type");
   });
 
   it("renders full Explore controls with selected taxonomy and localized metadata", async () => {
@@ -118,6 +183,13 @@ describe("Category and Tag Explore routes", () => {
     expect(exploreHref(tagUrl, "tag", "")).toBe("/category/poster?ui_locale=en-US");
     expect(exploreHref(categoryUrl, "category", "photo")).toBe("/category/photo?ui_locale=en-US&model=Flux&tag=cinematic");
     expect(pageHref(categoryUrl, 3)).toContain("/category/poster?");
+    const imageCategoryUrl = new URL("https://vault.disign.me/image/category/poster?ui_locale=en-US&tag=cinematic&page=2");
+    const imageTagUrl = new URL("https://vault.disign.me/image/tag/cinematic?category=poster");
+    expect(exploreHref(imageCategoryUrl, "category", "")).toBe("/image/tag/cinematic?ui_locale=en-US");
+    expect(exploreHref(imageTagUrl, "tag", "")).toBe("/image/category/poster");
+    expect(exploreHref(imageCategoryUrl, "category", "photo")).toBe("/image/category/photo?ui_locale=en-US&tag=cinematic");
+    expect(exploreHref(imageCategoryUrl, "tag", "travel")).toBe("/image/category/poster?ui_locale=en-US&tag=travel");
+    expect(pageHref(imageCategoryUrl, 3)).toBe("/image/category/poster?ui_locale=en-US&tag=cinematic&page=3");
     const categoryHtml = await htmlOf("category", "poster", "?ui_locale=en-US");
     expect(categoryHtml).toContain('action="/category/poster"');
     expect(categoryHtml).not.toContain('name="category" value="poster"');
@@ -154,7 +226,7 @@ describe("Category and Tag Explore routes", () => {
     expect(taxonomyMeta(page2)).toContainEqual({ tagName: "link", rel: "canonical",
       href: "https://vault.disign.me/category/poster?page=2" });
     for (const query of ["?tag=cinematic", "?model=Flux", "?ratio=1%3A1", "?q=poster",
-      "?sort=popular", "?content_type=image", "?source_language=en-US", "?tag=cinematic&page=2"]) {
+      "?sort=popular", "?source_language=en-US", "?tag=cinematic&page=2"]) {
       const data = await scoped("category", "poster", query);
       expect(taxonomyMeta(data)).toContainEqual({ name: "robots", content: "noindex,follow" });
       expect(taxonomyMeta(data)).toContainEqual({ tagName: "link", rel: "canonical",

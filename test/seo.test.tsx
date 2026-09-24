@@ -6,6 +6,7 @@ import migration1 from "../migrations/0001_init.sql?raw";
 import migration2 from "../migrations/0002_i18n.sql?raw";
 import migration4 from "../migrations/0004_reference_image_requirement.sql?raw";
 import Home, { loader as homeLoader, meta as homeMeta } from "../app/routes/home";
+import { loader as imageLoader, meta as imageMeta } from "../app/routes/image";
 import Detail, { loader as detailLoader, meta as detailMeta } from "../app/routes/prompt-detail";
 import { loader as robotsLoader } from "../app/routes/robots.txt";
 import { loader as sitemapLoader } from "../app/routes/sitemap.xml";
@@ -79,16 +80,54 @@ describe("public SEO metadata", () => {
     for (const path of ["/?category=poster&tag=cinematic", "/?category=missing"]) {
       await expect(explore(path)).rejects.toMatchObject({ status: path.includes("missing") ? 404 : 302 });
     }
-    const image = await explore("/?content_type=image&sort=popular");
-    expect(image.filters).toMatchObject({ contentType: "image", sort: "popular" });
-    expect(meta(image)).toContainEqual({ name: "robots", content: "noindex,follow" });
-    for (const query of ["content_type=all", "content_type=video", "sort=latest", "sort=unknown"]) {
+    const legacyImage = await explore("/?content_type=image&sort=popular").catch((error: Response) => error);
+    expect((legacyImage as Response).status).toBe(302);
+    expect((legacyImage as Response).headers.get("Location")).toBe("/image?sort=popular");
+    for (const query of ["content_type=all", "content_type=video", "content_type=", "sort=latest", "sort=unknown"]) {
       const response = await explore("/?" + query).catch((error: Response) => error);
       expect(response).toBeInstanceOf(Response);
       expect((response as Response).headers.get("Location")).toBe("/");
     }
+    for (const query of ["all", "video", ""]) {
+      const response = await explore("/?content_type=" + query + "&model=Flux").catch((error: Response) => error);
+      expect((response as Response).headers.get("Location")).toBe("/?model=Flux");
+    }
+    const imageQuery = await imageLoader({
+      request: request("/image?content_type=all&model=Flux"),
+    } as Parameters<typeof imageLoader>[0]).catch((error: Response) => error) as Response;
+    expect(imageQuery.status).toBe(302);
+    expect(imageQuery.headers.get("Location")).toBe("/image?model=Flux");
     await expect(explore("/?page=0&q=poster")).rejects.toMatchObject({ status: 404 });
     await expect(explore("/?page=3")).rejects.toMatchObject({ status: 404 });
+  });
+
+  it("indexes image Path identities and canonicals filtered image pages to their base Path", async () => {
+    const loadImage = (path: string) => imageLoader({ request: request(path) } as Parameters<typeof imageLoader>[0]);
+    const imageMetadata = (data: Awaited<ReturnType<typeof loadImage>>) =>
+      imageMeta({ loaderData: data } as Parameters<typeof imageMeta>[0]);
+    for (const path of ["/image/", "/image//", "/IMAGE", "/Image/"]) {
+      const normalized = await loadImage(path).catch((error: Response) => error) as Response;
+      expect(normalized.status).toBe(302);
+      expect(normalized.headers.get("Location")).toBe("/image");
+    }
+    const base = await loadImage("/image?ui_locale=en-US");
+    expect(base.filters.contentType).toBe("image");
+    expect(imageMetadata(base)).toContainEqual({ tagName: "link", rel: "canonical", href: "https://vault.disign.me/image" });
+    expect(imageMetadata(base)).toContainEqual({ name: "robots", content: "index,follow" });
+    expect(imageMetadata(base)).toContainEqual({ title: "Images · PromptVault" });
+    const page2 = await loadImage("/image?page=2");
+    expect(imageMetadata(page2)).toContainEqual({ tagName: "link", rel: "canonical", href: "https://vault.disign.me/image?page=2" });
+    for (const query of ["?model=Flux", "?ratio=1%3A1", "?q=poster", "?source_language=en-US", "?sort=popular"]) {
+      const data = await loadImage("/image" + query);
+      expect(imageMetadata(data)).toContainEqual({ name: "robots", content: "noindex,follow" });
+      expect(imageMetadata(data)).toContainEqual({ tagName: "link", rel: "canonical", href: "https://vault.disign.me/image" });
+    }
+    const html = renderToStaticMarkup(createElement(ExplorePage, { loaderData: base }));
+    expect(html).toContain('action="/image"');
+    expect(html).toContain('href="/image?ui_locale=zh-CN"');
+    expect(html).toContain('href="/image?ui_locale=en-US&amp;page=2"');
+    expect(html).toMatch(/href="\/image[^"]*" aria-current="true">Images <small>/);
+    expect(html).not.toContain("content_type");
   });
 
   it("uses taxonomy path metadata and full Explore SSR", async () => {
@@ -162,11 +201,15 @@ describe("crawler resources", () => {
     const xml = await buildSitemap(db);
     expect(queries).toHaveLength(3);
     expect(xml).toContain("<loc>https://vault.disign.me/</loc>");
+    expect(xml).toContain("<loc>https://vault.disign.me/image</loc>");
     expect(xml).toContain("<loc>https://vault.disign.me/prompt/poster</loc><lastmod>2026-09-23T01:02:03Z</lastmod>");
     expect(xml).toContain("<loc>https://vault.disign.me/category/poster</loc><lastmod>2026-09-21T00:00:00Z</lastmod>");
+    expect(xml).toContain("<loc>https://vault.disign.me/image/category/poster</loc><lastmod>2026-09-21T00:00:00Z</lastmod>");
     expect(xml).toContain("<loc>https://vault.disign.me/tag/cinematic</loc><lastmod>2026-09-22T00:00:00Z</lastmod>");
+    expect(xml).toContain("<loc>https://vault.disign.me/image/tag/cinematic</loc><lastmod>2026-09-22T00:00:00Z</lastmod>");
     for (const value of ["/prompt/draft", "/prompt/deleted", "/category/draft-only",
-      "/category/empty", "/tag/draft-only", "/tag/empty", "/model/", "?model=", "?category=", "?tag=", "ui_locale", "prompt_locale", "?q="]) {
+      "/category/empty", "/image/category/draft-only", "/image/category/empty",
+      "/tag/draft-only", "/tag/empty", "/image/tag/draft-only", "/image/tag/empty", "/model/", "?model=", "?category=", "?tag=", "ui_locale", "prompt_locale", "?q="]) {
       expect(xml).not.toContain(value);
     }
     expect(xml.match(/<loc>https:\/\/vault\.disign\.me\/prompt\//g)).toHaveLength(25);

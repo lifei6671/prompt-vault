@@ -15,7 +15,7 @@ export type ExploreFilters = {
   sort: ExploreSort;
 };
 
-export function readExploreFilters(params: URLSearchParams): ExploreFilters {
+export function readExploreFilters(params: URLSearchParams, contentType: ContentType = "all"): ExploreFilters {
   return {
     q: (params.get("q") ?? "").trim(),
     category: params.get("category") ?? "",
@@ -23,23 +23,36 @@ export function readExploreFilters(params: URLSearchParams): ExploreFilters {
     model: params.get("model") ?? "",
     ratio: params.get("ratio") ?? "",
     sourceLanguage: params.get("source_language") ?? "",
-    contentType: params.get("content_type") === "image" ? "image" : "all",
+    contentType,
     sort: params.get("sort") === "recommended" || params.get("sort") === "popular"
       ? params.get("sort") as ExploreSort : "latest",
   };
 }
 
+export function exploreContentType(pathname: string): ContentType {
+  return /^\/image(?:\/|$)/i.test(pathname) ? "image" : "all";
+}
+
+export function explorePath(contentType: ContentType, scope: { kind: "category" | "tag"; slug: string } | null = null): string {
+  const prefix = contentType === "image" ? "/image" : "";
+  return scope ? `${prefix}/${scope.kind}/${encodeURIComponent(scope.slug)}` : prefix || "/";
+}
+
 export function exploreHref(url: URL, key: string, value: string): string {
   const next = new URL(url);
   const scope = exploreScope(url.pathname);
-  if ((key === "category" || key === "tag") && (!scope || scope.kind === key)) {
+  const contentType = exploreContentType(url.pathname);
+  next.searchParams.delete("content_type");
+  if (key === "content_type") {
+    next.pathname = explorePath(value === "image" ? "image" : "all", scope);
+  } else if ((key === "category" || key === "tag") && (!scope || scope.kind === key)) {
     next.searchParams.delete(key);
-    if (value) next.pathname = "/" + key + "/" + encodeURIComponent(value);
+    if (value) next.pathname = explorePath(contentType, { kind: key, slug: value });
     else {
       const other = key === "category" ? "tag" : "category";
       const promoted = next.searchParams.get(other);
       next.searchParams.delete(other);
-      next.pathname = promoted ? "/" + other + "/" + encodeURIComponent(promoted) : "/";
+      next.pathname = explorePath(contentType, promoted ? { kind: other, slug: promoted } : null);
     }
   } else if (value) next.searchParams.set(key, value);
   else next.searchParams.delete(key);
@@ -48,7 +61,7 @@ export function exploreHref(url: URL, key: string, value: string): string {
 }
 
 export function exploreScope(pathname: string): { kind: "category" | "tag"; slug: string } | null {
-  const match = /^\/(category|tag)\/([^/]+)$/.exec(pathname);
+  const match = /^\/(?:image\/)?(category|tag)\/([^/]+)$/.exec(pathname);
   return match ? { kind: match[1] as "category" | "tag", slug: decodeURIComponent(match[2]) } : null;
 }
 

@@ -253,6 +253,7 @@ describe("Prompt admin", () => {
           loaderData: detail, actionData: undefined,
         } as Parameters<typeof AdminPromptEdit>[0]) }] }]);
       const editHtml = renderToStaticMarkup(createElement(RouterProvider, { router: editRouter }));
+      expect(editHtml.indexOf('id="admin-image-title"')).toBeLessThan(editHtml.indexOf('id="admin-basic-title"'));
       expect(editHtml).toContain(locale === "zh-CN" ? "Prompt 正文" : "Prompt body");
       expect(editHtml).toContain("original.png");
       expect(editHtml).toContain("variables_json");

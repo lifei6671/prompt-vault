@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { Locale } from "~/lib/localization";
-import { exploreHref, exploreScope, type ExploreFilters } from "~/lib/explore";
+import { exploreContentType, exploreHref, explorePath, exploreScope, type ExploreFilters } from "~/lib/explore";
 import { uiCopy } from "~/lib/ui-copy";
 import { FilterDropdown, type FilterOption } from "./filter-dropdown";
 
@@ -82,7 +82,7 @@ export function ExploreFiltersBar({ locale, filters, categories, tags, models, r
               aria-label={t.clear + ": " + item.label + " " + item.value}>
               {item.value}<span aria-hidden="true">×</span>
             </a>)}
-            <a className="clear-filters" href={"/?ui_locale=" + locale}>{t.clear}</a>
+            <a className="clear-filters" href={explorePath(exploreContentType(url.pathname)) + "?ui_locale=" + locale}>{t.clear}</a>
           </div>}
         </div>
       </div>

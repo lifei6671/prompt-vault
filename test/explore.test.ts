@@ -8,7 +8,7 @@ import migration1 from "../migrations/0001_init.sql?raw";
 import migration2 from "../migrations/0002_i18n.sql?raw";
 import migration4 from "../migrations/0004_reference_image_requirement.sql?raw";
 import {
-  exploreHref, localeHref, pageHref, previewImageUrl, readExploreFilters, readPage,
+  exploreContentType, exploreHref, explorePath, exploreScope, localeHref, pageHref, previewImageUrl, readExploreFilters, readPage,
   readUiLocale, uiLocaleCookie,
 } from "../app/lib/explore";
 import { listExplorePrompts } from "../app/services/prompt.server";
@@ -21,7 +21,7 @@ async function applyMigration(sql: string) {
   }
 }
 
-const filters = (query = "") => readExploreFilters(new URLSearchParams(query));
+const filters = (query = "", path = "/") => readExploreFilters(new URLSearchParams(query), exploreContentType(path));
 const list = (query = "", locale: "zh-CN" | "en-US" = "zh-CN", page = 1) =>
   listExplorePrompts(env.DB, filters(query), locale, page);
 
@@ -92,7 +92,7 @@ describe("Explore D1 listing", () => {
         .toEqual(["prompt-2", "prompt-1", "prompt-3"]);
       expect(result.total).toBe(26);
     }
-    expect((await list("content_type=image")).total).toBe(26);
+    expect((await listExplorePrompts(env.DB, filters("", "/image"), "zh-CN", 1)).total).toBe(26);
   });
 
   it("filters category, model, ratio, and source language", async () => {
@@ -146,24 +146,34 @@ describe("Explore URL and UI locale", () => {
     expect(pageHref(url, 3)).toBe("/?q=rain&model=Flux&page=3");
   });
 
-  it("parses content and sort safely and preserves query state in tab links", () => {
+  it("takes content type from Path and preserves filters across tabs and taxonomy", () => {
     expect(filters()).toMatchObject({ contentType: "all", sort: "latest" });
-    expect(filters("content_type=image&sort=popular")).toMatchObject({ contentType: "image", sort: "popular" });
-    expect(filters("sort=recommended").sort).toBe("recommended");
-    expect(filters("content_type=video&sort=unknown")).toMatchObject({ contentType: "all", sort: "latest" });
-    const url = new URL("https://vault.disign.me/?ui_locale=en-US&q=rain&category=poster&tag=cinematic&model=Flux&ratio=1%3A1&source_language=en-US&sort=popular&content_type=image&page=2");
-    const imageHref = exploreHref(url, "content_type", "");
-    expect(imageHref).toContain("ui_locale=en-US");
-    expect(imageHref).toContain("q=rain");
-    expect(imageHref).toContain("category=poster");
-    expect(imageHref).toContain("sort=popular");
-    expect(imageHref).not.toContain("content_type=");
-    expect(imageHref).not.toContain("page=");
-    const sortHref = exploreHref(url, "sort", "recommended");
-    expect(sortHref).toContain("content_type=image");
-    expect(sortHref).toContain("sort=recommended");
-    expect(sortHref).not.toContain("page=");
-    expect(exploreHref(url, "tag", "")).not.toContain("tag=");
+    expect(filters("content_type=image&sort=popular")).toMatchObject({ contentType: "all", sort: "popular" });
+    expect(filters("sort=recommended", "/image").sort).toBe("recommended");
+    expect(filters("sort=unknown", "/image")).toMatchObject({ contentType: "image", sort: "latest" });
+    expect(explorePath("all")).toBe("/");
+    expect(explorePath("image")).toBe("/image");
+    for (const path of ["/image/", "/image//", "/IMAGE", "/Image/", "/IMAGE/category/poster", "/image/CATEGORY/poster", "/IMAGE/TAG/cinematic"]) {
+      expect(exploreContentType(path)).toBe("image");
+    }
+    expect(exploreContentType("/images")).toBe("all");
+    for (const kind of ["category", "tag"] as const) {
+      const scope = { kind, slug: "poster" };
+      expect(explorePath("image", scope)).toBe("/image/" + kind + "/poster");
+      expect(exploreScope(explorePath("image", scope))).toEqual(scope);
+      const url = new URL("https://vault.disign.me" + explorePath("image", scope) + "?ui_locale=en-US&q=rain&model=Flux&sort=popular&page=2");
+      expect(exploreHref(url, "content_type", "")).toBe(explorePath("all", scope) + "?ui_locale=en-US&q=rain&model=Flux&sort=popular");
+      expect(exploreHref(new URL("https://vault.disign.me" + explorePath("all", scope)), "content_type", "image"))
+        .toBe(explorePath("image", scope));
+      expect(exploreHref(url, "sort", "recommended"))
+        .toBe(explorePath("image", scope) + "?ui_locale=en-US&q=rain&model=Flux&sort=recommended");
+    }
+    const url = new URL("https://vault.disign.me/image?ui_locale=en-US&q=rain&model=Flux&content_type=all&page=2");
+    expect(exploreHref(url, "content_type", "")).toBe("/?ui_locale=en-US&q=rain&model=Flux");
+    expect(exploreHref(url, "content_type", "image")).toBe("/image?ui_locale=en-US&q=rain&model=Flux");
+    expect(exploreHref(url, "category", "poster")).toBe("/image/category/poster?ui_locale=en-US&q=rain&model=Flux");
+    expect(exploreHref(url, "tag", "cinematic")).toBe("/image/tag/cinematic?ui_locale=en-US&q=rain&model=Flux");
+    expect(exploreHref(url, "sort", "recommended")).not.toContain("content_type");
   });
 
   it("builds the direct image URL with encoded object-key segments", () => {
@@ -201,19 +211,19 @@ describe("Header search scope", () => {
 });
 
 describe("Explore controls", () => {
-  async function renderBar(query: string, locale: "zh-CN" | "en-US" = "en-US") {
-    const url = new URL("https://vault.disign.me/?ui_locale=" + locale + "&" + query);
-    const result = await list(query, locale);
+  async function renderBar(query: string, locale: "zh-CN" | "en-US" = "en-US", path = "/") {
+    const url = new URL("https://vault.disign.me" + path + "?ui_locale=" + locale + "&" + query);
+    const result = await listExplorePrompts(env.DB, filters(query, path), locale, 1);
     return renderToStaticMarkup(createElement(ExploreFiltersBar, {
-      locale, filters: filters(query), categories: result.categories,
+      locale, filters: filters(query, path), categories: result.categories,
       tags: result.tags, models: result.models, ratios: result.ratios,
       total: result.total, url,
     }));
   }
 
   it("renders custom URL dropdowns and real type/sort tabs", async () => {
-    const query = "q=rain&model=Midjourney&ratio=3%3A4&content_type=image&sort=recommended&page=2";
-    const html = await renderBar(query);
+    const query = "q=rain&model=Midjourney&ratio=3%3A4&sort=recommended&page=2";
+    const html = await renderBar(query, "en-US", "/image");
     expect(html).not.toContain("<select");
     expect(html).toContain('id="explore-filter-model"');
     expect(html).toContain('aria-expanded="false"');
@@ -223,7 +233,7 @@ describe("Explore controls", () => {
     expect(html).toContain('disabled="" aria-disabled="true">Videos <small>0</small>');
     expect(html).toContain('disabled="" aria-disabled="true">Text <small>0</small>');
     expect(html).toContain('id="explore-filters"');
-    const url = new URL("https://vault.disign.me/?ui_locale=en-US&" + query);
+    const url = new URL("https://vault.disign.me/image?ui_locale=en-US&" + query);
     for (const [key, value] of [["category", "poster"], ["tag", "cinematic"], ["model", "Flux"],
       ["ratio", "1:1"], ["source_language", "zh-CN"]]) {
       expect(html).toContain('href="' + exploreHref(url, key, value).replaceAll("&", "&amp;") + '"');
@@ -235,7 +245,7 @@ describe("Explore controls", () => {
   it("restores all content and sort active states in SSR markup", async () => {
     for (const contentType of ["all", "image"]) {
       for (const sort of ["recommended", "popular", "latest"]) {
-        const html = await renderBar("content_type=" + contentType + "&sort=" + sort);
+        const html = await renderBar("sort=" + sort, "en-US", contentType === "image" ? "/image" : "/");
         const contentLabel = contentType === "all" ? "All" : "Images";
         const sortLabel = { recommended: "Recommended", popular: "Popular", latest: "Newest" }[sort];
         expect(html).toContain('aria-current="true">' + contentLabel + ' <small>');
@@ -245,8 +255,8 @@ describe("Explore controls", () => {
   });
 
   it("keeps Chinese and English labels and preserves new state in search", async () => {
-    const zh = await renderBar("content_type=image&sort=popular", "zh-CN");
-    const en = await renderBar("content_type=image&sort=popular");
+    const zh = await renderBar("sort=popular", "zh-CN", "/image");
+    const en = await renderBar("sort=popular", "en-US", "/image");
     for (const label of ["模型", "风格分类", "画幅比例", "Prompt 语言", "标签", "热门"]) {
       expect(zh).toContain(label);
     }
@@ -254,11 +264,12 @@ describe("Explore controls", () => {
       expect(en).toContain(label);
     }
     const header = renderToStaticMarkup(createElement(SiteHeader, {
-      locale: "en-US", filters: filters("q=rain&content_type=image&sort=popular"),
-      url: new URL("https://vault.disign.me/?ui_locale=en-US&q=rain&content_type=image&sort=popular"),
+      locale: "en-US", filters: filters("q=rain&sort=popular", "/image"),
+      url: new URL("https://vault.disign.me/image?ui_locale=en-US&q=rain&sort=popular"),
     }));
-    expect(header).toContain('name="content_type" value="image"');
+    expect(header).toContain('action="/image"');
+    expect(header).not.toContain('name="content_type"');
     expect(header).toContain('name="sort" value="popular"');
-    expect(header).toContain('href="/?ui_locale=en-US&amp;q=rain&amp;content_type=image&amp;sort=popular#explore-filters"');
+    expect(header).toContain('<nav aria-label="Main navigation" class="site-nav"><a href="/" aria-current="page">Explore</a></nav>');
   });
 });

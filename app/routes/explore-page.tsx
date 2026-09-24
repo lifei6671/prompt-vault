@@ -4,6 +4,7 @@ import { PromptGrid } from "~/components/prompt-grid";
 import { Pagination } from "~/components/pagination";
 import { uiCopy } from "~/lib/ui-copy";
 import { canonicalUrl } from "~/lib/seo";
+import { exploreContentType, explorePath } from "~/lib/explore";
 import type { loadExplore } from "./explore-page.server";
 
 export function ExplorePage({ loaderData }: { loaderData: Awaited<ReturnType<typeof loadExplore>> }) {
@@ -25,7 +26,7 @@ export function ExplorePage({ loaderData }: { loaderData: Awaited<ReturnType<typ
           : <section className="empty-state">
               <h2>{t.emptyTitle}</h2>
               <p>{t.emptyDescription}</p>
-              <a href={`/?ui_locale=${locale}`}>{t.clear}</a>
+              <a href={explorePath(exploreContentType(url.pathname)) + "?ui_locale=" + locale}>{t.clear}</a>
             </section>}
         <Pagination url={url} page={page} totalPages={totalPages} locale={locale} />
       </main>
@@ -45,7 +46,7 @@ export function taxonomyMeta(data: Awaited<ReturnType<typeof loadExplore>> | und
     { title: taxonomy.name + " · " + title + " · PromptVault" },
     { name: "description", content: description },
     { tagName: "link", rel: "canonical",
-      href: canonicalUrl("/" + taxonomy.kind + "/" + encodeURIComponent(taxonomy.slug), data.filtered ? 1 : data.page) },
+      href: canonicalUrl(explorePath(data.filters.contentType, taxonomy), data.filtered ? 1 : data.page) },
     { name: "robots", content: data.filtered ? "noindex,follow" : "index,follow" },
   ];
 }

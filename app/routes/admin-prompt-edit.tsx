@@ -75,10 +75,6 @@ export default function AdminPromptEdit({ loaderData, actionData }: Route.Compon
     {prompt.deleted_at && <p className="admin-field-note" role="status">{t.readOnly}</p>}
     <div className="admin-editor-layout">
       <div className="admin-editor-main">
-        <Form id="admin-prompt-form" method="post" className="admin-editor-main">
-          <input type="hidden" name="_intent" value="save" />
-          <AdminPromptFields locale={locale} source={prompt.source_language} taxonomy={taxonomy} prompt={prompt} editable={editable} />
-        </Form>
         <section className="admin-editor-panel" aria-labelledby="admin-image-title">
           <div className="admin-editor-panel-head"><h2 id="admin-image-title">{t.imageMetadata}</h2></div>
           <div className="admin-new-upload-layout">
@@ -111,6 +107,10 @@ export default function AdminPromptEdit({ loaderData, actionData }: Route.Compon
             </div>
           </div>
         </section>
+        <Form id="admin-prompt-form" method="post" className="admin-editor-main">
+          <input type="hidden" name="_intent" value="save" />
+          <AdminPromptFields locale={locale} source={prompt.source_language} taxonomy={taxonomy} prompt={prompt} editable={editable} />
+        </Form>
       </div>
       <aside className="admin-editor-side" aria-label={t.lifecycle}>
         <section className="admin-side-panel"><div className="admin-side-heading"><h2>{t.lifecycle}</h2>
