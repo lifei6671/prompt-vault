@@ -1,7 +1,9 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { readFileSync, realpathSync } from "node:fs";
+import { createRequire } from "node:module";
 import { test } from "node:test";
 import { checkReleaseConfig, parseJsonc } from "./release-check.mjs";
+import { forbiddenPorts } from "./vitest-safe-ports.mjs";
 
 const config = parseJsonc(readFileSync(new URL("../wrangler.jsonc", import.meta.url), "utf8"), "wrangler.jsonc");
 const schema = JSON.parse(readFileSync(new URL("../node_modules/wrangler/config-schema.json", import.meta.url), "utf8"));
@@ -40,9 +42,30 @@ test("cache and observability settings are required", () => {
   assert.match(errors, /cache.enabled/);
   assert.match(errors, /redact_query_string/);
 });
+test("admin authorization values stay in Worker secrets", () => {
+  const exposed = valid();
+  exposed.vars.ADMIN_EMAILS = "admin@example.com";
+  exposed.vars.CF_ACCESS_AUD = "audience-id";
+  assert.match(checkReleaseConfig(exposed, schema, hasFile).join(" "), /must not be committed under vars/);
+
+  const missing = valid();
+  missing.secrets.required = ["ADMIN_EMAILS"];
+  assert.match(checkReleaseConfig(missing, schema, hasFile).join(" "), /secrets.required/);
+});
 test("deploy script gates the actual deploy command", () => {
   const scripts = JSON.parse(readFileSync(new URL("../package.json", import.meta.url), "utf8")).scripts;
   assert.equal(scripts["release:check"], "node scripts/release-check.mjs");
   assert.match(scripts["verify:release"], /typecheck.*test.*build/);
   assert.match(scripts.deploy, /^pnpm run release:check && pnpm run verify:release && wrangler deploy /);
+});
+
+test("Vitest reserves every Undici forbidden port Windows may assign", () => {
+  const pluginPackage = realpathSync(new URL("../node_modules/@cloudflare/vitest-plugin/package.json", import.meta.url));
+  const pluginRequire = createRequire(pluginPackage);
+  const miniflareRequire = createRequire(pluginRequire.resolve("miniflare"));
+  const { badPorts } = miniflareRequire("undici/lib/web/fetch/constants.js");
+  assert.deepEqual(forbiddenPorts, badPorts.map(Number).filter((port) => port >= 1024));
+
+  const scripts = JSON.parse(readFileSync(new URL("../package.json", import.meta.url), "utf8")).scripts;
+  assert.match(scripts.test, /^node scripts\/vitest-safe-ports\.mjs && node --test /);
 });

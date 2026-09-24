@@ -17,15 +17,15 @@ export function handleImageDrop(
   if (image) onImage(image);
 }
 
-export function AdminImageDropzone({ onImage, inputLabel, buttonLabel, children }: {
-  onImage: (file: File) => void; inputLabel: string; buttonLabel: string; children: ReactNode;
+export function AdminImageDropzone({ onImage, inputLabel, buttonLabel, uploading, children }: {
+  onImage: (file: File) => void; inputLabel: string; buttonLabel: string; uploading: boolean; children: ReactNode;
 }) {
   const [dragActive, setDragActive] = useState(false);
   const dragDepth = useRef(0);
   const imageInput = useRef<HTMLInputElement>(null);
   return <div className={dragActive ? "admin-import-dropzone admin-import-dropzone-active" : "admin-import-dropzone"}
     onDragEnter={(event) => {
-      if (!event.dataTransfer.types.includes("Files")) return;
+      if (uploading || !event.dataTransfer.types.includes("Files")) return;
       dragDepth.current += 1;
       setDragActive(true);
     }}
@@ -37,13 +37,14 @@ export function AdminImageDropzone({ onImage, inputLabel, buttonLabel, children 
     onDrop={(event) => {
       dragDepth.current = 0;
       setDragActive(false);
-      handleImageDrop(event, onImage);
+      handleImageDrop(event, (file) => { if (!uploading) onImage(file); });
     }}>
     <input ref={imageInput} className="admin-new-upload-input" type="file"
-      accept="image/jpeg,image/png,image/webp" aria-label={inputLabel}
+      accept="image/jpeg,image/png,image/webp" aria-label={inputLabel} disabled={uploading}
       onChange={(event) => { const file = event.currentTarget.files?.[0]; if (file) onImage(file); event.currentTarget.value = ""; }} />
-    <button type="button" className="admin-secondary-action" onClick={() => imageInput.current?.click()}>
-      {buttonLabel}</button>
+    <button type="button" className="admin-secondary-action" disabled={uploading}
+      aria-busy={uploading || undefined} onClick={() => imageInput.current?.click()}>
+      {uploading && <span className="admin-button-spinner" aria-hidden="true" />}{buttonLabel}</button>
     {children}
   </div>;
 }

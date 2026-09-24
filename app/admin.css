@@ -132,6 +132,10 @@
 .admin-back-link:hover, .admin-secondary-action:hover { border-color: var(--border-hover, #d4d4d8); color: var(--primary); }
 .admin-editor-page .admin-primary-action, .admin-taxonomy-page .admin-primary-action { border: 0; cursor: pointer; }
 .admin-editor-page button:disabled { opacity: .5; cursor: not-allowed; }
+.admin-button-spinner { display: inline-block; vertical-align: -1px; width: 12px; height: 12px; margin-inline-end: 7px; border: 2px solid currentColor; border-inline-end-color: transparent; border-radius: 50%; animation: admin-button-spin 800ms linear infinite; }
+@keyframes admin-button-spin { to { transform: rotate(360deg); } }
+.admin-editor-page button[aria-busy="true"]:disabled, .admin-taxonomy-page button[aria-busy="true"]:disabled { opacity: .8; }
+
 .admin-editor-layout { display: grid; grid-template-columns: minmax(0, 7fr) minmax(250px, 3fr); align-items: start; gap: 28px; }
 .admin-editor-new .admin-editor-layout { display: block; max-width: 960px; }
 .admin-editor-main { display: grid; gap: 24px; min-width: 0; }

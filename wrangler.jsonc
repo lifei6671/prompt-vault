@@ -19,7 +19,14 @@
 		"enabled": true
 	},
 	"vars": {
-		"IMAGE_BASE_URL": "https://vault-pic.disign.me"
+		"IMAGE_BASE_URL": "https://vault-pic.disign.me",
+		"CF_ACCESS_ISSUER": "https://lifei6671.cloudflareaccess.com"
+	},
+	"secrets": {
+		"required": [
+			"ADMIN_EMAILS",
+			"CF_ACCESS_AUD"
+		]
 	},
 	"d1_databases": [
 		{

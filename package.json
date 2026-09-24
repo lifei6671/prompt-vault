@@ -11,7 +11,7 @@
     "release:check": "node scripts/release-check.mjs",
     "cf-typegen": "wrangler types --experimental-auto-create=false",
     "typecheck": "wrangler types --experimental-auto-create=false && react-router typegen && tsc -b",
-    "test": "vitest run && node --test scripts/release-check.check.mjs",
+    "test": "node scripts/vitest-safe-ports.mjs && node --test scripts/release-check.check.mjs",
     "db:migrate:local": "wrangler d1 migrations apply prompt-vault-db --local --experimental-auto-create=false",
     "db:migrate:remote": "wrangler d1 migrations apply prompt-vault-db --remote --experimental-auto-create=false"
   },

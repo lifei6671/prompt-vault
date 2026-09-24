@@ -234,6 +234,49 @@ describe("Phase 4D image create", () => {
     expect(await getAdminPrompt(env.DB, id)).toMatchObject({ source_language: "en-US",
       original_content_type: "image/webp", translation: { locale: "zh-CN", title: "中文" } });
   });
+  it("preserves an upload after an unknown D1 failure so the same reference can be retried", async () => {
+    const reference = await uploadPair();
+    const keys = imageKeys(reference);
+    const failure = new Error("D1_ERROR: table prompts has no column named requires_reference_image");
+    let attempts = 0;
+    const db = {
+      prepare: env.DB.prepare.bind(env.DB),
+      batch: (statements: D1PreparedStatement[]) => ++attempts === 1
+        ? Promise.reject(failure) : env.DB.batch(statements),
+    } as D1Database;
+    const log = vi.spyOn(console, "error").mockImplementation(() => {});
+    try {
+      await expect(createAdminPrompt(db, env.IMAGES, form(reference, "retry-after-d1")))
+        .rejects.toBe(failure);
+      expect(log).toHaveBeenCalledWith("Prompt create D1 batch failed",
+        expect.objectContaining({ error: "Error", schema: true }));
+      expect(JSON.stringify(log.mock.calls)).not.toContain(reference);
+      expect(await env.DB.prepare("SELECT 1 FROM retired_image_keys WHERE original_image_key = ?")
+        .bind(keys.original).first()).toBeNull();
+      expect(await env.IMAGES.head(keys.original)).not.toBeNull();
+      expect(await env.IMAGES.head(keys.preview)).not.toBeNull();
+      const id = await createAdminPrompt(db, env.IMAGES, form(reference, "retry-after-d1"));
+      expect((await getAdminPrompt(env.DB, id)).original_image_key).toBe(keys.original);
+      expect(attempts).toBe(2);
+    } finally { log.mockRestore(); }
+  });
+  it("preserves images if a concurrent create binds the reference before conflict cleanup", async () => {
+    const reference = await uploadPair();
+    const db = {
+      prepare: env.DB.prepare.bind(env.DB),
+      batch: async () => {
+        await createAdminPrompt(env.DB, env.IMAGES, form(reference, "concurrent-winner"));
+        throw new Error("D1_ERROR: UNIQUE constraint failed: prompts.original_image_key");
+      },
+    } as unknown as D1Database;
+    await expect(createAdminPrompt(db, env.IMAGES, form(reference, "concurrent-loser")))
+      .rejects.toMatchObject({ status: 409 });
+    const keys = imageKeys(reference);
+    expect(await env.IMAGES.head(keys.original)).not.toBeNull();
+    expect(await env.IMAGES.head(keys.preview)).not.toBeNull();
+    expect(await env.DB.prepare("SELECT 1 FROM retired_image_keys WHERE original_image_key = ?")
+      .bind(keys.original).first()).toBeNull();
+  });
   it("rolls back a failed batch and deletes both R2 objects", async () => {
     const reference = await uploadPair();
     const db = {
@@ -241,11 +284,14 @@ describe("Phase 4D image create", () => {
       batch: (statements: D1PreparedStatement[]) => env.DB.batch([...statements,
         env.DB.prepare("INSERT INTO prompt_tags (prompt_id, tag_id) VALUES (0, 999)")]),
     } as unknown as D1Database;
-    await expect(createAdminPrompt(db, env.IMAGES, form(reference, "rollback-draft"))).rejects.toThrow();
+    await expect(createAdminPrompt(db, env.IMAGES, form(reference, "rollback-draft")))
+      .rejects.toMatchObject({ status: 409 });
     expect(await env.DB.prepare("SELECT 1 FROM prompts WHERE slug = 'rollback-draft'").first()).toBeNull();
     const keys = imageKeys(reference);
     expect(await env.IMAGES.head(keys.original)).toBeNull();
     expect(await env.IMAGES.head(keys.preview)).toBeNull();
+    expect(await env.DB.prepare("SELECT 1 FROM retired_image_keys WHERE original_image_key = ?")
+      .bind(keys.original).first()).not.toBeNull();
   });
   it("returns no-store from upload and create endpoints", async () => {
     const bad = await uploadAction({ request: request(png(), "image/svg+xml"),

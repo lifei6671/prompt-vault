@@ -16,6 +16,15 @@ export function checkReleaseConfig(config, schema, hasFile) {
   requireValue(config.vars?.IMAGE_BASE_URL === "https://vault-pic.disign.me",
     "IMAGE_BASE_URL must be https://vault-pic.disign.me");
 
+  requireValue(config.vars?.CF_ACCESS_ISSUER === "https://lifei6671.cloudflareaccess.com",
+    "CF_ACCESS_ISSUER must match the production Cloudflare Access issuer");
+  requireValue(!Object.prototype.hasOwnProperty.call(config.vars ?? {}, "ADMIN_EMAILS")
+    && !Object.prototype.hasOwnProperty.call(config.vars ?? {}, "CF_ACCESS_AUD"),
+  "ADMIN_EMAILS and CF_ACCESS_AUD must not be committed under vars");
+  const requiredSecrets = new Set(config.secrets?.required ?? []);
+  requireValue(requiredSecrets.has("ADMIN_EMAILS") && requiredSecrets.has("CF_ACCESS_AUD"),
+    "ADMIN_EMAILS and CF_ACCESS_AUD must be declared under secrets.required");
+
   const db = config.d1_databases?.find((item) => item.binding === "DB");
   requireValue(db?.database_name === "prompt-vault-db", "DB binding/database_name must be DB/prompt-vault-db");
   requireValue(typeof db?.database_id === "string"

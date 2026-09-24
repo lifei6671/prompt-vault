@@ -45,17 +45,23 @@ export async function createAdminPrompt(db: D1Database, bucket: R2Bucket, form: 
   try {
     await db.batch(statements);
   } catch (error) {
+    const message = error instanceof Error ? error.message : "";
+    const conflict = message.includes("UNIQUE constraint failed") ||
+      message.includes("FOREIGN KEY constraint failed") || message.includes("malformed JSON");
+    if (!conflict) {
+      console.error("Prompt create D1 batch failed", { id,
+        error: error instanceof Error ? error.name : "unknown",
+        schema: /no such (column|table)|has no column named/i.test(message) });
+      throw error;
+    }
     // A concurrent successful create may have bound the same reference. Never remove its images.
     try {
       if (await retireUnboundImageKey(db, images.keys.original)) await cleanupImages(bucket, uploadReference);
     } catch (checkError) {
-      console.error("Could not check image binding after D1 failure", { reference: uploadReference,
+      console.error("Could not check image binding after D1 conflict", { id,
         error: checkError instanceof Error ? checkError.name : "unknown" });
     }
-    const message = error instanceof Error ? error.message : "";
-    if (message.includes("UNIQUE constraint failed") || message.includes("FOREIGN KEY constraint failed") ||
-      message.includes("malformed JSON")) throw new PromptAdminError(409, "conflict");
-    throw error;
+    throw new PromptAdminError(409, "conflict");
   }
   return id;
 }

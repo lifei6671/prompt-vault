@@ -1,8 +1,9 @@
 import { env } from "cloudflare:workers";
-import { data, Form, redirect, useOutletContext } from "react-router";
+import { data, Form, redirect, useNavigation, useOutletContext } from "react-router";
 import type { Route } from "./+types/admin-prompt-edit";
 import type { Locale } from "../lib/localization";
 import { adminPromptCopy } from "../lib/admin-prompt-copy";
+import { AdminSubmitButton } from "../components/admin-submit-button";
 import { AdminPromptChecks, AdminPromptFields } from "../components/admin-prompt-fields";
 import { AdminImageDropzone, handleImagePaste } from "../components/admin-image-dropzone";
 import { usePromptImageUpload } from "../lib/use-prompt-image-upload";
@@ -46,6 +47,9 @@ export async function action({ request, params }: Route.ActionArgs) {
 export default function AdminPromptEdit({ loaderData, actionData }: Route.ComponentProps) {
   const locale = useOutletContext<Locale>();
   const t = adminPromptCopy(locale);
+  const navigation = useNavigation();
+  const pendingIntent = navigation.state !== "idle" ? navigation.formData?.get("_intent") : null;
+  const submitting = !!pendingIntent;
   const { reference, state: uploadState, previewUrl, onImage } = usePromptImageUpload();
   const { prompt, taxonomy } = loaderData;
   const status = prompt.deleted_at ? t.deleted : prompt.status === "published" ? t.published : t.draft;
@@ -58,13 +62,14 @@ export default function AdminPromptEdit({ loaderData, actionData }: Route.Compon
     return Number.isNaN(parsed.getTime()) ? "—" : date.format(parsed);
   };
   return <section className="admin-editor-page" aria-labelledby="admin-editor-title"
-    onPaste={editable ? (event) => handleImagePaste(event, (file) => void onImage(file)) : undefined}>
+    onPaste={editable ? (event) => handleImagePaste(event, (file) => { if (uploadState !== "uploading") void onImage(file); }) : undefined}>
     <header className="admin-editor-header">
       <div className="admin-editor-heading"><a className="admin-back-link" href="/admin/prompts">← {t.back}</a>
         <h1 id="admin-editor-title">{prompt.title}</h1><span className={`admin-status admin-status-${statusKey}`}>{status}</span></div>
       <div className="admin-editor-actions">
         {editable && <a className="admin-secondary-action" href={`/admin/prompts/${prompt.id}/preview?ui_locale=${locale}`}>{t.previewPrompt}</a>}
-        {editable && <button className="admin-primary-action" type="submit" form="admin-prompt-form">{t.save}</button>}
+        {editable && <AdminSubmitButton className="admin-primary-action" form="admin-prompt-form"
+          disabled={submitting} pending={pendingIntent === "save"} pendingLabel={t.processing}>{t.save}</AdminSubmitButton>}
       </div>
     </header>
     {actionData?.error && <p role="alert" className="admin-form-error">
@@ -91,7 +96,9 @@ export default function AdminPromptEdit({ loaderData, actionData }: Route.Compon
               </dl>
               {editable && <div className="admin-image-replace">
                 <h3>{t.replaceImage}</h3>
-                <AdminImageDropzone onImage={(file) => void onImage(file)} inputLabel={t.originalImage} buttonLabel={t.selectImage}>
+                <AdminImageDropzone onImage={(file) => void onImage(file)} inputLabel={t.originalImage}
+                  buttonLabel={uploadState === "uploading" ? t.uploading : t.selectImage}
+                  uploading={uploadState === "uploading"}>
                   <p className="admin-field-note">{t.dropOrPaste}</p>
                   <p className="admin-field-note">{t.originalImage}</p>
                   <p aria-live="polite" className="admin-field-note">
@@ -101,7 +108,8 @@ export default function AdminPromptEdit({ loaderData, actionData }: Route.Compon
                 </AdminImageDropzone>
                 <Form method="post"><input type="hidden" name="_intent" value="replace_image" />
                   <input type="hidden" name="upload_reference" value={reference} />
-                  <button className="admin-secondary-action" type="submit" disabled={uploadState !== "ready"}>{t.replaceImage}</button>
+                  <AdminSubmitButton className="admin-secondary-action" disabled={uploadState !== "ready" || submitting}
+                    pending={pendingIntent === "replace_image"} pendingLabel={t.processing}>{t.replaceImage}</AdminSubmitButton>
                 </Form>
               </div>}
             </div>
@@ -124,11 +132,14 @@ export default function AdminPromptEdit({ loaderData, actionData }: Route.Compon
         {editable && <section className="admin-side-panel admin-publish-panel"><h2>{t.status}</h2>
           <p className="admin-field-note">{t.saveFirst}</p>
           {prompt.status === "draft" && <Form method="post"><input type="hidden" name="_intent" value="publish" />
-            <button className="admin-primary-action" type="submit">{t.publish}</button></Form>}
+            <AdminSubmitButton className="admin-primary-action" disabled={submitting}
+              pending={pendingIntent === "publish"} pendingLabel={t.processing}>{t.publish}</AdminSubmitButton></Form>}
           {prompt.status === "published" && <Form method="post"><input type="hidden" name="_intent" value="withdraw" />
-            <button className="admin-secondary-action" type="submit">{t.withdraw}</button></Form>}
+            <AdminSubmitButton className="admin-secondary-action" disabled={submitting}
+              pending={pendingIntent === "withdraw"} pendingLabel={t.processing}>{t.withdraw}</AdminSubmitButton></Form>}
           <Form method="post"><input type="hidden" name="_intent" value="delete" />
-            <button className="admin-danger-action" type="submit">{t.softDelete}</button></Form>
+            <AdminSubmitButton className="admin-danger-action" disabled={submitting}
+              pending={pendingIntent === "delete"} pendingLabel={t.processing}>{t.softDelete}</AdminSubmitButton></Form>
         </section>}
       </aside>
     </div>

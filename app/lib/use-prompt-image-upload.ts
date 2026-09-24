@@ -20,6 +20,7 @@ export function usePromptImageUpload() {
   const [originalWidth, setOriginalWidth] = useState(0);
   const [originalHeight, setOriginalHeight] = useState(0);
   const currentUpload = useRef<AbortController | null>(null);
+  const uploading = useRef(false);
   const currentUrl = useRef("");
   useEffect(() => () => {
     currentUpload.current?.abort();
@@ -27,6 +28,7 @@ export function usePromptImageUpload() {
   }, []);
 
   async function onImage(file: File | undefined) {
+    if (uploading.current) return;
     currentUpload.current?.abort();
     const controller = new AbortController();
     currentUpload.current = controller;
@@ -41,6 +43,7 @@ export function usePromptImageUpload() {
     if (!["image/jpeg", "image/png", "image/webp"].includes(file.type) || !file.size || file.size > ORIGINAL_MAX_BYTES) {
       setState("failed"); return;
     }
+    uploading.current = true;
     setState("uploading");
     try {
       const preview = await createLocalImagePreview(file, (local) => {
@@ -68,6 +71,8 @@ export function usePromptImageUpload() {
       setState("ready");
     } catch {
       if (currentUpload.current === controller) setState("failed");
+    } finally {
+      uploading.current = false;
     }
   }
   return { reference, state, previewUrl, fileName, originalWidth, originalHeight,

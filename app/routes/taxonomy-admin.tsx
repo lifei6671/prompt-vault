@@ -1,6 +1,7 @@
+import { AdminSubmitButton } from "../components/admin-submit-button";
 import { Select } from "../components/ui/select";
 import { Fragment, useState, type ReactNode } from "react";
-import { Form, useOutletContext } from "react-router";
+import { Form, useNavigation, useOutletContext } from "react-router";
 import type { Locale } from "../lib/localization";
 import { adminTaxonomyCopy } from "../lib/ui-copy";
 import type { TaxonomyKind, TaxonomyRow } from "../services/taxonomy-admin.server";
@@ -12,6 +13,10 @@ const otherLocale = (locale: Locale): Locale => locale === "zh-CN" ? "en-US" : "
 export default function TaxonomyAdminPage({ kind, items, error }: Props) {
   const locale = useOutletContext<Locale>();
   const t = adminTaxonomyCopy(locale);
+  const navigation = useNavigation();
+  const pendingIntent = navigation.state !== "idle" ? navigation.formData?.get("_intent") : null;
+  const pendingId = navigation.formData?.get("id");
+  const submitting = !!pendingIntent;
   const title = kind === "category" ? t.categories : t.tags;
   const [source, setSource] = useState<Locale | "">("");
   const [editing, setEditing] = useState<number | null>(null);
@@ -36,10 +41,12 @@ export default function TaxonomyAdminPage({ kind, items, error }: Props) {
           {kind === "category" && <label className="admin-field">{t.translationDescription} ({translationLocale})<textarea name="translation_description" defaultValue={item.translation_description ?? ""} maxLength={1000} rows={2} /></label>}
         </div>
         <p className="admin-field-note">{t.optional}</p>
-        <button className="admin-primary-action" type="submit">{t.save}</button>
+        <AdminSubmitButton className="admin-primary-action" disabled={submitting}
+          pending={pendingIntent === "update" && pendingId === String(item.id)} pendingLabel={t.processing}>{t.save}</AdminSubmitButton>
       </Form>
       <Form method="post"><input type="hidden" name="_intent" value="delete" /><input type="hidden" name="id" value={item.id} />
-        <button className="admin-danger-action" type="submit">{t.delete} {item.name}</button></Form>
+        <AdminSubmitButton className="admin-danger-action" disabled={submitting}
+          pending={pendingIntent === "delete" && pendingId === String(item.id)} pendingLabel={t.processing}>{t.delete} {item.name}</AdminSubmitButton></Form>
     </div>;
   };
   return <section aria-labelledby="taxonomy-admin-title" className="admin-taxonomy-page">
@@ -63,7 +70,8 @@ export default function TaxonomyAdminPage({ kind, items, error }: Props) {
           <label className="admin-field">{t.translationName} ({target || t.chooseLanguage})<input name="translation_name" maxLength={120} /></label>
           {kind === "category" && <label className="admin-field">{t.translationDescription} ({target || t.chooseLanguage})<textarea name="translation_description" maxLength={1000} rows={2} /></label>}
         </div>
-        <p className="admin-field-note">{t.optional}</p><button className="admin-primary-action" type="submit">{t.create}</button>
+        <p className="admin-field-note">{t.optional}</p><AdminSubmitButton className="admin-primary-action" disabled={submitting}
+          pending={pendingIntent === "create"} pendingLabel={t.processing}>{t.create}</AdminSubmitButton>
       </Form>
     </section>
     {items.length === 0 ? <div className="admin-empty"><p>{t.empty}</p></div> : <>

@@ -1,11 +1,12 @@
 import { env } from "cloudflare:workers";
 import { useMemo, useState } from "react";
-import { data, Form, redirect, useOutletContext } from "react-router";
+import { data, Form, redirect, useNavigation, useOutletContext } from "react-router";
 import type { Route } from "./+types/admin-prompt-new";
 import type { Locale } from "../lib/localization";
 import { parsePromptImport, stableHash } from "../lib/prompt-import";
 import { usePromptImageUpload } from "../lib/use-prompt-image-upload";
 import { adminPromptCopy } from "../lib/admin-prompt-copy";
+import { AdminSubmitButton } from "../components/admin-submit-button";
 import { AdminPromptFields } from "../components/admin-prompt-fields";
 import { AdminImageDropzone, handleImagePaste } from "../components/admin-image-dropzone";
 import { listPromptTaxonomy, PromptAdminError } from "../services/prompt-admin.server";
@@ -46,6 +47,8 @@ export async function action({ request }: Route.ActionArgs) {
 export default function AdminPromptNew({ loaderData, actionData }: Route.ComponentProps) {
   const locale = useOutletContext<Locale>();
   const t = adminPromptCopy(locale);
+  const navigation = useNavigation();
+  const submitting = navigation.state !== "idle" && !!navigation.formData?.has("_mode");
   const [document, setDocument] = useState("");
   const [revision, setRevision] = useState(0);
   const [advancedOpen, setAdvancedOpen] = useState(false);
@@ -61,7 +64,7 @@ export default function AdminPromptNew({ loaderData, actionData }: Route.Compone
   const imageStatus = uploadState === "idle" ? t.chooseImage : uploadState === "uploading" ? t.uploading :
     uploadState === "ready" ? t.uploadReady : t.uploadFailed;
   function acceptImage(file: File | undefined) {
-    if (file) void onImage(file);
+    if (file && uploadState !== "uploading") void onImage(file);
   }
   return <section className="admin-editor-page admin-editor-new" aria-labelledby="admin-editor-title"
     onPaste={(event) => handleImagePaste(event, acceptImage)}>
@@ -82,7 +85,8 @@ export default function AdminPromptNew({ loaderData, actionData }: Route.Compone
           <div className="admin-new-upload-preview">
             {previewUrl ? <img src={previewUrl} alt={t.previewImage} /> : <span>{t.previewEmpty}</span>}
           </div>
-          <AdminImageDropzone onImage={acceptImage} inputLabel={t.originalImage} buttonLabel={t.selectImage}>
+          <AdminImageDropzone onImage={acceptImage} inputLabel={t.originalImage} buttonLabel={uploadState === "uploading" ? t.uploading : t.selectImage}
+            uploading={uploadState === "uploading"}>
             <p className="admin-field-note">{t.dropOrPaste}</p>
             <p className="admin-field-note">{t.originalImage}</p>
             <p aria-live="polite" className="admin-field-note">{imageStatus}</p>
@@ -134,7 +138,8 @@ export default function AdminPromptNew({ loaderData, actionData }: Route.Compone
             importTaxonomy={!!document.trim()} editable />
         </fieldset>
       </details>
-      <button className="admin-primary-action admin-import-create" type="submit" disabled={!ready}>{t.createDraft}</button>
+      <AdminSubmitButton className="admin-primary-action admin-import-create" disabled={!ready}
+        pending={submitting} pendingLabel={t.creatingDraft}>{t.createDraft}</AdminSubmitButton>
     </Form>
   </section>;
 }

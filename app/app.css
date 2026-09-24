@@ -35,6 +35,11 @@ body { margin: 0; font-family: Inter, "Noto Sans SC", system-ui, sans-serif; }
 button, input, select { font: inherit; }
 a { color: inherit; }
 :focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
+button:not(:disabled), a { transition: transform 150ms ease; }
+button:not(:disabled):active, a:active { transform: scale(.98); }
+@media (prefers-reduced-motion: reduce) {
+  button:not(:disabled), a { transition-duration: 0.01ms; }
+}
 
 .site-header {
   position: sticky;
