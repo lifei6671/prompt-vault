@@ -19,6 +19,8 @@ pnpm dev
 
 常用验证命令：`pnpm typecheck`、`pnpm test`、`pnpm build`。本地 D1 migration 使用 `wrangler d1 migrations apply prompt-vault-db --local`；远端 migration 命令保留为 `pnpm db:migrate:remote`，仅在已完成远端资源配置后执行。
 
+本地验收 Admin 时，自行创建未提交的 `.env.local`，写入 `ADMIN_DEV_BYPASS=1`。此开关只对 `localhost`、`127.0.0.1` 和 `::1` 生效，线上域名无效。不要把真实 Access token 或 secret 放进仓库；生产环境仍必须配置 Cloudflare Access，以及 `CF_ACCESS_ISSUER`、`CF_ACCESS_AUD`、`ADMIN_EMAILS`。
+
 首次部署前，需在 Cloudflare 完成以下步骤。项目脚本已显式关闭 Wrangler 的资源自动创建，不会把本地占位 Binding 自动变成远端资源：
 
 1. 执行 `wrangler d1 create prompt-vault-db`，将返回的真实 `database_id` 替换 `wrangler.jsonc` 中的全零占位符 `00000000-0000-0000-0000-000000000000`。
@@ -28,6 +30,6 @@ pnpm dev
 
 ## Phase 4A 后台安全配置
 
-部署前在 Worker 环境中设置 `CF_ACCESS_ISSUER`（精确的 `https://<team>.cloudflareaccess.com`）、`CF_ACCESS_AUD`（Access 应用的单个 AUD tag）和 `ADMIN_EMAILS`（逗号分隔的管理员邮箱）。这些值通过 Cloudflare Worker secret/env 提供，不写入 `wrangler.jsonc`；本地未配置时 `/admin` 返回 503。邮箱匹配会去除配置项两侧空白并按大小写不敏感比较，配置中不允许空项。
+部署前在 Worker 环境中设置 `CF_ACCESS_ISSUER`（精确的 `https://<team>.cloudflareaccess.com`）、`CF_ACCESS_AUD`（Access 应用的单个 AUD tag）和 `ADMIN_EMAILS`（逗号分隔的管理员邮箱）。这些值通过 Cloudflare Worker secret/env 提供，不写入 `wrangler.jsonc`；未开启上述本地旁路且缺少这些配置时，`/admin` 返回 503。邮箱匹配会去除配置项两侧空白并按大小写不敏感比较，配置中不允许空项。
 
 在 Cloudflare Zero Trust 中为 `vault.disign.me/admin` 和 `vault.disign.me/admin/*` 都配置 Access 应用策略，并限制为预期管理员。边缘 Access 策略必须在 Cloudflare 控制台单独完成；仓库代码只负责 Worker 内的 JWT、邮箱白名单和后台写请求同源校验。后台写请求要求 `Origin: https://vault.disign.me` 与 `Sec-Fetch-Site: same-origin`。

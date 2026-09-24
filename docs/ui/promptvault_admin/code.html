@@ -1,0 +1,450 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"><meta content="mobile_stack" name="shell-type"><title>PromptVault Admin</title><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"><link href="https://fonts.googleapis.com" rel="preconnect"><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"><style>@layer base { html, body { width: 100%; margin: 0; padding: 0; min-height: 100%; } .pb-safe { padding-bottom: env(safe-area-inset-bottom, 0px); } .pt-safe { padding-top: env(safe-area-inset-top, 0px); } main > :first-child { margin-top: 0 !important; } main > :last-child { margin-bottom: 0 !important; } } ::-webkit-scrollbar { display: none; }</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { colors: { "text-muted": "#A1A1AA", "on-secondary-fixed": "#001551", "surface-container-high": "#eae7eb", "surface-bright": "#fbf8fc", "surface-container-highest": "#e4e1e6", "primary-fixed-dim": "#b4c5ff", "primary-fixed": "#dbe1ff", "on-background": "#1b1b1e", "on-primary-fixed": "#00174b", "on-secondary-fixed-variant": "#0039b5", "secondary": "#1d4ed8", "tertiary-fixed": "#ffdbcd", "action-primary-hover": "#1D4ED8", "primary": "#004ac6", "text-primary": "#18181B", "surface-variant": "#e4e1e6", "on-primary-container": "#eeefff", "bg-inverse": "#111111", "surface-container-low": "#f6f2f7", "on-error": "#ffffff", "on-primary-fixed-variant": "#003ea8", "surface": "#fbf8fc", "on-primary": "#ffffff", "bg-surface": "#FFFFFF", "primary-container": "#2563eb", "secondary-fixed-dim": "#b7c4ff", "tertiary": "#943700", "inverse-on-surface": "#f3f0f4", "inverse-surface": "#303033", "tertiary-fixed-dim": "#ffb596", "on-secondary-container": "#fffbff", "on-tertiary": "#ffffff", "secondary-fixed": "#dce1ff", "on-secondary": "#ffffff", "outline": "#737686", "surface-tint": "#0053db", "text-secondary": "#71717A", "tertiary-container": "#bc4800", "on-tertiary-container": "#ffede6", "secondary-container": "#4069f2", "border-default": "#E4E4E7", "border-hover": "#D4D4D8", "on-surface": "#1b1b1e", "on-error-container": "#93000a", "outline-variant": "#c3c6d7", "on-tertiary-fixed": "#360f00", "error-container": "#ffdad6", "background": "#fbf8fc", "on-tertiary-fixed-variant": "#7d2d00", "inverse-primary": "#b4c5ff", "surface-container": "#f0edf1", "on-surface-variant": "#434655", "status-danger": "#DC2626", "error": "#ba1a1a", "status-success": "#16A34A", "bg-page": "#F7F7F5", "action-primary": "#2563EB", "surface-dim": "#dcd9dd", "surface-container-lowest": "#ffffff" }, borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, spacing: { "space-xl": "2rem", "space-sm": "0.5rem", "space-md": "1rem", "gutter": "1.5rem", "margin-mobile": "1rem", "margin": "2rem", "gutter-mobile": "1rem", "space-xs": "0.25rem", "space-lg": "1.5rem" }, fontFamily: { "page-title": ["Inter"], "card-title": ["Inter"], "prompt-text": ["Inter"], "detail-title": ["Inter"], "body": ["Inter"], "metadata": ["Inter"], "section-title": ["Inter"], "page-title-mobile": ["Inter"], "code-json": ["JetBrains Mono"] }, fontSize: { "page-title": ["32px", { lineHeight: "38px", letterSpacing: "-0.02em", fontWeight: "700" }], "card-title": ["15px", { lineHeight: "21px", letterSpacing: "0em", fontWeight: "600" }], "prompt-text": ["15px", { lineHeight: "25px", letterSpacing: "0em", fontWeight: "400" }], "detail-title": ["24px", { lineHeight: "31px", letterSpacing: "-0.01em", fontWeight: "600" }], "body": ["15px", { lineHeight: "24px", letterSpacing: "0em", fontWeight: "400" }], "metadata": ["13px", { lineHeight: "18px", letterSpacing: "0.01em", fontWeight: "500" }], "section-title": ["16px", { lineHeight: "22px", letterSpacing: "-0.005em", fontWeight: "600" }], "page-title-mobile": ["26px", { lineHeight: "32px", letterSpacing: "-0.01em", fontWeight: "700" }], "code-json": ["13px", { lineHeight: "20px", letterSpacing: "0em", fontWeight: "400" }] } } } };</script></head><body class="bg-bg-page font-body text-text-primary antialiased min-h-screen flex flex-col"><header class="fixed top-0 w-full z-50 pt-safe bg-bg-surface/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="h-[52px] px-margin-mobile flex items-center justify-between gap-space-sm"><div class="flex items-center"><button aria-label="Open Admin Navigation Menu" class="w-11 h-11 flex items-center justify-center rounded-lg text-text-primary hover:bg-surface-container-high transition-colors" onclick="openDrawer()" type="button"><span class="material-symbols-outlined text-[22px]">menu</span></button></div><div class="flex-1 flex items-center justify-center px-space-xs"><span class="font-card-title text-card-title text-text-primary tracking-tight font-semibold truncate">PromptVault Admin</span></div><div class="flex items-center"><button aria-label="Switch Language" class="h-8 px-2.5 flex items-center justify-center rounded-lg bg-surface-container text-text-secondary font-metadata text-metadata hover:text-text-primary hover:bg-surface-container-high transition-colors" type="button"><span class="font-medium text-[12px]">EN / 中文</span></button></div></div></header><main class="flex-1 flex flex-col w-full bg-bg-page pt-[52px] pb-safe"><div class="flex flex-col w-full relative">
+<!-- Content Header & Stats Section -->
+<section class="px-margin-mobile pt-space-md pb-space-sm flex flex-col gap-space-xs">
+<div class="flex items-center justify-between">
+<div class="flex flex-col">
+<h1 class="font-page-title-mobile text-page-title-mobile text-text-primary tracking-tight">Prompt 管理</h1>
+<p class="font-metadata text-metadata text-text-secondary mt-0.5">128 Total · 12 草稿 (Draft) · 108 已发布 (Published) · 8 已删除 (Deleted)</p>
+</div>
+<button aria-label="Open Management Sections" class="w-9 h-9 rounded-lg bg-surface-container flex items-center justify-center text-text-primary hover:bg-surface-container-high transition-colors" onclick="openDrawer()" type="button">
+<span class="material-symbols-outlined text-[20px]">tune</span>
+</button>
+</div>
+<!-- Quick Stat Chips -->
+<div class="flex items-center gap-space-xs pt-space-xs overflow-x-auto no-scrollbar"><div class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-surface-container text-text-primary"><span class="w-2 h-2 rounded-full bg-status-success"></span><span class="font-metadata text-[12px]">108 已发布</span></div><div class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-surface-container text-text-secondary"><span class="w-2 h-2 rounded-full bg-text-muted"></span><span class="font-metadata text-[12px]">12 草稿</span></div><div class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-surface-container text-text-secondary"><span class="w-2 h-2 rounded-full bg-error"></span><span class="font-metadata text-[12px]">8 已删除</span></div></div>
+</section>
+<!-- Search & Filter Controls -->
+<section class="px-margin-mobile py-space-xs flex flex-col gap-space-sm sticky top-[52px] z-20 bg-bg-page/95 backdrop-blur-md">
+<!-- Search Bar -->
+<div class="relative w-full">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-text-muted text-[18px]">search</span>
+<input class="w-full h-[38px] pl-9 pr-8 rounded-lg bg-surface-container-lowest text-text-primary placeholder:text-text-muted font-body text-body text-[14px] shadow-sm focus:outline-none focus:bg-surface focus:shadow-md transition-all" id="promptSearchInput" placeholder="Search prompts or slugs..." type="text">
+<button class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-primary" id="clearSearchBtn" onclick="clearSearch()" type="button">
+<span class="material-symbols-outlined text-[16px]">close</span>
+</button>
+</div>
+<!-- Horizontal Scroll Filter Chips -->
+<div class="flex items-center gap-space-xs overflow-x-auto pb-1 no-scrollbar">
+<button class="h-8 px-3 rounded-full bg-surface-container text-text-primary font-metadata text-metadata flex items-center gap-1 whitespace-nowrap shadow-sm hover:bg-surface-container-high transition-colors" id="filterStatusBtn" onclick="cycleStatusFilter()" type="button">
+<span id="filterStatusLabel" class="">Status: All</span>
+<span class="material-symbols-outlined text-[16px] text-text-secondary">expand_more</span>
+</button>
+<button class="h-8 px-3 rounded-full bg-surface-container text-text-primary font-metadata text-metadata flex items-center gap-1 whitespace-nowrap shadow-sm hover:bg-surface-container-high transition-colors" type="button">
+<span class="">Category</span>
+<span class="material-symbols-outlined text-[16px] text-text-secondary">expand_more</span>
+</button>
+<button class="h-8 px-3 rounded-full bg-surface-container text-text-primary font-metadata text-metadata flex items-center gap-1 whitespace-nowrap shadow-sm hover:bg-surface-container-high transition-colors" type="button">
+<span class="">Model</span>
+<span class="material-symbols-outlined text-[16px] text-text-secondary">expand_more</span>
+</button>
+<button class="h-8 px-2.5 rounded-full bg-surface-container-low text-text-secondary hover:text-status-danger font-metadata text-metadata flex items-center gap-1 whitespace-nowrap transition-colors" onclick="resetFilters()" type="button">
+<span class="material-symbols-outlined text-[15px]">restart_alt</span>
+<span class="">Reset</span>
+</button>
+</div>
+</section>
+<!-- Mobile High-Density Prompt List -->
+<section class="px-margin-mobile pt-space-xs pb-24 flex flex-col gap-space-sm" id="promptListContainer">
+<!-- Row 1: Cinematic Tokyo Street -->
+<article class="p-3 rounded-xl bg-surface-container-lowest shadow-sm flex items-center gap-space-sm active:scale-[0.99] transition-transform" data-status="published">
+<img class="w-12 h-12 rounded-lg object-cover bg-surface-container shrink-0" data-alt="A rain-slicked Tokyo street at dusk with neon sign reflection in cyan and amber light pools, hyper-detailed photography, moody atmospheric haze, cinematic 35mm composition with authentic film grain." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCq_KWKP2H8Ix1KkoGfhUpdbzCjy--ofMUsZXhIlgbhp9LGWQJnml3cOo7nhF9sFvWN0oplecPIBFYEs-1iBRAGlO83z2KYU_NKG-zZ6Q00EX5KtJS3aAb-Mxcoq3RyFQhGM3AVOhvXT7PY-DlWliQ_1mKbHlEguf81EYoaLJCYPy7O0TWS6mSc3gf2GAQcFTbLZcKJLN8g3OGJZj2ljzgOHuPx_nc4IpINMaf-eYeTiw3b-uS5wZEL">
+<div class="flex-1 min-w-0 flex flex-col justify-center">
+<div class="flex items-center gap-1.5">
+<h2 class="font-card-title text-card-title text-text-primary truncate">Cinematic Tokyo Street</h2>
+</div>
+<p class="font-code-json text-[11px] text-text-muted truncate mt-0.5">cinematic-tokyo-street</p>
+<p class="font-metadata text-[11px] text-text-secondary truncate mt-0.5">摄影写真 · Midjourney v6.1</p>
+</div>
+<div class="flex flex-col items-end gap-1.5 shrink-0 pl-1">
+<span class="px-2 py-0.5 rounded-full bg-status-success/10 text-status-success font-metadata text-[11px] font-semibold">Published</span>
+<button class="text-action-primary hover:text-action-primary-hover font-metadata text-[12px] flex items-center font-medium" onclick="openDetailModal('Cinematic Tokyo Street', 'cinematic-tokyo-street', '摄影写真', 'Midjourney v6.1', 'Published')" type="button">
+          Edit <span class="material-symbols-outlined text-[14px] ml-0.5">arrow_forward</span>
+</button>
+</div>
+</article>
+<!-- Row 2: Vintage Editorial Travel Poster -->
+<article class="p-3 rounded-xl bg-surface-container-lowest shadow-sm flex items-center gap-space-sm active:scale-[0.99] transition-transform" data-status="draft">
+<img class="w-12 h-12 rounded-lg object-cover bg-surface-container shrink-0" data-alt="Vintage retro mid-century Italian Riviera graphic travel poster illustration with clean bold typography, warm Mediterranean sea tones, flat vector aesthetic with slight paper texture, rich ochre and deep cobalt palette." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCwGWJ5HLZEjCklhdyClZDXnuR_0I4KdnZyn5SL96OQwefhnzyYm6GbJMQFwP4WbFvLXHP4nTUO7locbipHHE-ijTT9Wvjjk_hxokutm5uC29TsDjmpQPI_Bc0jxhVBk7Tlavpo8ajrEZ6elw4IYYJcy48_JQ-5DmFkp5KPW0j_zGuMmp7sNTzTl5IW0tR4EM8kWs1SQrFbZON8Kes1CTArwiWbOAw69vd4eBE3NqBj8sFEGFGF88XD">
+<div class="flex-1 min-w-0 flex flex-col justify-center">
+<div class="flex items-center gap-1.5">
+<h2 class="font-card-title text-card-title text-text-primary truncate">Vintage Editorial Travel Poster</h2>
+</div>
+<p class="font-code-json text-[11px] text-text-muted truncate mt-0.5">vintage-editorial-poster</p>
+<p class="font-metadata text-[11px] text-text-secondary truncate mt-0.5">海报设计 · DALL-E 3</p>
+</div>
+<div class="flex flex-col items-end gap-1.5 shrink-0 pl-1">
+<span class="px-2 py-0.5 rounded-full bg-surface-container-high text-text-secondary font-metadata text-[11px] font-semibold">Draft</span>
+<button class="text-action-primary hover:text-action-primary-hover font-metadata text-[12px] flex items-center font-medium" onclick="openDetailModal('Vintage Editorial Travel Poster', 'vintage-editorial-poster', '海报设计', 'DALL-E 3', 'Draft')" type="button">
+          Edit <span class="material-symbols-outlined text-[14px] ml-0.5">arrow_forward</span>
+</button>
+</div>
+</article>
+<!-- Row 3: Minimalist Portrait Studio -->
+<article class="p-3 rounded-xl bg-surface-container-lowest shadow-sm flex items-center gap-space-sm active:scale-[0.99] transition-transform" data-status="published">
+<img class="w-12 h-12 rounded-lg object-cover bg-surface-container shrink-0" data-alt="Editorial studio portrait shot of an androgynous model against warm alabaster minimal backdrop, directional softbox light casting elegant soft shadows, natural skin texture, calm serene artistic gaze, 85mm lens aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCRT-74ylf7b72VmJjHStlb4xLBxET5pLIihjlS7rL6D07Mm3mmCgobOpy98xeWGcHt1P3RnW3BQz5GCLvwfyD6Vf1XdaKJJuS2pKoIJfJHkNTk5WsSblXC8jkluPigmfyE1gkEoA3GXtywnJwabBlmSN5JXdy3T9ow8UQa1z5FHfpX2dP6i4_61NgXOjStSxpFUas5zBshDpgaWs8IXgmizC9uiwgpq-QEZCs62cnRAH_456rawKTK">
+<div class="flex-1 min-w-0 flex flex-col justify-center">
+<div class="flex items-center gap-1.5">
+<h2 class="font-card-title text-card-title text-text-primary truncate">Minimalist Portrait Studio</h2>
+</div>
+<p class="font-code-json text-[11px] text-text-muted truncate mt-0.5">minimalist-portrait</p>
+<p class="font-metadata text-[11px] text-text-secondary truncate mt-0.5">摄影写真 · Midjourney</p>
+</div>
+<div class="flex flex-col items-end gap-1.5 shrink-0 pl-1">
+<span class="px-2 py-0.5 rounded-full bg-status-success/10 text-status-success font-metadata text-[11px] font-semibold">Published</span>
+<button class="text-action-primary hover:text-action-primary-hover font-metadata text-[12px] flex items-center font-medium" onclick="openDetailModal('Minimalist Portrait Studio', 'minimalist-portrait', '摄影写真', 'Midjourney', 'Published')" type="button">
+          Edit <span class="material-symbols-outlined text-[14px] ml-0.5">arrow_forward</span>
+</button>
+</div>
+</article>
+<!-- Row 4: Bauhaus Swiss Typography -->
+<article class="p-3 rounded-xl bg-surface-container-lowest shadow-sm flex items-center gap-space-sm active:scale-[0.99] transition-transform" data-status="draft">
+<img class="w-12 h-12 rounded-lg object-cover bg-surface-container shrink-0" data-alt="Strict geometric Swiss graphic design poster layout featuring asymmetrical grid balance, stark black and primary vermilion red circles, clean sans-serif typography elements, archival paper matte finish." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCdIQurv4uk6V4xNj-Z4eH9zmf6QTdWRJs6JK7Ph8KQaBjntNzYuktHTpYexT0rKqxPFC-3dEkv6SjM-F1oIavOJoFXgirzHCDOUS5mV9Au5oGGPM5NoY_z5N69Cw-pH5JXAXDbSNYZPhlV0-0prm94QcpzgEstWQmnhCsSWDUM1RaErC9mQE_8XmhnSm632IZjZRYwPLKtEQmHXMfb01e94RbuAMTWgSCANIp1_Ru3UzxxFqaCYW6r">
+<div class="flex-1 min-w-0 flex flex-col justify-center">
+<div class="flex items-center gap-1.5">
+<h2 class="font-card-title text-card-title text-text-primary truncate">Bauhaus Swiss Typography</h2>
+</div>
+<p class="font-code-json text-[11px] text-text-muted truncate mt-0.5">bauhaus-swiss-typography</p>
+<p class="font-metadata text-[11px] text-text-secondary truncate mt-0.5">UI 构图 · Midjourney</p>
+</div>
+<div class="flex flex-col items-end gap-1.5 shrink-0 pl-1">
+<span class="px-2 py-0.5 rounded-full bg-surface-container-high text-text-secondary font-metadata text-[11px] font-semibold">Draft</span>
+<button class="text-action-primary hover:text-action-primary-hover font-metadata text-[12px] flex items-center font-medium" onclick="openDetailModal('Bauhaus Swiss Typography', 'bauhaus-swiss-typography', 'UI 构图', 'Midjourney', 'Draft')" type="button">
+          Edit <span class="material-symbols-outlined text-[14px] ml-0.5">arrow_forward</span>
+</button>
+</div>
+</article>
+<!-- Row 5: Cyberpunk Rain Alley -->
+<article class="p-3 rounded-xl bg-surface-container-lowest shadow-sm flex items-center gap-space-sm active:scale-[0.99] transition-transform" data-status="published">
+<img class="w-12 h-12 rounded-lg object-cover bg-surface-container shrink-0" data-alt="Cinematic rain-soaked sci-fi alleyway at midnight, neon signs glowing in electric cobalt and deep magenta, steam rising from grates, wet asphalt textures, sharp architectural perspective, Flux photo style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuC8tuj-qJNBgUrpi114CcgqBsVj0F_pc6AlQdFXsEw87e_eChAReB36qAiuUMn9-GPQZvntbbMzgNlMi_wBzc_D60oT3z5ydHRMOuPqVUQD6GOXCa-AxZQ0z5MsXsjVi3mJRweILZJHXdT-86QvTuwVsaJ2cAKFMcqkpvwXWL4ftMmih_AcBwKPZJS-ocq1XR2tjnCFMfOHo9VfWAUhw5r8zxTmBRB7vfxUtf9BWvHX07lgPSVanAQr">
+<div class="flex-1 min-w-0 flex flex-col justify-center">
+<div class="flex items-center gap-1.5">
+<h2 class="font-card-title text-card-title text-text-primary truncate">Cyberpunk Rain Alley</h2>
+</div>
+<p class="font-code-json text-[11px] text-text-muted truncate mt-0.5">cyberpunk-rain-alley</p>
+<p class="font-metadata text-[11px] text-text-secondary truncate mt-0.5">电影写真 · Flux.1</p>
+</div>
+<div class="flex flex-col items-end gap-1.5 shrink-0 pl-1">
+<span class="px-2 py-0.5 rounded-full bg-status-success/10 text-status-success font-metadata text-[11px] font-semibold">Published</span>
+<button class="text-action-primary hover:text-action-primary-hover font-metadata text-[12px] flex items-center font-medium" onclick="openDetailModal('Cyberpunk Rain Alley', 'cyberpunk-rain-alley', '电影写真', 'Flux.1', 'Published')" type="button">
+          Edit <span class="material-symbols-outlined text-[14px] ml-0.5">arrow_forward</span>
+</button>
+</div>
+</article>
+</section>
+<!-- Sticky Bottom Floating Action Bar -->
+<aside class="fixed bottom-0 left-0 right-0 z-40 p-margin-mobile pb-safe bg-gradient-to-t from-bg-page via-bg-page/95 to-transparent flex items-center justify-between gap-space-sm pointer-events-none"><button class="pointer-events-auto w-full h-11 rounded-xl bg-action-primary hover:bg-action-primary-hover active:bg-secondary text-on-primary font-section-title text-section-title flex items-center justify-center gap-1.5 shadow-lg transition-transform active:scale-[0.98]" onclick="openCreatePromptModal()" type="button"><span class="material-symbols-outlined text-[20px]">add</span><span class="">新建 Prompt</span></button></aside>
+<!-- Admin Navigation Drawer Overlay -->
+<div class="fixed inset-0 z-50 bg-bg-inverse/40 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-200" id="adminDrawerBackdrop" onclick="closeDrawer()"></div>
+<!-- Admin Drawer (Content Categories / Tags) -->
+<div class="fixed top-0 bottom-0 left-0 z-50 w-[280px] bg-surface-container-lowest shadow-2xl -translate-x-full transition-transform duration-200 flex flex-col" id="adminDrawer">
+<div class="h-[52px] px-margin-mobile flex items-center justify-between bg-surface-container">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[22px]">admin_panel_settings</span>
+<span class="font-card-title text-card-title text-text-primary">Admin Control</span>
+</div>
+<button aria-label="Close Drawer" class="w-8 h-8 rounded-lg flex items-center justify-center text-text-secondary hover:text-text-primary" onclick="closeDrawer()" type="button">
+<span class="material-symbols-outlined text-[20px]">close</span>
+</button>
+</div>
+<div class="flex-1 overflow-y-auto p-margin-mobile flex flex-col gap-space-md">
+<div>
+<p class="font-metadata text-[11px] font-semibold text-text-muted uppercase tracking-wider mb-2">Content Workspace</p>
+<nav class="flex flex-col gap-1">
+<a class="flex items-center justify-between px-3 py-2.5 rounded-lg bg-primary-fixed text-on-primary-fixed font-section-title text-[14px]" href="#">
+<span class="flex items-center gap-2.5">
+<span class="material-symbols-outlined text-[18px]">terminal</span>
+<span class="">Prompts 提示词</span>
+</span>
+<span class="px-2 py-0.5 rounded-full bg-primary text-on-primary font-code-json text-[11px]">128</span>
+</a>
+<a class="flex items-center justify-between px-3 py-2.5 rounded-lg text-text-secondary hover:bg-surface-container hover:text-text-primary font-section-title text-[14px] transition-colors" href="#">
+<span class="flex items-center gap-2.5">
+<span class="material-symbols-outlined text-[18px]">folder_open</span>
+<span class="">Categories 分类</span>
+</span>
+<span class="font-code-json text-[12px] text-text-muted">14</span>
+</a>
+<a class="flex items-center justify-between px-3 py-2.5 rounded-lg text-text-secondary hover:bg-surface-container hover:text-text-primary font-section-title text-[14px] transition-colors" href="#">
+<span class="flex items-center gap-2.5">
+<span class="material-symbols-outlined text-[18px]">label</span>
+<span class="">Tags 标签库</span>
+</span>
+<span class="font-code-json text-[12px] text-text-muted">64</span>
+</a>
+</nav>
+</div>
+<div>
+<p class="font-metadata text-[11px] font-semibold text-text-muted uppercase tracking-wider mb-2">System Config</p>
+<nav class="flex flex-col gap-1">
+<a class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-text-secondary hover:bg-surface-container hover:text-text-primary font-metadata text-[13px] transition-colors" href="#">
+<span class="material-symbols-outlined text-[18px]">tune</span>
+<span class="">Model Presets 模型预设</span>
+</a>
+<a class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-text-secondary hover:bg-surface-container hover:text-text-primary font-metadata text-[13px] transition-colors" href="#">
+<span class="material-symbols-outlined text-[18px]">sync_alt</span>
+<span class="">API Webhook 同步</span>
+</a>
+</nav>
+</div>
+</div>
+<div class="p-margin-mobile bg-surface-container-low flex items-center justify-between">
+<div class="flex items-center gap-2">
+<div class="w-7 h-7 rounded-full bg-secondary-fixed flex items-center justify-center text-on-secondary-fixed text-[12px] font-bold">AD</div>
+<div class="flex flex-col leading-tight">
+<span class="font-card-title text-[12px] text-text-primary">Admin Lead</span>
+<span class="font-metadata text-[10px] text-text-muted">admin@promptvault.internal</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-text-muted text-[18px]">logout</span>
+</div>
+</div>
+<!-- Prompt Quick Edit Modal Drawer (Bottom Sheet) -->
+<div class="fixed inset-0 z-50 bg-bg-inverse/40 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-200" id="editSheetBackdrop" onclick="closeEditModal()"></div>
+<div class="fixed bottom-0 left-0 right-0 z-50 max-h-[85vh] overflow-y-auto bg-surface-container-lowest rounded-t-2xl shadow-2xl translate-y-full transition-transform duration-200 flex flex-col pb-safe" id="editSheet">
+<!-- Grab bar -->
+<div class="w-full pt-3 pb-1 flex justify-center">
+<div class="w-10 h-1 rounded-full bg-surface-container-high"></div>
+</div>
+<!-- Sheet Header -->
+<div class="px-margin-mobile py-space-xs flex items-center justify-between">
+<div class="flex flex-col">
+<span class="font-metadata text-metadata text-text-secondary" id="modalActionSubtitle">编辑 Prompt</span>
+<h3 class="font-section-title text-section-title text-text-primary" id="modalPromptTitle">Cinematic Tokyo Street</h3>
+</div>
+<button class="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-text-secondary hover:text-text-primary" onclick="closeEditModal()" type="button">
+<span class="material-symbols-outlined text-[18px]">close</span>
+</button>
+</div>
+<!-- Edit Form Elements -->
+<div class="p-margin-mobile flex flex-col gap-space-sm">
+<div class="flex flex-col gap-1">
+<label class="font-metadata text-[12px] text-text-secondary">Prompt 标题</label>
+<input class="h-10 px-3 rounded-lg bg-surface-container-low font-body text-body text-[14px] text-text-primary focus:outline-none focus:bg-surface-container" id="inputEditTitle" type="text" value="Cinematic Tokyo Street">
+</div>
+<div class="flex flex-col gap-1">
+<label class="font-metadata text-[12px] text-text-secondary">Slug (URL 唯一标识)</label>
+<input class="h-10 px-3 rounded-lg bg-surface-container-low font-code-json text-[12px] text-text-primary focus:outline-none focus:bg-surface-container" id="inputEditSlug" type="text" value="cinematic-tokyo-street">
+</div>
+<div class="grid grid-cols-2 gap-space-sm">
+<div class="flex flex-col gap-1">
+<label class="font-metadata text-[12px] text-text-secondary">分类</label>
+<select class="h-10 px-2 rounded-lg bg-surface-container-low font-body text-body text-[13px] text-text-primary focus:outline-none" id="selectEditCategory">
+<option>摄影写真</option>
+<option>海报设计</option>
+<option>UI 构图</option>
+<option>电影写真</option>
+</select>
+</div>
+<div class="flex flex-col gap-1">
+<label class="font-metadata text-[12px] text-text-secondary">目标模型</label>
+<select class="h-10 px-2 rounded-lg bg-surface-container-low font-body text-body text-[13px] text-text-primary focus:outline-none" id="selectEditModel">
+<option>Midjourney v6.1</option>
+<option>DALL-E 3</option>
+<option>Flux.1</option>
+<option>Stable Diffusion XL</option>
+</select>
+</div>
+</div>
+<div class="flex flex-col gap-1">
+<label class="font-metadata text-[12px] text-text-secondary">状态</label>
+<div class="grid grid-cols-2 gap-space-xs p-1 rounded-lg bg-surface-container-low">
+<button class="h-8 rounded-md bg-surface text-status-success font-metadata text-[12px] font-semibold shadow-sm transition-all" id="statusBtnPublished" onclick="setModalStatus('Published')" type="button">Published</button>
+<button class="h-8 rounded-md text-text-secondary font-metadata text-[12px] transition-all" id="statusBtnDraft" onclick="setModalStatus('Draft')" type="button">Draft</button>
+</div>
+</div>
+<div class="flex items-center justify-between pt-space-xs gap-space-sm">
+<button class="h-10 px-4 rounded-lg bg-error-container text-error font-metadata text-metadata font-semibold hover:bg-opacity-80 transition-colors" onclick="confirmDeletePrompt()" type="button">
+          删除
+        </button>
+<button class="flex-1 h-10 rounded-lg bg-action-primary text-on-primary font-section-title text-section-title font-medium flex items-center justify-center gap-1 shadow hover:bg-action-primary-hover transition-colors" onclick="savePromptChanges()" type="button">
+<span class="material-symbols-outlined text-[18px]">save</span>
+<span class="">保存修改</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Toast Notification Feedback -->
+<div class="fixed top-16 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-full bg-inverse-surface text-inverse-on-surface shadow-xl font-metadata text-[12px] flex items-center gap-2 opacity-0 pointer-events-none transition-all duration-200" id="toastNotification">
+<span class="material-symbols-outlined text-status-success text-[16px]" id="toastIcon">check_circle</span>
+<span id="toastMessage" class="">已保存更改</span>
+</div>
+</div>
+<script>
+  let activeFilterStatus = 'all';
+
+  function openDrawer() {
+    const backdrop = document.getElementById('adminDrawerBackdrop');
+    const drawer = document.getElementById('adminDrawer');
+    backdrop.classList.remove('opacity-0', 'pointer-events-none');
+    backdrop.classList.add('opacity-100');
+    drawer.classList.remove('-translate-x-full');
+  }
+
+  function closeDrawer() {
+    const backdrop = document.getElementById('adminDrawerBackdrop');
+    const drawer = document.getElementById('adminDrawer');
+    backdrop.classList.remove('opacity-100');
+    backdrop.classList.add('opacity-0', 'pointer-events-none');
+    drawer.classList.add('-translate-x-full');
+  }
+
+  function cycleStatusFilter() {
+    const label = document.getElementById('filterStatusLabel');
+    const items = document.querySelectorAll('#promptListContainer > article');
+
+    if (activeFilterStatus === 'all') {
+      activeFilterStatus = 'published';
+      label.innerText = 'Status: Published';
+    } else if (activeFilterStatus === 'published') {
+      activeFilterStatus = 'draft';
+      label.innerText = 'Status: Draft';
+    } else {
+      activeFilterStatus = 'all';
+      label.innerText = 'Status: All';
+    }
+
+    items.forEach(item => {
+      const status = item.getAttribute('data-status');
+      if (activeFilterStatus === 'all' || status === activeFilterStatus) {
+        item.classList.remove('hidden');
+      } else {
+        item.classList.add('hidden');
+      }
+    });
+
+    showToast(`过滤: ${label.innerText}`);
+  }
+
+  function resetFilters() {
+    activeFilterStatus = 'all';
+    document.getElementById('filterStatusLabel').innerText = 'Status: All';
+    const items = document.querySelectorAll('#promptListContainer > article');
+    items.forEach(item => item.classList.remove('hidden'));
+    const input = document.getElementById('promptSearchInput');
+    input.value = '';
+    document.getElementById('clearSearchBtn').classList.add('hidden');
+    showToast('已重置所有筛选');
+  }
+
+  const searchInput = document.getElementById('promptSearchInput');
+  const clearSearchBtn = document.getElementById('clearSearchBtn');
+
+  searchInput.addEventListener('input', (e) => {
+    const q = e.target.value.toLowerCase().trim();
+    if (q.length > 0) {
+      clearSearchBtn.classList.remove('hidden');
+    } else {
+      clearSearchBtn.classList.add('hidden');
+    }
+
+    const items = document.querySelectorAll('#promptListContainer > article');
+    items.forEach(item => {
+      const text = item.innerText.toLowerCase();
+      if (text.includes(q)) {
+        item.classList.remove('hidden');
+      } else {
+        item.classList.add('hidden');
+      }
+    });
+  });
+
+  function clearSearch() {
+    searchInput.value = '';
+    clearSearchBtn.classList.add('hidden');
+    const items = document.querySelectorAll('#promptListContainer > article');
+    items.forEach(item => item.classList.remove('hidden'));
+  }
+
+  let currentEditingStatus = 'Published';
+
+  function openDetailModal(title, slug, category, model, status) {
+    document.getElementById('modalPromptTitle').innerText = title;
+    document.getElementById('modalActionSubtitle').innerText = '编辑 Prompt';
+    document.getElementById('inputEditTitle').value = title;
+    document.getElementById('inputEditSlug').value = slug;
+    document.getElementById('selectEditCategory').value = category;
+    document.getElementById('selectEditModel').value = model;
+    setModalStatus(status);
+
+    const backdrop = document.getElementById('editSheetBackdrop');
+    const sheet = document.getElementById('editSheet');
+    backdrop.classList.remove('opacity-0', 'pointer-events-none');
+    backdrop.classList.add('opacity-100');
+    sheet.classList.remove('translate-y-full');
+  }
+
+  function openCreatePromptModal() {
+    document.getElementById('modalPromptTitle').innerText = '新建 Prompt 模板';
+    document.getElementById('modalActionSubtitle').innerText = '快速入库';
+    document.getElementById('inputEditTitle').value = '';
+    document.getElementById('inputEditSlug').value = '';
+    setModalStatus('Draft');
+
+    const backdrop = document.getElementById('editSheetBackdrop');
+    const sheet = document.getElementById('editSheet');
+    backdrop.classList.remove('opacity-0', 'pointer-events-none');
+    backdrop.classList.add('opacity-100');
+    sheet.classList.remove('translate-y-full');
+  }
+
+  function closeEditModal() {
+    const backdrop = document.getElementById('editSheetBackdrop');
+    const sheet = document.getElementById('editSheet');
+    backdrop.classList.remove('opacity-100');
+    backdrop.classList.add('opacity-0', 'pointer-events-none');
+    sheet.classList.add('translate-y-full');
+  }
+
+  function setModalStatus(status) {
+    currentEditingStatus = status;
+    const pubBtn = document.getElementById('statusBtnPublished');
+    const draftBtn = document.getElementById('statusBtnDraft');
+    if (status === 'Published') {
+      pubBtn.className = 'h-8 rounded-md bg-surface text-status-success font-metadata text-[12px] font-semibold shadow-sm transition-all';
+      draftBtn.className = 'h-8 rounded-md text-text-secondary font-metadata text-[12px] transition-all';
+    } else {
+      draftBtn.className = 'h-8 rounded-md bg-surface text-text-primary font-metadata text-[12px] font-semibold shadow-sm transition-all';
+      pubBtn.className = 'h-8 rounded-md text-text-secondary font-metadata text-[12px] transition-all';
+    }
+  }
+
+  function savePromptChanges() {
+    closeEditModal();
+    showToast('Prompt 数据已同步保存！');
+  }
+
+  function confirmDeletePrompt() {
+    if (confirm('确认删除该 Prompt 记录吗？此操作不可撤回。')) {
+      closeEditModal();
+      showToast('已安全移除该项');
+    }
+  }
+
+  function toggleSelectAll() {
+    const btn = document.getElementById('batchSelectBtn');
+    if (btn.classList.contains('bg-primary')) {
+      btn.classList.remove('bg-primary', 'text-on-primary');
+      btn.classList.add('bg-surface-container-lowest', 'text-text-secondary');
+      showToast('已取消批量选择');
+    } else {
+      btn.classList.remove('bg-surface-container-lowest', 'text-text-secondary');
+      btn.classList.add('bg-primary', 'text-on-primary');
+      showToast('已进入批量管理模式 (5 项)');
+    }
+  }
+
+  function showToast(msg) {
+    const toast = document.getElementById('toastNotification');
+    const msgEl = document.getElementById('toastMessage');
+    msgEl.innerText = msg;
+    toast.classList.remove('opacity-0', 'pointer-events-none');
+    toast.classList.add('opacity-100');
+    setTimeout(() => {
+      toast.classList.remove('opacity-100');
+      toast.classList.add('opacity-0', 'pointer-events-none');
+    }, 1800);
+  }
+</script></main>
+
+</body></html>

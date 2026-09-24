@@ -3,6 +3,7 @@ import { data, Form, redirect, useOutletContext } from "react-router";
 import type { Route } from "./+types/admin-prompt-edit";
 import type { Locale } from "../lib/localization";
 import { adminPromptCopy } from "../lib/admin-prompt-copy";
+import { AdminPromptChecks, AdminPromptFields } from "../components/admin-prompt-fields";
 import { usePromptImageUpload } from "../lib/use-prompt-image-upload";
 import { UploadError } from "../services/image-upload.server";
 import { replacePromptImage } from "../services/prompt-image.server";
@@ -41,141 +42,85 @@ export async function action({ request, params }: Route.ActionArgs) {
     return data({ error: "failed" as const }, { status: 500, headers: { "Cache-Control": "no-store" } });
   }
 }
-const input = "w-full rounded-md border border-border bg-white px-3 py-2 text-sm focus-visible:outline-2 focus-visible:outline-primary";
-const label = "block space-y-1 text-sm font-medium";
-const panel = "space-y-4 rounded-md border border-border bg-white p-5";
-const button = "rounded-md border border-border px-4 py-2 text-sm font-medium";
 export default function AdminPromptEdit({ loaderData, actionData }: Route.ComponentProps) {
   const locale = useOutletContext<Locale>();
   const t = adminPromptCopy(locale);
   const { reference, state: uploadState, previewUrl, onImage } = usePromptImageUpload();
   const { prompt, taxonomy } = loaderData;
-  const target = prompt.source_language === "zh-CN" ? "en-US" : "zh-CN";
   const status = prompt.deleted_at ? t.deleted : prompt.status === "published" ? t.published : t.draft;
+  const statusKey = prompt.deleted_at ? "deleted" : prompt.status;
   const editable = !prompt.deleted_at;
-  const translated = prompt.translation;
-  return <section className="space-y-7">
-    <a className="text-sm text-primary underline" href="/admin/prompts">← {t.back}</a>
-    <div className="flex flex-wrap items-baseline justify-between gap-3">
-      <h1 className="text-3xl font-semibold">{t.edit}: {prompt.title}</h1>
-      <div className="flex items-center gap-4">
-        {editable && <a className="text-sm font-medium text-primary underline" href={`/admin/prompts/${prompt.id}/preview?ui_locale=${locale}`}>{t.previewPrompt}</a>}
-        <span className="text-sm font-medium">{t.status}: {status}</span>
+  const date = new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeStyle: "short", timeZone: "UTC" });
+  const formatDate = (value: string | null) => {
+    if (!value) return t.neverPublished;
+    const parsed = new Date(value);
+    return Number.isNaN(parsed.getTime()) ? "—" : date.format(parsed);
+  };
+  return <section className="admin-editor-page" aria-labelledby="admin-editor-title">
+    <header className="admin-editor-header">
+      <div className="admin-editor-heading"><a className="admin-back-link" href="/admin/prompts">← {t.back}</a>
+        <h1 id="admin-editor-title">{prompt.title}</h1><span className={`admin-status admin-status-${statusKey}`}>{status}</span></div>
+      <div className="admin-editor-actions">
+        {editable && <a className="admin-secondary-action" href={`/admin/prompts/${prompt.id}/preview?ui_locale=${locale}`}>{t.previewPrompt}</a>}
+        {editable && <button className="admin-primary-action" type="submit" form="admin-prompt-form">{t.save}</button>}
       </div>
-    </div>
-    {actionData?.error && <p role="alert" className="rounded-md border border-red-300 bg-red-50 p-3 text-sm text-red-800">
+    </header>
+    {actionData?.error && <p role="alert" className="admin-form-error">
       {actionData.error === "deleted" ? t.deletedError : actionData.error === "slugFrozen" ? t.slugFrozen :
-        actionData.error === "tokens" ? t.tokens :
-        actionData.error === "missingUpload" ? t.missingUpload :
+        actionData.error === "tokens" ? t.tokens : actionData.error === "missingUpload" ? t.missingUpload :
         actionData.error === "tooLarge" ? t.tooLarge : t[actionData.error]}
     </p>}
-    <Form method="post" className="space-y-6">
-      <input type="hidden" name="_intent" value="save" />
-      <section className={panel}>
-        <h2 className="text-lg font-semibold">{t.original} · {prompt.source_language}</h2>
-        <div className="grid gap-4 md:grid-cols-2">
-          <label className={label}>{t.slug}<input className={input} name="slug" defaultValue={prompt.slug}
-            readOnly={!!prompt.published_at || !editable} required maxLength={80} /></label>
-          <label className={label}>{t.title}<input className={input} name="title" defaultValue={prompt.title}
-            disabled={!editable} required maxLength={200} /></label>
-          <label className={label}>{t.model}<input className={input} name="model" defaultValue={prompt.model ?? ""}
-            disabled={!editable} maxLength={120} /></label>
-          <label className={label}>{t.ratio}<input className={input} name="ratio" defaultValue={prompt.ratio ?? ""}
-            disabled={!editable} maxLength={60} /></label>
-          <label className={label}>{t.category}<select className={input} name="category_id" defaultValue={prompt.category_id} disabled={!editable}>
-            {taxonomy.categories.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
-          </select></label>
-        </div>
-        {!!prompt.published_at && <p className="text-sm text-muted-foreground">{t.slugFrozen}</p>}
-        <label className={label}>{t.description}<textarea className={input} name="description" rows={3}
-          defaultValue={prompt.description ?? ""} disabled={!editable} maxLength={2000} /></label>
-        <label className={label}>{t.template}<textarea className={input} name="prompt_template" rows={10}
-          defaultValue={prompt.prompt_template} disabled={!editable} required maxLength={50000} /></label>
-        <label className={label}>{t.imageAlt}<input className={input} name="image_alt"
-          defaultValue={prompt.image_alt} disabled={!editable} required maxLength={500} /></label>
-      </section>
-      <section className={panel}>
-        <h2 className="text-lg font-semibold">{t.translation} · {target}</h2>
-        <input type="hidden" name="translation_locale" value={target} />
-        <label className={label}>{t.translationMode}<select className={input} name="translation_mode"
-          defaultValue={translated ? "present" : "remove"} disabled={!editable}>
-          <option value="present">{t.present}</option><option value="remove">{t.remove}</option>
-        </select></label>
-        <div className="grid gap-4 md:grid-cols-2">
-          <label className={label}>{t.title}<input className={input} name="translation_title"
-            defaultValue={translated?.title ?? ""} disabled={!editable} maxLength={200} /></label>
-          <label className={label}>{t.imageAlt}<input className={input} name="translation_image_alt"
-            defaultValue={translated?.image_alt ?? ""} disabled={!editable} maxLength={500} /></label>
-        </div>
-        <label className={label}>{t.description}<textarea className={input} name="translation_description"
-          defaultValue={translated?.description ?? ""} disabled={!editable} maxLength={2000} rows={3} /></label>
-        <label className={label}>{t.template}<textarea className={input} name="translation_prompt_template"
-          defaultValue={translated?.prompt_template ?? ""} disabled={!editable} maxLength={50000} rows={10} /></label>
-      </section>
-      <section className={panel}>
-        <h2 className="text-lg font-semibold">{t.variables}</h2>
-        <p className="text-sm text-muted-foreground">{t.variablesHelp}</p>
-        <details className="text-sm"><summary className="cursor-pointer text-primary underline">{t.example}</summary>
-          <pre className="mt-2 overflow-x-auto rounded-md bg-muted p-3">{JSON.stringify([
-            { key: "subject", type: "text", label: prompt.source_language === "zh-CN" ? "主体" : "Subject", placeholder: null,
-              translation_label: target === "zh-CN" ? "主体" : "Subject", translation_placeholder: null, options: null },
-            { key: "style", type: "select", label: prompt.source_language === "zh-CN" ? "风格" : "Style", placeholder: null,
-              translation_label: target === "zh-CN" ? "风格" : "Style", translation_placeholder: null,
-              options: [{ value: "retro", labels: { "zh-CN": "复古", "en-US": "Retro" } }] },
-          ], null, 2)}</pre>
-        </details>
-        <label className={label}>{t.variables}<textarea className={input + " font-mono"} name="variables_json"
-          defaultValue={JSON.stringify(prompt.variables, null, 2)} disabled={!editable} rows={14} spellCheck={false} /></label>
-      </section>
-      <section className={panel}>
-        <h2 className="text-lg font-semibold">{t.tags}</h2>
-        <div className="flex flex-wrap gap-4">{taxonomy.tags.map((tag) =>
-          <label key={tag.id} className="flex items-center gap-2 text-sm">
-            <input type="checkbox" name="tag_ids" value={tag.id} defaultChecked={prompt.tagIds.includes(tag.id)}
-              disabled={!editable} />{tag.name}
-          </label>)}</div>
-      </section>
-      {editable && <button className="rounded-md bg-primary px-4 py-2 text-sm font-semibold text-white" type="submit">{t.save}</button>}
-    </Form>
-    <section className={panel}>
-      <h2 className="text-lg font-semibold">{t.imageMetadata}</h2>
-      <dl className="grid gap-2 text-sm md:grid-cols-2">
-        <div><dt>Original key</dt><dd className="break-all font-mono">{prompt.original_image_key}</dd></div>
-        <div><dt>Preview key</dt><dd className="break-all font-mono">{prompt.preview_image_key}</dd></div>
-        <div><dt>Content-Type</dt><dd>{prompt.original_content_type}</dd></div>
-        <div><dt>Original</dt><dd>{prompt.original_width} × {prompt.original_height} · {prompt.original_size_bytes} B</dd></div>
-        <div><dt>Preview</dt><dd>{prompt.preview_width} × {prompt.preview_height} · {prompt.preview_size_bytes} B</dd></div>
-      </dl>
-    </section>
-    {editable && <section className={panel}>
-      <h2 className="text-lg font-semibold">{t.replaceImage}</h2>
-      <label className={label}>{t.originalImage}
-        <input className={input} type="file" accept="image/jpeg,image/png,image/webp"
-          onChange={(event) => void onImage(event.currentTarget.files?.[0])} />
-      </label>
-      <p aria-live="polite" className="text-sm text-muted-foreground">
-        {uploadState === "idle" ? t.chooseImage : uploadState === "uploading" ? t.uploading :
-          uploadState === "ready" ? t.replaceReady : t.uploadFailed}
-      </p>
-      {previewUrl && <img className="max-h-64 rounded-md object-contain" src={previewUrl} alt={t.previewImage} />}
-      <Form method="post">
-        <input type="hidden" name="_intent" value="replace_image" />
-        <input type="hidden" name="upload_reference" value={reference} />
-        <button className="rounded-md bg-primary px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
-          type="submit" disabled={uploadState !== "ready"}>{t.replaceImage}</button>
-      </Form>
-    </section>}
-    {editable && <section className={panel}>
-      <h2 className="text-lg font-semibold">{t.status}: {status}</h2>
-      <p className="text-sm text-muted-foreground">{t.saveFirst}</p>
-      <div className="flex flex-wrap gap-3">
-        {prompt.status === "draft" && <Form method="post"><input type="hidden" name="_intent" value="publish" />
-          <button className={button} type="submit">{t.publish}</button></Form>}
-        {prompt.status === "published" && <Form method="post"><input type="hidden" name="_intent" value="withdraw" />
-          <button className={button} type="submit">{t.withdraw}</button></Form>}
-        <Form method="post"><input type="hidden" name="_intent" value="delete" />
-          <button className={button} type="submit">{t.softDelete}</button></Form>
+    {prompt.deleted_at && <p className="admin-field-note" role="status">{t.readOnly}</p>}
+    <div className="admin-editor-layout">
+      <div className="admin-editor-main">
+        <Form id="admin-prompt-form" method="post" className="admin-editor-main">
+          <input type="hidden" name="_intent" value="save" />
+          <AdminPromptFields locale={locale} source={prompt.source_language} taxonomy={taxonomy} prompt={prompt} editable={editable} />
+        </Form>
+        <section className="admin-editor-panel" aria-labelledby="admin-image-title">
+          <div className="admin-editor-panel-head"><h2 id="admin-image-title">{t.imageMetadata}</h2></div>
+          <dl className="admin-image-meta">
+            <div><dt>{t.imageOriginalKey}</dt><dd className="admin-mono">{prompt.original_image_key}</dd></div>
+            <div><dt>{t.imagePreviewKey}</dt><dd className="admin-mono">{prompt.preview_image_key}</dd></div>
+            <div><dt>{t.imageMime}</dt><dd>{prompt.original_content_type}</dd></div>
+            <div><dt>{t.imageOriginalSize}</dt><dd>{prompt.original_width} × {prompt.original_height} · {new Intl.NumberFormat(locale).format(prompt.original_size_bytes)} B</dd></div>
+            <div><dt>{t.imagePreviewSize}</dt><dd>{prompt.preview_width} × {prompt.preview_height} · {new Intl.NumberFormat(locale).format(prompt.preview_size_bytes)} B</dd></div>
+          </dl>
+          {editable && <div className="admin-image-replace">
+            <h3>{t.replaceImage}</h3>
+            <label className="admin-field">{t.originalImage}<input type="file" accept="image/jpeg,image/png,image/webp"
+              onChange={(event) => void onImage(event.currentTarget.files?.[0])} /></label>
+            <p aria-live="polite" className="admin-field-note">
+              {uploadState === "idle" ? t.chooseImage : uploadState === "uploading" ? t.uploading :
+                uploadState === "ready" ? t.replaceReady : t.uploadFailed}
+            </p>
+            {previewUrl && <img className="admin-upload-preview" src={previewUrl} alt={t.previewImage} />}
+            <Form method="post"><input type="hidden" name="_intent" value="replace_image" />
+              <input type="hidden" name="upload_reference" value={reference} />
+              <button className="admin-secondary-action" type="submit" disabled={uploadState !== "ready"}>{t.replaceImage}</button>
+            </Form>
+          </div>}
+        </section>
       </div>
-    </section>}
+      <aside className="admin-editor-side" aria-label={t.lifecycle}>
+        <section className="admin-side-panel"><div className="admin-side-heading"><h2>{t.lifecycle}</h2>
+          <span className={`admin-status admin-status-${statusKey}`}>{status}</span></div>
+          <dl className="admin-lifecycle">
+            <div><dt>{t.createdAt}</dt><dd>{formatDate(prompt.created_at)}</dd></div>
+            <div><dt>{t.updatedAt}</dt><dd>{formatDate(prompt.updated_at)}</dd></div>
+            <div><dt>{t.publishedAt}</dt><dd>{formatDate(prompt.published_at)}</dd></div>
+          </dl></section>
+        <AdminPromptChecks prompt={prompt} locale={locale} />
+        {editable && <section className="admin-side-panel admin-publish-panel"><h2>{t.status}</h2>
+          <p className="admin-field-note">{t.saveFirst}</p>
+          {prompt.status === "draft" && <Form method="post"><input type="hidden" name="_intent" value="publish" />
+            <button className="admin-primary-action" type="submit">{t.publish}</button></Form>}
+          {prompt.status === "published" && <Form method="post"><input type="hidden" name="_intent" value="withdraw" />
+            <button className="admin-secondary-action" type="submit">{t.withdraw}</button></Form>}
+          <Form method="post"><input type="hidden" name="_intent" value="delete" />
+            <button className="admin-danger-action" type="submit">{t.softDelete}</button></Form>
+        </section>}
+      </aside>
+    </div>
   </section>;
 }

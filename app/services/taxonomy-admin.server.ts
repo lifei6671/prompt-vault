@@ -5,6 +5,7 @@ export type TaxonomyRow = {
   id: number; slug: string; source_language: Locale; name: string;
   description: string | null; sort_order: number;
   translation_name: string | null; translation_description: string | null;
+  prompt_count: number; updated_at: string;
 };
 
 export class TaxonomyAdminError extends Error {
@@ -82,12 +83,17 @@ function mapWriteError(error: unknown, kind: TaxonomyKind): never {
 
 export async function listTaxonomyAdmin(db: D1Database, kind: TaxonomyKind): Promise<TaxonomyRow[]> {
   const { table, translations, foreignKey } = config[kind];
-  const rows = await db.prepare(`SELECT parent.id, parent.slug, parent.source_language,
+  const rows = await db.prepare(`SELECT parent.id, parent.slug, parent.source_language, parent.updated_at,
     parent.name, ${kind === "category" ? "parent.description, parent.sort_order," : "NULL AS description, 0 AS sort_order,"}
     translation.name AS translation_name,
-    ${kind === "category" ? "translation.description" : "NULL"} AS translation_description
+    ${kind === "category" ? "translation.description" : "NULL"} AS translation_description,
+    COALESCE(usage.prompt_count, 0) AS prompt_count
     FROM ${table} parent LEFT JOIN ${translations} translation
       ON translation.${foreignKey} = parent.id AND translation.locale <> parent.source_language
+    LEFT JOIN (${kind === "category"
+      ? "SELECT category_id AS taxonomy_id, COUNT(*) AS prompt_count FROM prompts GROUP BY category_id"
+      : "SELECT pt.tag_id AS taxonomy_id, COUNT(*) AS prompt_count FROM prompt_tags pt GROUP BY pt.tag_id"}) usage
+      ON usage.taxonomy_id = parent.id
     ORDER BY ${kind === "category" ? "parent.sort_order, " : ""}parent.name, parent.id`)
     .all<TaxonomyRow>();
   return rows.results;

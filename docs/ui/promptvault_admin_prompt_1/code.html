@@ -1,0 +1,436 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1.0" name="viewport"><meta content="web_dashboard" name="shell-type"><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;display=swap" rel="stylesheet"><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{"colors":{"text-muted":"#A1A1AA","on-secondary-fixed":"#001551","surface-container-high":"#eae7eb","surface-bright":"#fbf8fc","surface-container-highest":"#e4e1e6","primary-fixed-dim":"#b4c5ff","primary-fixed":"#dbe1ff","on-background":"#1b1b1e","on-primary-fixed":"#00174b","on-secondary-fixed-variant":"#0039b5","secondary":"#1d4ed8","tertiary-fixed":"#ffdbcd","action-primary-hover":"#1D4ED8","primary":"#004ac6","text-primary":"#18181B","surface-variant":"#e4e1e6","on-primary-container":"#eeefff","bg-inverse":"#111111","surface-container-low":"#f6f2f7","on-error":"#ffffff","on-primary-fixed-variant":"#003ea8","surface":"#fbf8fc","on-primary":"#ffffff","bg-surface":"#FFFFFF","primary-container":"#2563eb","secondary-fixed-dim":"#b7c4ff","tertiary":"#943700","inverse-on-surface":"#f3f0f4","inverse-surface":"#303033","tertiary-fixed-dim":"#ffb596","on-secondary-container":"#fffbff","on-tertiary":"#ffffff","secondary-fixed":"#dce1ff","on-secondary":"#ffffff","outline":"#737686","surface-tint":"#0053db","text-secondary":"#71717A","tertiary-container":"#bc4800","on-tertiary-container":"#ffede6","secondary-container":"#4069f2","border-default":"#E4E4E7","border-hover":"#D4D4D8","on-surface":"#1b1b1e","on-error-container":"#93000a","outline-variant":"#c3c6d7","on-tertiary-fixed":"#360f00","error-container":"#ffdad6","background":"#fbf8fc","on-tertiary-fixed-variant":"#7d2d00","inverse-primary":"#b4c5ff","surface-container":"#f0edf1","on-surface-variant":"#434655","status-danger":"#DC2626","error":"#ba1a1a","status-success":"#16A34A","bg-page":"#F7F7F5","action-primary":"#2563EB","surface-dim":"#dcd9dd","surface-container-lowest":"#ffffff"},"borderRadius":{"DEFAULT":"0.25rem","lg":"0.5rem","xl":"0.75rem","full":"9999px"},"spacing":{"space-xl":"2rem","space-sm":"0.5rem","space-md":"1rem","gutter":"1.5rem","margin-mobile":"1rem","margin":"2rem","gutter-mobile":"1rem","space-xs":"0.25rem","space-lg":"1.5rem"},"fontFamily":{"page-title":["Inter"],"card-title":["Inter"],"prompt-text":["Inter"],"detail-title":["Inter"],"body":["Inter"],"metadata":["Inter"],"section-title":["Inter"],"page-title-mobile":["Inter"],"code-json":["JetBrains Mono"]},"fontSize":{"page-title":["32px",{"lineHeight":"38px","letterSpacing":"-0.02em","fontWeight":"700"}],"card-title":["15px",{"lineHeight":"21px","letterSpacing":"0em","fontWeight":"600"}],"prompt-text":["15px",{"lineHeight":"25px","letterSpacing":"0em","fontWeight":"400"}],"detail-title":["24px",{"lineHeight":"31px","letterSpacing":"-0.01em","fontWeight":"600"}],"body":["15px",{"lineHeight":"24px","letterSpacing":"0em","fontWeight":"400"}],"metadata":["13px",{"lineHeight":"18px","letterSpacing":"0.01em","fontWeight":"500"}],"section-title":["16px",{"lineHeight":"22px","letterSpacing":"-0.005em","fontWeight":"600"}],"page-title-mobile":["26px",{"lineHeight":"32px","letterSpacing":"-0.01em","fontWeight":"700"}],"code-json":["13px",{"lineHeight":"20px","letterSpacing":"0em","fontWeight":"400"}]}}}}</script></head><body class="bg-bg-page font-body text-text-primary min-h-screen"><aside class="fixed inset-y-0 left-0 w-[230px] bg-bg-surface z-50 flex flex-col justify-between border-r border-border-default"><div class="flex flex-col"><div class="h-16 px-space-md flex items-center gap-space-sm border-b border-border-default"><img alt="Brand logo. - Primary color: #2563eb
+- Font: inter
+- Mode: light
+- Roundness: rounded-md
+" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1U8-i-xDxT68ZTXWeCLTmtPVW__dNjnx8PeqxxxKDdxWbrQmyCffp8Fx0Yk9lPWIsPfNtq74le7CbPpW5i_EyZGlAGwP7OoTRzjmNPWOdDTiznOKgNsZtl0qerfsp2VhLDL53t4wcLrelPGHE27VsCVCw6KOujTgf30nxZR803UxiKh-nTvOud6-8cF1kuiUIP6uoOIP-Zm2LLTiysqQC0kBt9Ux2P34TSV2aUjzgVXbXEyTDDemyERXUY"><div class="flex items-center gap-space-xs"><span class="font-section-title text-section-title text-text-primary tracking-tight">PromptVault</span><span class="px-1.5 py-0.5 text-[10px] font-medium font-metadata tracking-wide uppercase bg-surface-container rounded text-text-secondary border border-border-default">Admin</span></div></div><div class="px-space-md pt-space-lg pb-space-xs"><span class="text-[11px] font-metadata font-semibold uppercase tracking-wider text-text-muted">Content</span></div><nav class="flex flex-col space-y-0.5 px-space-xs" data-active-classes="bg-surface-container-low text-action-primary font-medium border-l-2 border-action-primary"><a aria-current="page" class="flex items-center justify-between px-space-sm py-2 rounded transition-colors bg-surface-container-low text-action-primary font-medium border-l-2 border-action-primary" data-path="prompts-management" href="#"><span class="font-body text-body text-[14px]">Prompts</span><span class="px-2 py-0.5 font-metadata text-[11px] rounded bg-surface-container text-text-secondary">128</span></a><a class="flex items-center justify-between px-space-sm py-2 rounded text-text-secondary hover:text-text-primary hover:bg-surface-container-low transition-colors" data-path="categories-management" href="#"><span class="font-body text-body text-[14px]">Categories</span><span class="px-2 py-0.5 font-metadata text-[11px] rounded bg-surface-container text-text-secondary">12</span></a><a class="flex items-center justify-between px-space-sm py-2 rounded text-text-secondary hover:text-text-primary hover:bg-surface-container-low transition-colors" data-path="tags-management" href="#"><span class="font-body text-body text-[14px]">Tags</span><span class="px-2 py-0.5 font-metadata text-[11px] rounded bg-surface-container text-text-secondary">36</span></a></nav></div><div class="p-space-md border-t border-border-default flex flex-col gap-space-sm"><a class="flex items-center gap-space-xs text-text-secondary hover:text-text-primary text-metadata font-metadata transition-colors" data-path="explore-overview" href="#"><span class="material-symbols-outlined text-[16px]">arrow_back</span><span class="">Back to Explore</span></a><div class="flex items-center justify-between pt-space-xs border-t border-border-default text-metadata font-metadata"><span class="text-text-muted text-[12px]">Language</span><div class="flex items-center gap-1 text-[12px]"><button class="text-text-primary hover:text-action-primary font-medium transition-colors" type="button">中文</button><span class="text-text-muted">/</span><button class="text-action-primary font-semibold transition-colors" type="button">EN</button></div></div></div></aside><div class="pl-[230px]"><header class="fixed top-0 left-[230px] right-0 h-16 bg-bg-surface/90 backdrop-blur-md z-40 border-b border-border-default"><div class="h-16 w-full px-8 flex items-center justify-between"><div class="flex items-center gap-space-sm font-metadata text-metadata text-text-secondary"><span class="text-text-muted">Console</span><span class="text-text-muted">/</span><span class="text-text-primary font-medium">PromptVault Workbench</span></div></div></header><main class="relative pt-16 bg-bg-page min-h-screen"><div class="max-w-7xl mx-auto px-8 py-6"><div class="flex flex-col w-full gap-6 pb-12">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+<div class="flex flex-col">
+<h1 class="font-detail-title text-detail-title text-text-primary tracking-tight">Prompt 管理</h1>
+<p class="font-body text-[14px] text-text-secondary mt-0.5">管理 Prompt、翻译、变量、图片与发布状态。</p>
+</div>
+<div class="flex items-center gap-3">
+
+<button class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-action-primary hover:bg-action-primary-hover text-on-primary text-[13px] font-medium shadow-sm transition-all duration-150" type="button">
+<span class="material-symbols-outlined text-[18px]">add</span>
+<span class="">新建 Prompt</span>
+</button>
+</div>
+</div>
+<div class="flex flex-wrap items-center gap-2 p-1.5 px-3 bg-bg-surface rounded-lg border border-border-default shadow-sm text-[13px]">
+<div class="flex items-center gap-2 pr-3 border-r border-border-default">
+<span class="font-metadata text-text-muted text-[11px] uppercase tracking-wider">总览统计</span>
+<span class="font-semibold text-text-primary">128</span>
+<span class="text-text-muted text-[12px]">Total</span>
+</div>
+<div class="flex items-center gap-3 pl-1">
+<div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-surface-container text-text-secondary text-[12px] border border-border-default">
+<span class="w-1.5 h-1.5 rounded-full bg-text-muted"></span>
+<span class="font-medium text-text-primary">12</span>
+<span class="text-text-secondary">Draft</span>
+</div>
+<div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 text-status-success text-[12px] border border-emerald-200/60">
+<span class="w-1.5 h-1.5 rounded-full bg-status-success"></span>
+<span class="font-medium text-emerald-950">108</span>
+<span class="text-emerald-800">Published</span>
+</div>
+<div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-rose-50 text-status-danger text-[12px] border border-rose-200/60">
+<span class="w-1.5 h-1.5 rounded-full bg-status-danger"></span>
+<span class="font-medium text-rose-950">8</span>
+<span class="text-rose-800">Deleted</span>
+</div>
+</div>
+
+</div>
+<div class="flex flex-col lg:flex-row lg:items-center justify-between gap-3 p-3 bg-bg-surface rounded-lg border border-border-default shadow-sm">
+<div class="flex flex-1 flex-wrap items-center gap-2.5">
+<div class="relative flex-1 min-w-[220px] max-w-sm">
+<span class="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-text-muted text-[18px]">search</span>
+<input class="w-full h-9 pl-9 pr-3 rounded-lg border border-border-default bg-bg-page/50 text-[13px] text-text-primary placeholder:text-text-muted focus:bg-bg-surface focus:border-action-primary focus:outline-none transition-colors" placeholder="Search title, slug or prompt tag..." type="text">
+</div>
+<div class="flex items-center gap-2">
+<div class="relative">
+<select class="appearance-none h-9 pl-3 pr-8 rounded-lg border border-border-default bg-bg-surface text-[13px] text-text-primary font-metadata hover:border-border-hover focus:outline-none focus:border-action-primary cursor-pointer">
+<option value="">状态: 全部</option>
+<option value="published">已发布 (Published)</option>
+<option value="draft">草稿 (Draft)</option>
+<option value="deleted">已归档 (Deleted)</option>
+</select>
+<span class="material-symbols-outlined pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-[16px] text-text-muted">expand_more</span>
+</div>
+<div class="relative">
+<select class="appearance-none h-9 pl-3 pr-8 rounded-lg border border-border-default bg-bg-surface text-[13px] text-text-primary font-metadata hover:border-border-hover focus:outline-none focus:border-action-primary cursor-pointer">
+<option value="">分类: 全部</option>
+<option value="photography">摄影写真</option>
+<option value="poster">海报设计</option>
+<option value="ui">UI 构图</option>
+<option value="industrial">工业设计</option>
+<option value="architecture">空间建筑</option>
+</select>
+<span class="material-symbols-outlined pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-[16px] text-text-muted">expand_more</span>
+</div>
+<div class="relative">
+<select class="appearance-none h-9 pl-3 pr-8 rounded-lg border border-border-default bg-bg-surface text-[13px] text-text-primary font-metadata hover:border-border-hover focus:outline-none focus:border-action-primary cursor-pointer">
+<option value="">模型: 全部</option>
+<option value="mj">Midjourney v6.1</option>
+<option value="flux">Flux.1 Dev</option>
+<option value="dalle">DALL·E 3</option>
+</select>
+<span class="material-symbols-outlined pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-[16px] text-text-muted">expand_more</span>
+</div>
+<div class="relative hidden sm:block">
+<select class="appearance-none h-9 pl-3 pr-8 rounded-lg border border-border-default bg-bg-surface text-[13px] text-text-primary font-metadata hover:border-border-hover focus:outline-none focus:border-action-primary cursor-pointer">
+<option value="">画幅: 全部</option>
+<option value="3:4">3:4</option>
+<option value="16:9">16:9</option>
+<option value="1:1">1:1</option>
+<option value="2:3">2:3</option>
+</select>
+<span class="material-symbols-outlined pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-[16px] text-text-muted">expand_more</span>
+</div>
+</div>
+</div>
+<div class="flex items-center justify-between lg:justify-end gap-3 pt-2 lg:pt-0 border-t lg:border-t-0 border-border-default"><button class="text-[12px] font-metadata text-text-muted hover:text-text-primary transition-colors flex items-center gap-1" type="button"><span class="material-symbols-outlined text-[15px]">restart_alt</span><span class="">重置筛选</span></button></div>
+</div>
+<div class="bg-bg-surface rounded-lg border border-border-default overflow-hidden shadow-sm">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse min-w-[960px]">
+<thead>
+<tr class="bg-surface-container/50 border-b border-border-default text-[11px] font-semibold text-text-secondary uppercase tracking-wider font-metadata">
+<th class="py-3 px-4 w-[340px]">Prompt / 模版名称</th>
+<th class="py-3 px-3 w-[170px]">Slug 标识</th>
+<th class="py-3 px-3 w-[110px]">分类</th>
+<th class="py-3 px-3 w-[130px]">推荐模型</th>
+<th class="py-3 px-3 w-[80px]">画幅</th>
+<th class="py-3 px-3 w-[110px]">状态</th>
+<th class="py-3 px-3 w-[100px]">更新时间</th>
+<th class="py-3 px-4 w-[110px] text-right">操作</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-border-default/60 text-[13px]">
+<tr class="hover:bg-surface-container-low/60 transition-colors group">
+<td class="py-3 px-4">
+<div class="flex items-center gap-3">
+<img class="w-[52px] h-[40px] rounded object-cover border border-border-default shrink-0 shadow-xs" data-alt="Cinematic night street view of Shibuya Tokyo drenched in rain, reflections of neon billboard lights on wet asphalt, 35mm film photograph aesthetic with muted teal and deep amber contrast, ultra sharp" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAA1Cq2py-zy9IbJeYrJrRpIj-P0KECwRUCcll0gQxm5JSQfFQYwJMI5PEAtfxE48-LmEj3tSWRCq2zXrwCLiSPzaT_aq1xdDEBRDXg0yfEgdV6xqzbjylLOjZtfqREh3g7OIuA8sEmuF3i7Jn2ydni8mRg3BWEPIgB5-veRuuBmI0h44LwmNfWyiWQM_U-lm2b9s-90z5H_AoixPFHlFNEHP-44J8VOLwE8eAaEmsLIWnFEXM377Hi">
+<div class="flex flex-col min-w-0">
+<span class="font-card-title text-[14px] text-text-primary truncate font-medium group-hover:text-action-primary transition-colors cursor-pointer">Cinematic Tokyo Street</span>
+<span class="text-text-muted text-[12px] truncate max-w-[240px]">A rain-slicked neon street in Shibuya during twilight with soft atmospheric haze...</span>
+</div>
+</div>
+</td>
+<td class="py-3 px-3">
+<span class="font-code-json text-code-json text-text-secondary bg-surface-container-low px-1.5 py-0.5 rounded border border-border-default/70">tokyo-street-rain</span>
+</td>
+<td class="py-3 px-3">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-metadata bg-surface-container text-text-primary">摄影写真</span>
+</td>
+<td class="py-3 px-3">
+<div class="flex items-center gap-1.5 text-text-secondary text-[12px] font-metadata">
+<span class="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>
+<span class="">Midjourney v6.1</span>
+</div>
+</td>
+<td class="py-3 px-3">
+<span class="font-code-json text-[12px] text-text-secondary">16:9</span>
+</td>
+<td class="py-3 px-3">
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-metadata font-medium bg-emerald-50 text-status-success border border-emerald-200/60">
+<span class="w-1.5 h-1.5 rounded-full bg-status-success"></span>
+<span class="">Published</span>
+</span>
+</td>
+<td class="py-3 px-3 text-text-secondary text-[12px] font-metadata">10m ago</td>
+<td class="py-3 px-4 text-right">
+<div class="flex items-center justify-end gap-1">
+<button class="px-2 py-1 text-[12px] text-text-secondary hover:text-action-primary hover:bg-surface-container rounded font-metadata transition-colors" type="button">编辑</button>
+<button class="p-1 text-text-muted hover:text-text-primary hover:bg-surface-container rounded transition-colors" title="预览" type="button">
+<span class="material-symbols-outlined text-[16px]">visibility</span>
+</button>
+<button class="p-1 text-text-muted hover:text-text-primary hover:bg-surface-container rounded transition-colors" title="更多选项" type="button">
+<span class="material-symbols-outlined text-[16px]">more_horiz</span>
+</button>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low/60 transition-colors group">
+<td class="py-3 px-4">
+<div class="flex items-center gap-3">
+<img class="w-[52px] h-[40px] rounded object-cover border border-border-default shrink-0 shadow-xs" data-alt="Vintage retro travel tourism lithograph poster of the Amalfi coast in Italy, elegant Swiss typography, pastel sunburst sky, bold geometric composition, screenprint grain texture" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB_vVTOkeCNJzyKlzC68tB_moAPkuXVTv8rS-yYIivV1OwiPJ7wYyIUdZgen_kk6F1qC2NoxQBTZFd0rnUVsaKI-f9WnvilBEEzQucPeU8fF6daCBpMGlSSZ_LHzioCAPm61QPg-Fd0FQuysLzDb4NkajnUURfUDTbmd4Pj8byOxKBI3ibdi1rHZQZ5SsP9K-rTupoV3p8ss2DaPnheg7w_H9VajX5F5wvefqsR61UvV8h4a0g9HJ9E">
+<div class="flex flex-col min-w-0">
+<span class="font-card-title text-[14px] text-text-primary truncate font-medium group-hover:text-action-primary transition-colors cursor-pointer">Vintage Editorial Travel Poster</span>
+<span class="text-text-muted text-[12px] truncate max-w-[240px]">Retro minimalist screenprint poster of coastal cliffs with rich flat vector shades...</span>
+</div>
+</div>
+</td>
+<td class="py-3 px-3">
+<span class="font-code-json text-code-json text-text-secondary bg-surface-container-low px-1.5 py-0.5 rounded border border-border-default/70">amalfi-travel-poster</span>
+</td>
+<td class="py-3 px-3">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-metadata bg-surface-container text-text-primary">海报设计</span>
+</td>
+<td class="py-3 px-3">
+<div class="flex items-center gap-1.5 text-text-secondary text-[12px] font-metadata">
+<span class="w-1.5 h-1.5 rounded-full bg-violet-600"></span>
+<span class="">Flux.1 Dev</span>
+</div>
+</td>
+<td class="py-3 px-3">
+<span class="font-code-json text-[12px] text-text-secondary">3:4</span>
+</td>
+<td class="py-3 px-3">
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-metadata font-medium bg-emerald-50 text-status-success border border-emerald-200/60">
+<span class="w-1.5 h-1.5 rounded-full bg-status-success"></span>
+<span class="">Published</span>
+</span>
+</td>
+<td class="py-3 px-3 text-text-secondary text-[12px] font-metadata">2h ago</td>
+<td class="py-3 px-4 text-right">
+<div class="flex items-center justify-end gap-1">
+<button class="px-2 py-1 text-[12px] text-text-secondary hover:text-action-primary hover:bg-surface-container rounded font-metadata transition-colors" type="button">编辑</button>
+<button class="p-1 text-text-muted hover:text-text-primary hover:bg-surface-container rounded transition-colors" title="预览" type="button">
+<span class="material-symbols-outlined text-[16px]">visibility</span>
+</button>
+<button class="p-1 text-text-muted hover:text-text-primary hover:bg-surface-container rounded transition-colors" title="更多选项" type="button">
+<span class="material-symbols-outlined text-[16px]">more_horiz</span>
+</button>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low/60 transition-colors group">
+<td class="py-3 px-4">
+<div class="flex items-center gap-3">
+<img class="w-[52px] h-[40px] rounded object-cover border border-border-default shrink-0 shadow-xs" data-alt="Nordic editorial fashion beauty portrait in soft directional window light, pure linen texture, natural skin tones, serene contemplative expression, Hasselblad medium format sharpness" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBUSPeb45T0aTmjRTFF39EmzjLhkL4TuvEDPkX0wBYzUOyG5MGW62mC7_fxKiUFuvb6TcvbuQYqiynSfK7EbUhns-Dm8nzMzeGI6pxx53jinMRoalgx-_yPKGUKMxr1y7IIt_qF2NJPAj9Ap-44xv6g7_IdMstzK8FpTi0AnhGmQGWlHUp4iyvUHc8n7Crb7W0WhL7MdavspI6dX11Zhf-SfRpEOas8zHFPe--rC2EN6oWHh8Ux02KW">
+<div class="flex flex-col min-w-0">
+<span class="font-card-title text-[14px] text-text-primary truncate font-medium group-hover:text-action-primary transition-colors cursor-pointer">Minimalist Natural Light Portrait</span>
+<span class="text-text-muted text-[12px] truncate max-w-[240px]">Quiet editorial studio portrait lit by oversized diffused side window pane...</span>
+</div>
+</div>
+</td>
+<td class="py-3 px-3">
+<span class="font-code-json text-code-json text-text-secondary bg-surface-container-low px-1.5 py-0.5 rounded border border-border-default/70">portrait-natural-light</span>
+</td>
+<td class="py-3 px-3">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-metadata bg-surface-container text-text-primary">摄影写真</span>
+</td>
+<td class="py-3 px-3">
+<div class="flex items-center gap-1.5 text-text-secondary text-[12px] font-metadata">
+<span class="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>
+<span class="">Midjourney v6.1</span>
+</div>
+</td>
+<td class="py-3 px-3">
+<span class="font-code-json text-[12px] text-text-secondary">2:3</span>
+</td>
+<td class="py-3 px-3">
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-metadata font-medium bg-zinc-100 text-zinc-600 border border-border-default">
+<span class="w-1.5 h-1.5 rounded-full bg-zinc-400"></span>
+<span class="">Draft</span>
+</span>
+</td>
+<td class="py-3 px-3 text-text-secondary text-[12px] font-metadata">Yesterday</td>
+<td class="py-3 px-4 text-right">
+<div class="flex items-center justify-end gap-1">
+<button class="px-2 py-1 text-[12px] text-text-secondary hover:text-action-primary hover:bg-surface-container rounded font-metadata transition-colors" type="button">编辑</button>
+<button class="p-1 text-text-muted hover:text-text-primary hover:bg-surface-container rounded transition-colors" title="预览" type="button">
+<span class="material-symbols-outlined text-[16px]">visibility</span>
+</button>
+<button class="p-1 text-text-muted hover:text-text-primary hover:bg-surface-container rounded transition-colors" title="更多选项" type="button">
+<span class="material-symbols-outlined text-[16px]">more_horiz</span>
+</button>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low/60 transition-colors group">
+<td class="py-3 px-4">
+<div class="flex items-center gap-3">
+<img class="w-[52px] h-[40px] rounded object-cover border border-border-default shrink-0 shadow-xs" data-alt="Industrial product studio photography of matte dark titanium headphones on raw concrete plinth, grazing razor-sharp rim lights, hyperdetailed bevel edges and satin finishes" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCZnVp2-Ajxl-OtGsKRYRJbbOMkQMhiwNaZAxg_VtZlOKKFoBQ3l6WSbbRrSGSVCKfISSMN_clLMHUzxYTpoNhJ8E2rS1Km2f2eOrhYFozQmycVr_Lb50RH7xK10JV8LYRQyfT-6sP9h_fIw3PDOHNBRZVeuSbAeixZ65D4SlZ61HwTRRtWG8zFaNZZ3YtWGjek3szMvRg4_8VsCu_544yg8CYjoKfdrrK4auxpJStlRuVAxVZmRT4c">
+<div class="flex flex-col min-w-0">
+<span class="font-card-title text-[14px] text-text-primary truncate font-medium group-hover:text-action-primary transition-colors cursor-pointer">Matte Titanium Industrial Design</span>
+<span class="text-text-muted text-[12px] truncate max-w-[240px]">Precision crafted metal electronic device resting on stone base with rim lighting...</span>
+</div>
+</div>
+</td>
+<td class="py-3 px-3">
+<span class="font-code-json text-code-json text-text-secondary bg-surface-container-low px-1.5 py-0.5 rounded border border-border-default/70">titanium-gadget-render</span>
+</td>
+<td class="py-3 px-3">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-metadata bg-surface-container text-text-primary">工业设计</span>
+</td>
+<td class="py-3 px-3">
+<div class="flex items-center gap-1.5 text-text-secondary text-[12px] font-metadata">
+<span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+<span class="">DALL·E 3</span>
+</div>
+</td>
+<td class="py-3 px-3">
+<span class="font-code-json text-[12px] text-text-secondary">1:1</span>
+</td>
+<td class="py-3 px-3">
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-metadata font-medium bg-emerald-50 text-status-success border border-emerald-200/60">
+<span class="w-1.5 h-1.5 rounded-full bg-status-success"></span>
+<span class="">Published</span>
+</span>
+</td>
+<td class="py-3 px-3 text-text-secondary text-[12px] font-metadata">Apr 12</td>
+<td class="py-3 px-4 text-right">
+<div class="flex items-center justify-end gap-1">
+<button class="px-2 py-1 text-[12px] text-text-secondary hover:text-action-primary hover:bg-surface-container rounded font-metadata transition-colors" type="button">编辑</button>
+<button class="p-1 text-text-muted hover:text-text-primary hover:bg-surface-container rounded transition-colors" title="预览" type="button">
+<span class="material-symbols-outlined text-[16px]">visibility</span>
+</button>
+<button class="p-1 text-text-muted hover:text-text-primary hover:bg-surface-container rounded transition-colors" title="更多选项" type="button">
+<span class="material-symbols-outlined text-[16px]">more_horiz</span>
+</button>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low/60 transition-colors group">
+<td class="py-3 px-4">
+<div class="flex items-center gap-3">
+<img class="w-[52px] h-[40px] rounded object-cover border border-border-default shrink-0 shadow-xs" data-alt="Strict Bauhaus Swiss Style grid poster graphic design layout, bold red black and off-white shapes, clean sans-serif typography hierarchy, clean paper grain, high modernist purity" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDO0ISE55Nxg9l9fgnroxeQ65cJCe9oDVhFCP2do9R3YyyUhT4Xm_UiMOPx4VjjgaAtzmVFHAVysQ9fF6ZXHXZlVNaExIOvCJFWeDR4qhGYv-6e_0jDWtULgax-8M7alvbenrTFKbYyU1JFwDsWx-CFOtjfjqtWbTwkOQOvEYRJqCqHbLNXad26zEJAxVZMPPaZAQzkBW_1jqIpv0oSnbn6cTEZAeMgpkqqJTXDnlc92eIkAGpBsXaf">
+<div class="flex flex-col min-w-0">
+<span class="font-card-title text-[14px] text-text-primary truncate font-medium group-hover:text-action-primary transition-colors cursor-pointer">Bauhaus Swiss Grid Poster</span>
+<span class="text-text-muted text-[12px] truncate max-w-[240px]">Dynamic geometric layout inspired by Josef Müller-Brockmann's modular grids...</span>
+</div>
+</div>
+</td>
+<td class="py-3 px-3">
+<span class="font-code-json text-code-json text-text-secondary bg-surface-container-low px-1.5 py-0.5 rounded border border-border-default/70">bauhaus-swiss-grid</span>
+</td>
+<td class="py-3 px-3">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-metadata bg-surface-container text-text-primary">海报设计</span>
+</td>
+<td class="py-3 px-3">
+<div class="flex items-center gap-1.5 text-text-secondary text-[12px] font-metadata">
+<span class="w-1.5 h-1.5 rounded-full bg-violet-600"></span>
+<span class="">Flux.1 Dev</span>
+</div>
+</td>
+<td class="py-3 px-3">
+<span class="font-code-json text-[12px] text-text-secondary">3:4</span>
+</td>
+<td class="py-3 px-3">
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-metadata font-medium bg-emerald-50 text-status-success border border-emerald-200/60">
+<span class="w-1.5 h-1.5 rounded-full bg-status-success"></span>
+<span class="">Published</span>
+</span>
+</td>
+<td class="py-3 px-3 text-text-secondary text-[12px] font-metadata">Apr 10</td>
+<td class="py-3 px-4 text-right">
+<div class="flex items-center justify-end gap-1">
+<button class="px-2 py-1 text-[12px] text-text-secondary hover:text-action-primary hover:bg-surface-container rounded font-metadata transition-colors" type="button">编辑</button>
+<button class="p-1 text-text-muted hover:text-text-primary hover:bg-surface-container rounded transition-colors" title="预览" type="button">
+<span class="material-symbols-outlined text-[16px]">visibility</span>
+</button>
+<button class="p-1 text-text-muted hover:text-text-primary hover:bg-surface-container rounded transition-colors" title="更多选项" type="button">
+<span class="material-symbols-outlined text-[16px]">more_horiz</span>
+</button>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low/60 transition-colors group">
+<td class="py-3 px-4">
+<div class="flex items-center gap-3">
+<img class="w-[52px] h-[40px] rounded object-cover border border-border-default shrink-0 shadow-xs" data-alt="Dense atmospheric dark cyberpunk alleyway in heavy rain storm, holographic advertisements glowing purple and cyan, wet reflection textures, dark futuristic cinematic visual" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCanM-j4XvysExqywAhyJtHy4MyBABC1acomnZFFPFa7YXbps2nSciGbO1TL4utBPPdgowk6uNhyD557Dm7E_NlavfYbpzaXhWmkORTYADQRT3WsYaX9W1uTQ1yW0nl-t3vLEDyDSMcngDTTUfrqlXPqSo0PmgCk_QNSdU4zBw_7pWoF1zgxnO-eXF3zw8vqO_P8CcKsKuVZo-QNj8BuL9GcIZ1_gD0cDI0lYyRkJpJ5Jip01-jiKN4">
+<div class="flex flex-col min-w-0">
+<span class="font-card-title text-[14px] text-text-primary truncate font-medium group-hover:text-action-primary transition-colors cursor-pointer">Cyberpunk Rain Alley</span>
+<span class="text-text-muted text-[12px] truncate max-w-[240px]">Narrow alleyway between towering mega-structures shrouded in wet steam and neon...</span>
+</div>
+</div>
+</td>
+<td class="py-3 px-3">
+<span class="font-code-json text-code-json text-text-secondary bg-surface-container-low px-1.5 py-0.5 rounded border border-border-default/70">cyberpunk-rain-alley</span>
+</td>
+<td class="py-3 px-3">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-metadata bg-surface-container text-text-primary">UI 构图</span>
+</td>
+<td class="py-3 px-3">
+<div class="flex items-center gap-1.5 text-text-secondary text-[12px] font-metadata">
+<span class="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>
+<span class="">Midjourney v6.1</span>
+</div>
+</td>
+<td class="py-3 px-3">
+<span class="font-code-json text-[12px] text-text-secondary">16:9</span>
+</td>
+<td class="py-3 px-3">
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-metadata font-medium bg-rose-50 text-status-danger border border-rose-200/60">
+<span class="w-1.5 h-1.5 rounded-full bg-status-danger"></span>
+<span class="">Deleted</span>
+</span>
+</td>
+<td class="py-3 px-3 text-text-secondary text-[12px] font-metadata">Apr 08</td>
+<td class="py-3 px-4 text-right">
+<div class="flex items-center justify-end gap-1"><button class="p-1 text-text-muted hover:text-text-primary hover:bg-surface-container rounded transition-colors" title="预览" type="button"><span class="material-symbols-outlined text-[16px]">visibility</span></button><button class="p-1 text-text-muted hover:text-text-primary hover:bg-surface-container rounded transition-colors" title="更多选项" type="button"><span class="material-symbols-outlined text-[16px]">more_horiz</span></button></div>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low/60 transition-colors group">
+<td class="py-3 px-4">
+<div class="flex items-center gap-3">
+<img class="w-[52px] h-[40px] rounded object-cover border border-border-default shrink-0 shadow-xs" data-alt="Monolithic brutalist sand-cast concrete villa standing in desert dunes, dramatic sharp geometric shadows, warm golden hour sun, minimalist architectural marvel photograph" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAs_b7YtObPvQeg-3SnuX-x8WksbiyQYZeJICfij0gYg-dtp_9duxhdyAkl4rXJjvkqIdFiu4tC-Cn5ZC0PnI8YpE-7m695KiKOLI45r1y7dMdXOuKHFPK6sYLYXpk698aQXOKh3p-_PYFOwyOnjXj8IDGSwEXqGh-wvQzh2izq5UvBUdBlkWgociUxwOpYbuE-M8vBj8WhmaivSjOdLIuXa16Wef7iZHVxTqybBue52LuYu97nYYXR">
+<div class="flex flex-col min-w-0">
+<span class="font-card-title text-[14px] text-text-primary truncate font-medium group-hover:text-action-primary transition-colors cursor-pointer">Brutalist Desert Stone Villa</span>
+<span class="text-text-muted text-[12px] truncate max-w-[240px]">Sculptural raw concrete pavilion integrated seamlessly into arid sand dunes...</span>
+</div>
+</div>
+</td>
+<td class="py-3 px-3">
+<span class="font-code-json text-code-json text-text-secondary bg-surface-container-low px-1.5 py-0.5 rounded border border-border-default/70">brutalist-desert-villa</span>
+</td>
+<td class="py-3 px-3">
+<span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-metadata bg-surface-container text-text-primary">空间建筑</span>
+</td>
+<td class="py-3 px-3">
+<div class="flex items-center gap-1.5 text-text-secondary text-[12px] font-metadata">
+<span class="w-1.5 h-1.5 rounded-full bg-violet-600"></span>
+<span class="">Flux.1 Dev</span>
+</div>
+</td>
+<td class="py-3 px-3">
+<span class="font-code-json text-[12px] text-text-secondary">16:9</span>
+</td>
+<td class="py-3 px-3">
+<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-metadata font-medium bg-emerald-50 text-status-success border border-emerald-200/60">
+<span class="w-1.5 h-1.5 rounded-full bg-status-success"></span>
+<span class="">Published</span>
+</span>
+</td>
+<td class="py-3 px-3 text-text-secondary text-[12px] font-metadata">Apr 04</td>
+<td class="py-3 px-4 text-right">
+<div class="flex items-center justify-end gap-1">
+<button class="px-2 py-1 text-[12px] text-text-secondary hover:text-action-primary hover:bg-surface-container rounded font-metadata transition-colors" type="button">编辑</button>
+<button class="p-1 text-text-muted hover:text-text-primary hover:bg-surface-container rounded transition-colors" title="预览" type="button">
+<span class="material-symbols-outlined text-[16px]">visibility</span>
+</button>
+<button class="p-1 text-text-muted hover:text-text-primary hover:bg-surface-container rounded transition-colors" title="更多选项" type="button">
+<span class="material-symbols-outlined text-[16px]">more_horiz</span>
+</button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="p-3 px-4 bg-bg-surface border-t border-border-default flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-[13px] font-metadata">
+<div class="text-text-secondary">
+        Showing <span class="font-medium text-text-primary">1-7</span> of <span class="font-medium text-text-primary">128</span> prompts
+      </div>
+<div class="flex items-center gap-1">
+<button class="w-8 h-8 flex items-center justify-center rounded border border-border-default text-text-muted hover:text-text-primary hover:bg-surface-container-low transition-colors disabled:opacity-40" disabled="" type="button">
+<span class="material-symbols-outlined text-[16px]">chevron_left</span>
+</button>
+<button class="w-8 h-8 flex items-center justify-center rounded bg-action-primary text-on-primary font-medium text-[12px]" type="button">1</button>
+<button class="w-8 h-8 flex items-center justify-center rounded border border-border-default text-text-secondary hover:text-text-primary hover:bg-surface-container-low text-[12px] transition-colors" type="button">2</button>
+<button class="w-8 h-8 flex items-center justify-center rounded border border-border-default text-text-secondary hover:text-text-primary hover:bg-surface-container-low text-[12px] transition-colors" type="button">3</button>
+<span class="w-6 text-center text-text-muted text-[12px]">...</span>
+<button class="w-8 h-8 flex items-center justify-center rounded border border-border-default text-text-secondary hover:text-text-primary hover:bg-surface-container-low text-[12px] transition-colors" type="button">13</button>
+<button class="w-8 h-8 flex items-center justify-center rounded border border-border-default text-text-secondary hover:text-text-primary hover:bg-surface-container-low transition-colors" type="button">
+<span class="material-symbols-outlined text-[16px]">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+</div></div></main></div>
+
+</body></html>

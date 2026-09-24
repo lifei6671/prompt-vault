@@ -9,7 +9,7 @@ export type AdminPrompt = {
   id: number; slug: string; source_language: Locale; title: string; description: string | null;
   prompt_template: string; image_alt: string; model: string | null; ratio: string | null;
   category_id: number; status: "draft" | "published"; published_at: string | null;
-  deleted_at: string | null; updated_at: string; original_image_key: string; preview_image_key: string;
+  deleted_at: string | null; created_at: string; updated_at: string; original_image_key: string; preview_image_key: string;
   original_content_type: string; original_width: number; original_height: number;
   preview_width: number; preview_height: number; original_size_bytes: number; preview_size_bytes: number;
   translation: { locale: Locale; title: string; description: string | null; prompt_template: string; image_alt: string } | null;
@@ -165,7 +165,7 @@ export async function listPromptTaxonomy(db: D1Database) {
 }
 async function row(db: D1Database, id: number) {
   const prompt = await db.prepare(`SELECT id, slug, source_language, title, description, prompt_template,
-    image_alt, model, ratio, category_id, status, published_at, deleted_at, updated_at,
+    image_alt, model, ratio, category_id, status, published_at, deleted_at, created_at, updated_at,
     original_image_key, preview_image_key, original_content_type, original_width, original_height,
     preview_width, preview_height, original_size_bytes, preview_size_bytes FROM prompts WHERE id = ?`)
     .bind(id).first<Omit<AdminPrompt, "translation" | "variables" | "tagIds">>();

@@ -4,9 +4,17 @@ export interface AdminSecurityConfig {
   CF_ACCESS_ISSUER?: string;
   CF_ACCESS_AUD?: string;
   ADMIN_EMAILS?: string;
+  ADMIN_DEV_BYPASS?: string;
 }
 
 let remoteKeys: { issuer: string; keySet: JWTVerifyGetKey } | undefined;
+
+export function isLocalAdminBypass(request: Request, config: AdminSecurityConfig): boolean {
+  if (config.ADMIN_DEV_BYPASS !== "1") return false;
+  const hostname = new URL(request.url).hostname;
+  return hostname === "localhost" || hostname === "127.0.0.1" ||
+    hostname === "[::1]" || hostname === "::1";
+}
 
 function unavailable(): Response {
   return new Response("Admin security is not configured", {
@@ -39,6 +47,7 @@ export async function requireAdmin(
   config: AdminSecurityConfig,
   keySet?: JWTVerifyGetKey,
 ): Promise<void> {
+  if (isLocalAdminBypass(request, config)) return;
   const { issuer, audience, allowlist } = readConfig(config);
   const token = request.headers.get("Cf-Access-Jwt-Assertion");
   if (!token) {

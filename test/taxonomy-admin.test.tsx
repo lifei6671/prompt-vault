@@ -221,7 +221,30 @@ describe("Category and Tag admin CRUD", () => {
     expect(invalid.init?.status).toBe(400);
     expect(invalid.init?.headers).toMatchObject({ "Cache-Control": "no-store" });
   });
-});
+  it("reports referenced Prompt counts and renders bilingual compact taxonomy rows", async () => {
+    const category = (await row("category", "admin-category"))!;
+    const tag = (await row("tag", "admin-tag"))!;
+    expect(category.prompt_count).toBe(1);
+    expect(tag.prompt_count).toBe(1);
+    expect(category.updated_at).toBeTruthy();
+    const prompt = await env.DB.prepare("SELECT id FROM prompts WHERE slug = 'admin-prompt'").first<{ id: number }>();
+    await env.DB.prepare("UPDATE prompts SET deleted_at = 'now' WHERE id = ?").bind(prompt!.id).run();
+    expect((await row("category", "admin-category"))?.prompt_count).toBe(1);
+    expect((await row("tag", "admin-tag"))?.prompt_count).toBe(1);
+    for (const kind of ["category", "tag"] as const) {
+      const items = await listTaxonomyAdmin(env.DB, kind);
+      for (const locale of ["zh-CN", "en-US"] as const) {
+        const router = createMemoryRouter([{ path: "/", element: createElement(Outlet, { context: locale }),
+          children: [{ index: true, element: createElement(TaxonomyAdminPage, { kind, items }) }] }]);
+        const html = renderToStaticMarkup(createElement(RouterProvider, { router }));
+        expect(html).toContain('admin-taxonomy-table');
+        expect(html).toContain('admin-taxonomy-compact');
+        expect(html).toContain(locale === "zh-CN" ? "Prompt 数" : "Prompts");
+        expect(html).toContain('name="source_language"');
+        expect(html).toContain('name="translation_name"');
+      }
+    }
+  });});
 
 
 

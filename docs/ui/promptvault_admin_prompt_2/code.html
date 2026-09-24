@@ -1,0 +1,362 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1.0" name="viewport"><meta content="web_dashboard" name="shell-type"><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;display=swap" rel="stylesheet"><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{"colors":{"text-muted":"#A1A1AA","on-secondary-fixed":"#001551","surface-container-high":"#eae7eb","surface-bright":"#fbf8fc","surface-container-highest":"#e4e1e6","primary-fixed-dim":"#b4c5ff","primary-fixed":"#dbe1ff","on-background":"#1b1b1e","on-primary-fixed":"#00174b","on-secondary-fixed-variant":"#0039b5","secondary":"#1d4ed8","tertiary-fixed":"#ffdbcd","action-primary-hover":"#1D4ED8","primary":"#004ac6","text-primary":"#18181B","surface-variant":"#e4e1e6","on-primary-container":"#eeefff","bg-inverse":"#111111","surface-container-low":"#f6f2f7","on-error":"#ffffff","on-primary-fixed-variant":"#003ea8","surface":"#fbf8fc","on-primary":"#ffffff","bg-surface":"#FFFFFF","primary-container":"#2563eb","secondary-fixed-dim":"#b7c4ff","tertiary":"#943700","inverse-on-surface":"#f3f0f4","inverse-surface":"#303033","tertiary-fixed-dim":"#ffb596","on-secondary-container":"#fffbff","on-tertiary":"#ffffff","secondary-fixed":"#dce1ff","on-secondary":"#ffffff","outline":"#737686","surface-tint":"#0053db","text-secondary":"#71717A","tertiary-container":"#bc4800","on-tertiary-container":"#ffede6","secondary-container":"#4069f2","border-default":"#E4E4E7","border-hover":"#D4D4D8","on-surface":"#1b1b1e","on-error-container":"#93000a","outline-variant":"#c3c6d7","on-tertiary-fixed":"#360f00","error-container":"#ffdad6","background":"#fbf8fc","on-tertiary-fixed-variant":"#7d2d00","inverse-primary":"#b4c5ff","surface-container":"#f0edf1","on-surface-variant":"#434655","status-danger":"#DC2626","error":"#ba1a1a","status-success":"#16A34A","bg-page":"#F7F7F5","action-primary":"#2563EB","surface-dim":"#dcd9dd","surface-container-lowest":"#ffffff"},"borderRadius":{"DEFAULT":"0.25rem","lg":"0.5rem","xl":"0.75rem","full":"9999px"},"spacing":{"space-xl":"2rem","space-sm":"0.5rem","space-md":"1rem","gutter":"1.5rem","margin-mobile":"1rem","margin":"2rem","gutter-mobile":"1rem","space-xs":"0.25rem","space-lg":"1.5rem"},"fontFamily":{"page-title":["Inter"],"card-title":["Inter"],"prompt-text":["Inter"],"detail-title":["Inter"],"body":["Inter"],"metadata":["Inter"],"section-title":["Inter"],"page-title-mobile":["Inter"],"code-json":["JetBrains Mono"]},"fontSize":{"page-title":["32px",{"lineHeight":"38px","letterSpacing":"-0.02em","fontWeight":"700"}],"card-title":["15px",{"lineHeight":"21px","letterSpacing":"0em","fontWeight":"600"}],"prompt-text":["15px",{"lineHeight":"25px","letterSpacing":"0em","fontWeight":"400"}],"detail-title":["24px",{"lineHeight":"31px","letterSpacing":"-0.01em","fontWeight":"600"}],"body":["15px",{"lineHeight":"24px","letterSpacing":"0em","fontWeight":"400"}],"metadata":["13px",{"lineHeight":"18px","letterSpacing":"0.01em","fontWeight":"500"}],"section-title":["16px",{"lineHeight":"22px","letterSpacing":"-0.005em","fontWeight":"600"}],"page-title-mobile":["26px",{"lineHeight":"32px","letterSpacing":"-0.01em","fontWeight":"700"}],"code-json":["13px",{"lineHeight":"20px","letterSpacing":"0em","fontWeight":"400"}]}}}}</script></head><body class="bg-bg-page font-body text-text-primary min-h-screen"><aside class="fixed inset-y-0 left-0 w-[230px] bg-bg-surface z-50 flex flex-col justify-between border-r border-border-default"><div class="flex flex-col"><div class="h-16 px-space-md flex items-center gap-space-sm border-b border-border-default"><img alt="Brand logo. - Primary color: #2563eb
+- Font: inter
+- Mode: light
+- Roundness: rounded-md
+" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida/AEtjO1U8-i-xDxT68ZTXWeCLTmtPVW__dNjnx8PeqxxxKDdxWbrQmyCffp8Fx0Yk9lPWIsPfNtq74le7CbPpW5i_EyZGlAGwP7OoTRzjmNPWOdDTiznOKgNsZtl0qerfsp2VhLDL53t4wcLrelPGHE27VsCVCw6KOujTgf30nxZR803UxiKh-nTvOud6-8cF1kuiUIP6uoOIP-Zm2LLTiysqQC0kBt9Ux2P34TSV2aUjzgVXbXEyTDDemyERXUY"><div class="flex items-center gap-space-xs"><span class="font-section-title text-section-title text-text-primary tracking-tight">PromptVault</span><span class="px-1.5 py-0.5 text-[10px] font-medium font-metadata tracking-wide uppercase bg-surface-container rounded text-text-secondary border border-border-default">Admin</span></div></div><div class="px-space-md pt-space-lg pb-space-xs"><span class="text-[11px] font-metadata font-semibold uppercase tracking-wider text-text-muted">Content</span></div><nav class="flex flex-col space-y-0.5 px-space-xs" data-active-classes="bg-surface-container-low text-action-primary font-medium border-l-2 border-action-primary"><a aria-current="page" class="flex items-center justify-between px-space-sm py-2 rounded transition-colors bg-surface-container-low text-action-primary font-medium border-l-2 border-action-primary" data-path="prompts-management" href="#"><span class="font-body text-body text-[14px]">Prompts</span><span class="px-2 py-0.5 font-metadata text-[11px] rounded bg-surface-container text-text-secondary">128</span></a><a class="flex items-center justify-between px-space-sm py-2 rounded text-text-secondary hover:text-text-primary hover:bg-surface-container-low transition-colors" data-path="categories-management" href="#"><span class="font-body text-body text-[14px]">Categories</span><span class="px-2 py-0.5 font-metadata text-[11px] rounded bg-surface-container text-text-secondary">12</span></a><a class="flex items-center justify-between px-space-sm py-2 rounded text-text-secondary hover:text-text-primary hover:bg-surface-container-low transition-colors" data-path="tags-management" href="#"><span class="font-body text-body text-[14px]">Tags</span><span class="px-2 py-0.5 font-metadata text-[11px] rounded bg-surface-container text-text-secondary">36</span></a></nav></div><div class="p-space-md border-t border-border-default flex flex-col gap-space-sm"><a class="flex items-center gap-space-xs text-text-secondary hover:text-text-primary text-metadata font-metadata transition-colors" data-path="explore-overview" href="#"><span class="material-symbols-outlined text-[16px]">arrow_back</span><span class="">Back to Explore</span></a><div class="flex items-center justify-between pt-space-xs border-t border-border-default text-metadata font-metadata"><span class="text-text-muted text-[12px]">Language</span><div class="flex items-center gap-1 text-[12px]"><button class="text-text-primary hover:text-action-primary font-medium transition-colors" type="button">中文</button><span class="text-text-muted">/</span><button class="text-action-primary font-semibold transition-colors" type="button">EN</button></div></div></div></aside><div class="pl-[230px]"><header class="fixed top-0 left-[230px] right-0 h-16 bg-bg-surface/90 backdrop-blur-md z-40 border-b border-border-default"><div class="h-16 w-full px-8 flex items-center justify-between"><div class="flex items-center gap-space-sm font-metadata text-metadata text-text-secondary"><span class="text-text-muted">Console</span><span class="text-text-muted">/</span><span class="text-text-primary font-medium">PromptVault Workbench</span></div><div class="flex items-center gap-space-md"></div></div></header><main class="relative pt-16 bg-bg-page min-h-screen"><div class="max-w-7xl mx-auto px-8 py-6"><div class="flex flex-col w-full">
+<!-- Top Command Action Bar -->
+<div class="flex items-center justify-between pb-space-lg mb-space-lg border-b border-border-default">
+<div class="flex items-center gap-space-md min-w-0">
+<a class="flex items-center gap-1 font-metadata text-metadata text-text-secondary hover:text-text-primary transition-colors py-1.5 px-2.5 rounded bg-bg-surface border border-border-default hover:border-border-hover" data-path="prompts-management" href="#">
+<span class="material-symbols-outlined text-[16px]">arrow_back</span>
+<span class="">Prompts</span>
+</a>
+<div class="h-4 w-px bg-border-default"></div>
+<div class="flex items-center gap-space-sm min-w-0">
+<h1 class="font-detail-title text-detail-title text-text-primary truncate tracking-tight">Cinematic Tokyo Street</h1>
+<span class="px-2 py-0.5 font-metadata text-[11px] font-medium uppercase tracking-wide rounded bg-surface-container text-text-secondary border border-border-default">
+          Draft
+        </span>
+<span class="font-code-json text-[12px] text-text-muted px-2 py-0.5 rounded bg-bg-surface border border-border-default">
+          ID: pmt_8f93e2
+        </span>
+</div>
+</div>
+<div class="flex items-center gap-space-sm">
+<button class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-bg-surface border border-border-default hover:border-border-hover text-text-primary font-metadata text-metadata transition-colors" id="previewBtn" type="button">
+<span class="material-symbols-outlined text-[16px] text-text-secondary">visibility</span>
+<span class="">Preview</span>
+</button>
+<button class="flex items-center gap-1.5 px-4 py-1.5 rounded-lg bg-action-primary hover:bg-action-primary-hover text-on-primary font-metadata text-metadata font-medium transition-all shadow-sm" id="saveDraftBtn" type="button">
+<span class="material-symbols-outlined text-[16px]">save</span>
+<span id="saveBtnText" class="">Save Changes</span>
+</button>
+</div>
+</div>
+<!-- Editorial 2-Column Grid Workspace (72% Main / 28% Sticky Sidebar) -->
+<div class="grid grid-cols-12 gap-space-xl items-start">
+<!-- Main Editorial Document Flow (72% -> col-span-8 or ~68-72%) -->
+<div class="col-span-12 lg:col-span-8 flex flex-col space-y-space-xl">
+<!-- Section 1: Basic Information -->
+<section class="bg-bg-surface border border-border-default p-space-lg shadow-sm rounded-lg">
+<div class="flex items-center justify-between pb-space-md mb-space-md border-b border-border-default">
+<div class="flex items-center gap-space-sm">
+<span class="material-symbols-outlined text-[18px] text-action-primary">settings_suggest</span>
+<h2 class="font-section-title text-section-title text-text-primary">Basic Information</h2>
+</div>
+<span class="font-metadata text-[12px] text-text-muted">Slug &amp; Core Taxonomy</span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-space-md">
+<div class="space-y-1.5">
+<label class="font-metadata text-metadata text-text-secondary flex items-center justify-between">
+<span class="">Slug Parameter</span>
+<span class="font-code-json text-[11px] text-text-muted">/explore/:slug</span>
+</label>
+<div class="relative flex items-center">
+<span class="absolute inset-inline-start-3 text-text-muted font-code-json text-[13px]">/</span>
+<input class="w-full h-9 pl-7 pr-3 rounded-lg border border-border-default bg-bg-surface font-code-json text-code-json text-text-primary focus:outline-none focus:border-action-primary focus:ring-2 focus:ring-action-primary/20 transition-all" type="text" value="cinematic-tokyo-street">
+</div>
+</div>
+<div class="space-y-1.5">
+<label class="font-metadata text-metadata text-text-secondary">Chinese Display Name</label>
+<input class="w-full h-9 px-3 rounded-lg border border-border-default bg-bg-surface font-body text-body text-text-primary focus:outline-none focus:border-action-primary focus:ring-2 focus:ring-action-primary/20 transition-all" type="text" value="电影质感双重曝光氛围感人物肖像">
+</div>
+<div class="space-y-1.5">
+<label class="font-metadata text-metadata text-text-secondary">Primary Category</label>
+<div class="relative">
+<select class="w-full h-9 px-3 rounded-lg border border-border-default bg-bg-surface font-body text-body text-text-primary focus:outline-none focus:border-action-primary focus:ring-2 focus:ring-action-primary/20 appearance-none transition-all">
+<option selected="">摄影写真 (Portrait Photography)</option>
+<option>概念艺术 (Concept Art)</option>
+<option>商业渲染 (Commercial 3D)</option>
+<option>建筑与室内 (Architecture)</option>
+<option>矢量插画 (Vector Graphic)</option>
+</select>
+<span class="material-symbols-outlined text-[18px] text-text-muted absolute right-3 top-2 pointer-events-none">unfold_more</span>
+</div>
+</div>
+<div class="space-y-1.5">
+<label class="font-metadata text-metadata text-text-secondary">AI Model Architecture</label>
+<div class="relative">
+<select class="w-full h-9 px-3 rounded-lg border border-border-default bg-bg-surface font-body text-body text-text-primary focus:outline-none focus:border-action-primary focus:ring-2 focus:ring-action-primary/20 appearance-none transition-all">
+<option selected="">Midjourney v6.1</option>
+<option>Flux.1 Dev</option>
+<option>Flux.1 Schnell</option>
+<option>Stable Diffusion 3.5 Large</option>
+<option>DALL-E 3</option>
+</select>
+<span class="material-symbols-outlined text-[18px] text-text-muted absolute right-3 top-2 pointer-events-none">unfold_more</span>
+</div>
+</div>
+<div class="space-y-1.5">
+<label class="font-metadata text-metadata text-text-secondary">Aspect Ratio Preset</label>
+<div class="relative">
+<select class="w-full h-9 px-3 rounded-lg border border-border-default bg-bg-surface font-body text-body text-text-primary focus:outline-none focus:border-action-primary focus:ring-2 focus:ring-action-primary/20 appearance-none transition-all">
+<option selected="">2:3 (Portrait Standard)</option>
+<option>1:1 (Square Matrix)</option>
+<option>3:4 (Editorial Vertical)</option>
+<option>16:9 (Landscape Cinematic)</option>
+<option>21:9 (Ultrawide Anamorphic)</option>
+</select>
+<span class="material-symbols-outlined text-[18px] text-text-muted absolute right-3 top-2 pointer-events-none">unfold_more</span>
+</div>
+</div>
+<div class="space-y-1.5">
+<label class="font-metadata text-metadata text-text-secondary">Semantic Tags (Comma separated)</label>
+<input class="w-full h-9 px-3 rounded-lg border border-border-default bg-bg-surface font-metadata text-metadata text-text-primary focus:outline-none focus:border-action-primary focus:ring-2 focus:ring-action-primary/20 transition-all" type="text" value="#双重曝光, #胶片颗粒, #王家卫风格, #霓虹夜市">
+</div>
+</div>
+</section>
+<!-- Section 2: Source Content · zh-CN -->
+<section class="bg-bg-surface border border-border-default p-space-lg shadow-sm rounded-lg">
+<div class="flex items-center justify-between pb-space-md mb-space-md border-b border-border-default">
+<div class="flex items-center gap-space-sm">
+<span class="px-2 py-0.5 rounded font-metadata text-[11px] font-semibold bg-action-primary/10 text-action-primary uppercase tracking-wider">
+              Source
+            </span>
+<h2 class="font-section-title text-section-title text-text-primary">Content Layer · zh-CN</h2>
+</div>
+<span class="font-metadata text-[12px] text-text-secondary flex items-center gap-1">
+<span class="w-2 h-2 rounded-full bg-status-success"></span>
+            Canonical Master Source
+          </span>
+</div>
+<div class="space-y-space-md">
+<div class="space-y-1.5">
+<label class="font-metadata text-metadata text-text-secondary">Prompt Title (Chinese)</label>
+<input class="w-full h-9 px-3 rounded-lg border border-border-default bg-bg-surface font-body text-body text-text-primary focus:outline-none focus:border-action-primary focus:ring-2 focus:ring-action-primary/20 transition-all" type="text" value="电影质感双重曝光氛围感人物肖像">
+</div>
+<div class="space-y-1.5">
+<label class="font-metadata text-metadata text-text-secondary">Editorial Description</label>
+<textarea class="w-full p-3 rounded-lg border border-border-default bg-bg-surface font-body text-body text-text-primary focus:outline-none focus:border-action-primary focus:ring-2 focus:ring-action-primary/20 transition-all resize-y" rows="2">此提示词灵感来源于90年代经典港风霓虹电影美学，利用双重曝光技术将城市建筑街景与人物轮廓高度融合，具有独特的色彩情绪张力与细腻颗粒胶片感。</textarea>
+</div>
+<div class="space-y-1.5">
+<div class="flex items-center justify-between">
+<label class="font-metadata text-metadata text-text-secondary flex items-center gap-1.5">
+<span class="">Prompt Template (with variable interpolations)</span>
+<span class="px-1.5 py-0.2 rounded bg-surface-container text-text-muted font-code-json text-[11px]">{{var}}</span>
+</label>
+<span class="font-code-json text-[12px] text-text-muted">78 tokens · Midjourney param format</span>
+</div>
+<div class="relative">
+<textarea class="w-full p-3 rounded-lg border border-border-default bg-bg-surface font-prompt-text text-prompt-text leading-[1.65] text-text-primary focus:outline-none focus:border-action-primary focus:ring-2 focus:ring-action-primary/20 transition-all resize-y" rows="4">基于提供的参考图像主体轮廓，生成一张具有王家卫电影色彩风格的双重曝光艺术海报。主体为一个站在{{city}}雨夜十字路口的孤寂侧影，身体轮廓内部自然映射出{{style}}与泛光的密集城市霓虹霓光，35mm电影胶卷拍摄，柔和的绿色与琥珀色调，重度胶片噪点与漏光，朦胧散景 --ar 2:3 --v 6.1 --style raw</textarea>
+</div>
+</div>
+<div class="space-y-1.5">
+<label class="font-metadata text-metadata text-text-secondary">Image Alt Text (Accessibility &amp; SEO)</label>
+<input class="w-full h-9 px-3 rounded-lg border border-border-default bg-bg-surface font-body text-body text-text-primary focus:outline-none focus:border-action-primary focus:ring-2 focus:ring-action-primary/20 transition-all" type="text" value="王家卫风格雨夜双重曝光女性侧影艺术肖像，背景融合泛着琥珀金与墨绿色的摩登大厦霓虹车流">
+</div>
+</div>
+</section>
+<!-- Section 3: Translation · en-US -->
+<section class="bg-bg-surface border border-border-default p-space-lg shadow-sm rounded-lg">
+<div class="flex items-center justify-between pb-space-md mb-space-md border-b border-border-default">
+<div class="flex items-center gap-space-sm">
+<span class="px-2 py-0.5 rounded font-metadata text-[11px] font-semibold bg-surface-container text-text-secondary uppercase tracking-wider">
+              i18n Target
+            </span>
+<h2 class="font-section-title text-section-title text-text-primary">Translation Layer · en-US</h2>
+<span class="flex items-center gap-1 font-metadata text-[12px] text-status-success font-medium">
+<span class="material-symbols-outlined text-[16px]">check_circle</span>
+              Present · en-US
+            </span>
+</div>
+<button class="text-status-danger hover:underline font-metadata text-[12px] font-medium transition-colors" type="button">
+            Remove Translation
+          </button>
+</div>
+<div class="space-y-space-md">
+<div class="space-y-1.5">
+<label class="font-metadata text-metadata text-text-secondary">Prompt Title (English)</label>
+<input class="w-full h-9 px-3 rounded-lg border border-border-default bg-bg-surface font-body text-body text-text-primary focus:outline-none focus:border-action-primary focus:ring-2 focus:ring-action-primary/20 transition-all" type="text" value="Cinematic Double Exposure Atmosphere Portrait">
+</div>
+<div class="space-y-1.5">
+<label class="font-metadata text-metadata text-text-secondary">Editorial Description (English)</label>
+<textarea class="w-full p-3 rounded-lg border border-border-default bg-bg-surface font-body text-body text-text-primary focus:outline-none focus:border-action-primary focus:ring-2 focus:ring-action-primary/20 transition-all resize-y" rows="2">Inspired by classic 90s Hong Kong cinema aesthetics, merging architectural metropolis silhouettes with character profiles using double exposure techniques.</textarea>
+</div>
+<div class="space-y-1.5">
+<div class="flex items-center justify-between">
+<label class="font-metadata text-metadata text-text-secondary">English Master Prompt</label>
+<span class="font-code-json text-[12px] text-text-muted">Direct AI Model Syntax</span>
+</div>
+<textarea class="w-full p-3 rounded-lg border border-border-default bg-bg-surface font-prompt-text text-prompt-text leading-[1.65] text-text-primary focus:outline-none focus:border-action-primary focus:ring-2 focus:ring-action-primary/20 transition-all resize-y" rows="4">A cinematic double exposure fine art portrait poster in the distinctive visual aesthetic of Wong Kar-wai. Silhouette profile of an introspective figure standing in a rainy intersection of {{city}}, transparent overlay seamlessly revealing {{style}} with gleaming neon cityscapes, shot on 35mm film, muted jade green and warm amber hue gradation, organic analog film grain, prism light leaks --ar 2:3 --v 6.1 --style raw</textarea>
+</div>
+<div class="space-y-1.5">
+<label class="font-metadata text-metadata text-text-secondary">Image Alt Text (English)</label>
+<input class="w-full h-9 px-3 rounded-lg border border-border-default bg-bg-surface font-body text-body text-text-primary focus:outline-none focus:border-action-primary focus:ring-2 focus:ring-action-primary/20 transition-all" type="text" value="Double exposure cinematic portrait silhouette of a figure against dense Tokyo neon reflections with 35mm film grain aesthetic.">
+</div>
+</div>
+</section>
+<!-- Section 4: Variables Configuration -->
+<section class="bg-bg-surface border border-border-default p-space-lg shadow-sm rounded-lg">
+<div class="flex items-center justify-between pb-space-md mb-space-md border-b border-border-default">
+<div class="flex items-center gap-space-sm">
+<span class="material-symbols-outlined text-[18px] text-action-primary">data_object</span>
+<div>
+<h2 class="font-section-title text-section-title text-text-primary">Variables Configuration</h2>
+<p class="font-metadata text-[12px] text-text-muted">JSON Schema Declaration for Live Inspector Fields</p>
+</div>
+</div>
+<div class="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-status-success/10 text-status-success font-metadata text-[12px] font-medium border border-status-success/20">
+<span class="material-symbols-outlined text-[14px]">check</span>
+<span class="">Valid JSON Schema</span>
+</div>
+</div>
+<div class="rounded-lg border border-border-default bg-[#18181B] overflow-hidden shadow-inner">
+<div class="px-4 py-2 bg-[#27272A] border-b border-[#3F3F46] flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="w-2.5 h-2.5 rounded-full bg-[#EF4444]/80"></span>
+<span class="w-2.5 h-2.5 rounded-full bg-[#F59E0B]/80"></span>
+<span class="w-2.5 h-2.5 rounded-full bg-[#10B981]/80"></span>
+<span class="ml-2 font-code-json text-[12px] text-[#A1A1AA]">variables.schema.json</span>
+</div>
+<span class="font-code-json text-[11px] text-[#71717A]">UTF-8 • JSON</span>
+</div>
+<div class="p-4 grid grid-cols-[36px_1fr] font-code-json text-code-json text-[#E4E4E7] leading-relaxed select-text overflow-x-auto">
+<div class="text-[#71717A] text-right pr-3 select-none flex flex-col font-mono text-[12px] opacity-70">
+<span class="">1</span><span class="">2</span><span class="">3</span><span class="">4</span><span class="">5</span><span class="">6</span><span class="">7</span><span class="">8</span><span class="">9</span>
+</div>
+<pre class="overflow-x-auto text-[13px] leading-5 text-[#F4F4F5]"><code>{
+  <span class="text-[#93C5FD]">"variables"</span>: [
+    {
+      <span class="text-[#93C5FD]">"key"</span>: <span class="text-[#86EFAC]">"city"</span>,
+      <span class="text-[#93C5FD]">"type"</span>: <span class="text-[#86EFAC]">"text"</span>,
+      <span class="text-[#93C5FD]">"label"</span>: <span class="text-[#86EFAC]">"目标城市"</span>,
+      <span class="text-[#93C5FD]">"placeholder"</span>: <span class="text-[#86EFAC]">"东京 / 新宿歌舞伎町"</span>,
+      <span class="text-[#93C5FD]">"translation_label"</span>: <span class="text-[#86EFAC]">"Target City"</span>
+    },
+    {
+      <span class="text-[#93C5FD]">"key"</span>: <span class="text-[#86EFAC]">"style"</span>,
+      <span class="text-[#93C5FD]">"type"</span>: <span class="text-[#86EFAC]">"select"</span>,
+      <span class="text-[#93C5FD]">"label"</span>: <span class="text-[#86EFAC]">"视觉美学"</span>,
+      <span class="text-[#93C5FD]">"translation_label"</span>: <span class="text-[#86EFAC]">"Visual Aesthetics"</span>,
+      <span class="text-[#93C5FD]">"options"</span>: [<span class="text-[#86EFAC]">"复古编辑设计"</span>, <span class="text-[#86EFAC]">"电影胶片"</span>, <span class="text-[#86EFAC]">"极简瑞士"</span>]
+    }
+  ]
+}</code></pre>
+</div>
+</div>
+<div class="mt-3 flex items-center justify-between text-metadata font-metadata text-text-muted">
+<span class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[15px]">info</span>
+            v0.1 supports text and select variable types.
+          </span>
+<button class="text-action-primary hover:underline font-medium" type="button">Format JSON</button>
+</div>
+</section>
+<!-- Section 5: Image Assets -->
+<section class="bg-bg-surface border border-border-default p-space-lg shadow-sm rounded-lg">
+<div class="flex items-center justify-between pb-space-md mb-space-md border-b border-border-default">
+<div class="flex items-center gap-space-sm">
+<span class="material-symbols-outlined text-[18px] text-action-primary">image</span>
+<h2 class="font-section-title text-section-title text-text-primary">Image Assets &amp; Display Cache</h2>
+</div>
+<span class="font-metadata text-[12px] text-text-secondary">Aspect Ratio: 2:3 Organic Portrait</span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-12 gap-space-lg items-start">
+<!-- Thumbnail Asset Showcase -->
+<div class="md:col-span-5 flex flex-col items-center">
+<div class="relative w-full aspect-[2/3] max-w-[240px] rounded-lg overflow-hidden border border-border-default shadow-md group">
+<img class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" data-alt="Cinematic atmospheric double exposure portrait of a solitary figure in Tokyo rain, illuminated by vintage jade and amber neon signs, heavy 35mm film grain, moody cinematic reflections on wet pavement, Wong Kar-wai color palette style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBmoIuEwHgq7NHqbmLmL00SWp4ayRBeBZT-5Lbtya9Dx6jBURQqVxpVvxvUynYlNAGkoFpvH1jQAVBd6w5tnhBzEO2Pf1BduAC26BxIzbaRUPbOU1vGJx4ontT8wcx3T4eBDLMIJTJ_pto9W1T34hvALR3tJdjTwX3y3pC5d7aJ9RWilepOiVmCwpLXOtoBtU4bDhAqbcSaZv6JALm7lwM_1qdld4NEHEE1E1cg2fUgZ-S2MZ25yfiD">
+<div class="absolute inset-0 bg-bg-inverse/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+<button class="p-2 rounded-full bg-bg-surface text-text-primary hover:bg-bg-page transition-colors shadow" type="button">
+<span class="material-symbols-outlined text-[18px]">zoom_in</span>
+</button>
+<button class="p-2 rounded-full bg-bg-surface text-text-primary hover:bg-bg-page transition-colors shadow" type="button">
+<span class="material-symbols-outlined text-[18px]">download</span>
+</button>
+</div>
+</div>
+<button class="mt-3.5 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border-default bg-bg-surface hover:bg-bg-page text-text-primary font-metadata text-metadata transition-colors" type="button">
+<span class="material-symbols-outlined text-[16px] text-text-secondary">upload</span>
+<span class="">Replace Image Asset</span>
+</button>
+</div>
+<!-- Metadata Spec Grid -->
+<div class="md:col-span-7 flex flex-col justify-between h-full space-y-3"><div class="bg-bg-page rounded-lg p-space-md border border-border-default space-y-2.5"><div class="flex items-center justify-between pb-2 border-b border-border-default/60"><span class="font-metadata text-metadata text-text-secondary">Pixel Dimensions</span><span class="font-code-json text-code-json font-semibold text-text-primary">1536 × 2304 px</span></div><div class="flex items-center justify-between pb-2 border-b border-border-default/60"><span class="font-metadata text-metadata text-text-secondary">Original File Size</span><span class="font-code-json text-code-json text-text-primary">3.4 MB</span></div><div class="flex items-center justify-between"><span class="font-metadata text-metadata text-text-secondary">Content-Type</span><span class="font-code-json text-code-json text-text-primary">image/webp</span></div></div><div class="p-3 rounded-lg bg-surface-container-low border border-border-default flex items-center gap-2 text-text-secondary font-metadata text-[12px]"><span class="material-symbols-outlined text-[16px] text-status-success">check_circle</span><span class="">Primary display asset attached and verified.</span></div></div>
+</div>
+</section>
+</div>
+<!-- Sticky Right Sidebar (28% -> col-span-4) -->
+<div class="col-span-12 lg:col-span-4 sticky top-6 space-y-space-md">
+<!-- Block 1: Status & Lifecycle -->
+<div class="bg-bg-surface border border-border-default p-space-md shadow-sm space-y-space-sm rounded-lg"><div class="flex items-center justify-between pb-2 border-b border-border-default"><span class="font-section-title text-section-title text-text-primary">Lifecycle &amp; Audit</span><span class="flex items-center gap-1.5 px-2 py-0.5 rounded font-metadata text-[11px] font-medium text-text-secondary bg-surface-container border border-border-default"><span class="w-1.5 h-1.5 rounded-full bg-text-muted"></span>Draft</span></div><div class="space-y-2.5 font-metadata text-metadata"><div class="flex items-center justify-between"><span class="text-text-secondary">Created</span><span class="font-code-json text-[12px] text-text-primary">2026-04-10 14:22</span></div><div class="flex items-center justify-between"><span class="text-text-secondary">Last Saved</span><span class="text-text-primary font-medium flex items-center gap-1"><span class="material-symbols-outlined text-[14px] text-text-muted">schedule</span>12 minutes ago</span></div><div class="flex items-center justify-between"><span class="text-text-secondary">Published Time</span><span class="text-text-muted font-code-json text-[12px]">— Not published yet</span></div></div></div>
+<!-- Block 2: Validation Checklist -->
+<div class="bg-bg-surface border border-border-default p-space-md shadow-sm space-y-space-sm rounded-lg"><div class="flex items-center justify-between pb-2 border-b border-border-default"><div><span class="font-section-title text-section-title text-text-primary block">实时内容校验</span><span class="font-metadata text-[11px] text-text-muted">Live Content Validation</span></div><span class="font-metadata text-[11px] font-semibold text-status-success uppercase tracking-wider">5/5 Passed</span></div><div class="space-y-2 font-metadata text-metadata"><div class="flex items-start gap-2.5 py-1"><span class="material-symbols-outlined text-[16px] text-status-success mt-0.5">check_circle</span><div class="flex-1"><p class="text-text-primary leading-tight font-medium">Prompt tokens within model limit</p><p class="text-[11px] text-text-muted">78 tokens (Midjourney v6.1 limit: 2000)</p></div></div><div class="flex items-start gap-2.5 py-1"><span class="material-symbols-outlined text-[16px] text-status-success mt-0.5">check_circle</span><div class="flex-1"><p class="text-text-primary leading-tight font-medium">Variables schema matches template</p><p class="text-[11px] text-text-muted">Keys: {{city}}, {{style}} defined in schema</p></div></div><div class="flex items-start gap-2.5 py-1"><span class="material-symbols-outlined text-[16px] text-status-success mt-0.5">check_circle</span><div class="flex-1"><p class="text-text-primary leading-tight font-medium">Source content complete (zh-CN)</p><p class="text-[11px] text-text-muted">Title, description, template &amp; alt verified</p></div></div><div class="flex items-start gap-2.5 py-1"><span class="material-symbols-outlined text-[16px] text-status-success mt-0.5">check_circle</span><div class="flex-1"><p class="text-text-primary leading-tight font-medium">Translation token consistency (en-US)</p><p class="text-[11px] text-text-muted">Matching interpolation keys preserved</p></div></div><div class="flex items-start gap-2.5 py-1"><span class="material-symbols-outlined text-[16px] text-status-success mt-0.5">check_circle</span><div class="flex-1"><p class="text-text-primary leading-tight font-medium">Image metadata verified</p><p class="text-[11px] text-text-muted">Aspect ratio 2:3 &amp; resolution confirmed</p></div></div></div></div>
+<!-- Block 3: Publishing Actions & Danger Zone -->
+<div class="bg-bg-surface border border-border-default p-space-md shadow-sm space-y-space-md rounded-lg">
+<div class="space-y-space-xs">
+<button class="w-full h-10 px-4 rounded-lg bg-action-primary hover:bg-action-primary-hover text-on-primary font-metadata text-metadata font-medium flex items-center justify-center gap-2 transition-all shadow-sm" id="publishPromptBtn" type="button">
+<span class="material-symbols-outlined text-[18px]">rocket_launch</span>
+<span id="publishBtnText" class="">Publish Prompt</span>
+</button>
+<p class="font-metadata text-[11px] text-text-muted text-center leading-normal px-2">
+            Will make this prompt immediately visible on the public Explore gallery with real-time variable playground.
+          </p>
+</div>
+<div class="h-px bg-border-default"></div>
+<div class="space-y-space-xs pt-1">
+<span class="text-[11px] font-metadata font-semibold uppercase tracking-wider text-text-muted block">Danger Zone</span>
+<button class="w-full py-2 px-3 rounded-lg border border-red-200 text-status-danger hover:bg-red-50/60 font-metadata text-metadata font-medium flex items-center justify-center gap-1.5 transition-colors" id="deletePromptBtn" type="button">
+<span class="material-symbols-outlined text-[16px]">delete</span>
+<span class="">Delete Prompt</span>
+</button>
+<p class="text-[11px] font-metadata text-text-muted text-center">
+            Once deleted, this prompt and its history cannot be recovered.
+          </p>
+</div>
+</div>
+</div>
+</div>
+<!-- Micro-interaction Client Script -->
+<script>
+    (function() {
+      const saveDraftBtn = document.getElementById('saveDraftBtn');
+      const saveBtnText = document.getElementById('saveBtnText');
+      const publishPromptBtn = document.getElementById('publishPromptBtn');
+      const publishBtnText = document.getElementById('publishBtnText');
+      const previewBtn = document.getElementById('previewBtn');
+
+      if (saveDraftBtn) {
+        saveDraftBtn.addEventListener('click', function() {
+          const originalText = saveBtnText.innerText;
+          saveDraftBtn.disabled = true;
+          saveBtnText.innerText = 'Saving...';
+          setTimeout(() => {
+            saveBtnText.innerText = 'Saved!';
+            saveDraftBtn.classList.remove('bg-action-primary');
+            saveDraftBtn.classList.add('bg-status-success');
+            setTimeout(() => {
+              saveBtnText.innerText = originalText;
+              saveDraftBtn.classList.remove('bg-status-success');
+              saveDraftBtn.classList.add('bg-action-primary');
+              saveDraftBtn.disabled = false;
+            }, 1800);
+          }, 600);
+        });
+      }
+
+      if (publishPromptBtn) {
+        publishPromptBtn.addEventListener('click', function() {
+          const confirmed = confirm('Are you sure you want to publish this prompt to the public catalog?');
+          if (confirmed) {
+            publishBtnText.innerText = 'Publishing...';
+            setTimeout(() => {
+              publishBtnText.innerText = 'Live on Explore';
+              publishPromptBtn.classList.remove('bg-action-primary', 'hover:bg-action-primary-hover');
+              publishPromptBtn.classList.add('bg-status-success');
+            }, 800);
+          }
+        });
+      }
+
+      if (previewBtn) {
+        previewBtn.addEventListener('click', function() {
+          alert('Opening prompt split-inspection modal with live interpolated variables preview.');
+        });
+      }
+    })();
+  </script>
+</div></div></main></div>
+
+</body></html>

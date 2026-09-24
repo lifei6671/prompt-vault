@@ -10,6 +10,7 @@ import AdminPromptNew, { action as createAction, loader as createLoader } from "
 import { parseImageHeader, ORIGINAL_MAX_BYTES, PREVIEW_MAX_BYTES } from "../app/services/image-header";
 import { headImages, imageKeys, uploadOriginal, uploadPreview, UploadError } from "../app/services/image-upload.server";
 import { createAdminPrompt } from "../app/services/prompt-create.server";
+import { createImportedPrompt } from "../app/services/prompt-import.server";
 import { getAdminPrompt } from "../app/services/prompt-admin.server";
 import migration1 from "../migrations/0001_init.sql?raw";
 import migration2 from "../migrations/0002_i18n.sql?raw";
@@ -255,7 +256,12 @@ describe("Phase 4D image create", () => {
       expect(html).toContain(locale === "zh-CN" ? "新建 Prompt" : "New prompt");
       expect(html).toContain("source_language");
       expect(html).toContain("upload_reference");
-      expect(html).toContain("md:grid-cols-2");
+      expect(html).toContain("admin-import-textarea");
+      expect(html).toContain('type="file"');
+      expect(html).toContain("admin-import-dropzone");
+      expect(html).toContain("<details");
+      expect(html).not.toContain("<details open");
+      expect(html).toContain('disabled=""');
     }
   });
   it("registers both routes under the admin security boundary", () => {
@@ -266,4 +272,73 @@ describe("Phase 4D image create", () => {
     expect(routes.some((route) => route.path === "prompt/:slug")).toBe(true);
     expect(new UploadError(413, "tooLarge").status).toBe(413);
   });
+  it("imports with existing and new taxonomy, stable slugs, server time and unchanged image batch", async () => {
+    const markdown = (id: string) => [
+      "---", "id: " + id, "title: 一张图片", "category: 新分类", "tags:",
+      "  - 标签", "  - 新标签", "model: Flux", "created_at: 1999-01-01", "---",
+      "# 一张图片", "## Prompt", "主题：{{主题}}", "副标题：{{可留空}}",
+    ].join("\n");
+    const imported = async (id: string) => {
+      const input = new FormData();
+      input.set("_mode", "import");
+      input.set("upload_reference", await uploadPair());
+      input.set("import_document", markdown(id));
+      return createImportedPrompt(env.DB, env.IMAGES, input);
+    };
+    const firstId = await imported("import-first");
+    const first = await getAdminPrompt(env.DB, firstId);
+    expect(first).toMatchObject({ slug: "import-first", status: "draft", source_language: "zh-CN",
+      ratio: "3:2" });
+    expect(first.prompt_template).toBe("主题：{{topic}}\n副标题：{{subtitle}}");
+    expect(first.created_at).not.toContain("1999");
+    expect(first.variables).toHaveLength(2);
+    expect(first.tagIds).toHaveLength(2);
+    const category = await env.DB.prepare("SELECT id, slug, source_language FROM categories WHERE name = '新分类'")
+      .first<{ id: number; slug: string; source_language: string }>();
+    expect(category).toMatchObject({ id: first.category_id, source_language: "zh-CN" });
+    expect(category?.slug).toMatch(/^category-[a-f0-9]{8}$/);
+    const secondId = await imported("import-second");
+    expect((await getAdminPrompt(env.DB, secondId)).category_id).toBe(first.category_id);
+    expect((await env.DB.prepare("SELECT COUNT(*) AS count FROM categories WHERE name = '新分类'")
+      .first<{ count: number }>())?.count).toBe(1);
+    expect((await env.DB.prepare("SELECT COUNT(*) AS count FROM tags WHERE name = '新标签'")
+      .first<{ count: number }>())?.count).toBe(1);
+    expect((await env.DB.prepare("SELECT slug FROM tags WHERE name = '新标签'").first<{ slug: string }>())?.slug)
+      .toMatch(/^tag-[a-f0-9]{8}$/);
+  });
+
+  it("keeps image cleanup on an imported draft batch failure", async () => {
+    const reference = await uploadPair();
+    const input = new FormData();
+    input.set("_mode", "import");
+    input.set("upload_reference", reference);
+    input.set("import_document", "---\nid: import-rollback\ntitle: Rollback\ncategory: 分类\n---\n## Prompt\nBody");
+    const db = {
+      prepare: (sql: string) => env.DB.prepare(sql),
+      batch: (statements: D1PreparedStatement[]) => env.DB.batch([...statements,
+        env.DB.prepare("INSERT INTO prompt_tags (prompt_id, tag_id) VALUES (0, 999)")]),
+    } as unknown as D1Database;
+    await expect(createImportedPrompt(db, env.IMAGES, input)).rejects.toThrow();
+    expect(await env.IMAGES.head(imageKeys(reference).original)).toBeNull();
+    expect(await env.IMAGES.head(imageKeys(reference).preview)).toBeNull();
+    expect(await env.DB.prepare("SELECT 1 FROM prompts WHERE slug = 'import-rollback'").first()).toBeNull();
+  });
+
+  it("reuses a translation name and rejects a tampered default import", async () => {
+    await env.DB.prepare("INSERT INTO category_translations (category_id, locale, name) VALUES (1, 'en-US', 'Existing Category')").run();
+    const input = new FormData();
+    input.set("_mode", "import");
+    input.set("upload_reference", await uploadPair());
+    input.set("import_document", "---\nid: translated-import\ntitle: English title\ncategory: Existing Category\n---\n## Prompt\nEnglish text");
+    input.set("category_name", "Malicious replacement");
+    const id = await createImportedPrompt(env.DB, env.IMAGES, input);
+    expect((await getAdminPrompt(env.DB, id)).category_id).toBe(1);
+    expect(await env.DB.prepare("SELECT 1 FROM categories WHERE name = 'Malicious replacement'").first()).toBeNull();
+    const invalid = new FormData();
+    invalid.set("_mode", "import");
+    invalid.set("upload_reference", await uploadPair());
+    invalid.set("import_document", "---\ntitle: Broken\n---\n## Prompt\nBody");
+    await expect(createImportedPrompt(env.DB, env.IMAGES, invalid)).rejects.toMatchObject({ status: 400 });
+  });
+
 });

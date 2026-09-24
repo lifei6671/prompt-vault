@@ -39,7 +39,7 @@ export async function loader({ request, params }: Route.LoaderArgs) {
 
 export default function AdminPromptPreview({ loaderData }: Route.ComponentProps) {
   const { prompt, locale, id, pageUrl, imageUrl } = loaderData;
-  return <PromptDetailContent prompt={prompt} locale={locale} pageUrl={pageUrl} imageUrl={imageUrl}
+  return <div className="admin-preview-page"><PromptDetailContent prompt={prompt} locale={locale} pageUrl={pageUrl} imageUrl={imageUrl}
     backHref={`/admin/prompts/${id}/edit?ui_locale=${locale}`}
-    backLabel={adminPromptCopy(locale).edit} />;
+    backLabel={adminPromptCopy(locale).edit} /></div>;
 }

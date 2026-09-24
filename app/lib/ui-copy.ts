@@ -103,6 +103,7 @@ export function uiCopy(locale: Locale) {
 export const adminTaxonomy = {
   "zh-CN": {
     navigation: "后台导航", categories: "分类", tags: "标签",
+    manageDescription: "维护名称、译文与 Prompt 引用。", createHint: "创建后可在下方展开编辑", promptCount: "Prompt 数", updatedAt: "更新时间", close: "收起",
     create: "新建", save: "保存", delete: "删除", edit: "编辑", empty: "暂无条目。",
     slug: "Slug（创建后不可修改）", sourceLanguage: "原文语言",
     translationLanguage: "译文语言", chooseLanguage: "请选择原文语言", name: "名称", description: "描述",
@@ -116,6 +117,7 @@ export const adminTaxonomy = {
   },
   "en-US": {
     navigation: "Admin navigation", categories: "Categories", tags: "Tags",
+    manageDescription: "Manage names, translations, and Prompt references.", createHint: "Expand a row below to edit after creation", promptCount: "Prompts", updatedAt: "Updated", close: "Close",
     create: "Create", save: "Save", delete: "Delete", edit: "Edit", empty: "No entries yet.",
     slug: "Slug (fixed after creation)", sourceLanguage: "Source language",
     translationLanguage: "Translation language", chooseLanguage: "Select source language", name: "Name", description: "Description",

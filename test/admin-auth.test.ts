@@ -3,6 +3,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 import routes from "../app/routes";
 import { guardAdminRequest, loadAdmin } from "../app/services/admin-route.server";
 import {
+  isLocalAdminBypass,
   requireAdmin,
   requireAdminWriteOrigin,
   type AdminSecurityConfig,
@@ -107,6 +108,67 @@ describe("Cloudflare Access admin verification", () => {
     ]) {
       expect(await rejectedStatus(() => requireAdmin(request(token), invalid, localKeys))).toBe(503);
     }
+  });
+});
+
+describe("local admin bypass", () => {
+  const bypass = { ADMIN_DEV_BYPASS: "1" };
+  const localUrl = "http://localhost:5173/admin";
+
+  it("allows local GET and loader without Access configuration or token, with no-store", async () => {
+    for (const url of [localUrl, "http://127.0.0.1:5173/admin", "http://[::1]:5173/admin"]) {
+      const local = new Request(url);
+      expect(isLocalAdminBypass(local, bypass)).toBe(true);
+      await expect(requireAdmin(local, bypass)).resolves.toBeUndefined();
+      const response = await guardAdminRequest(local, bypass, async () => new Response("admin"));
+      expect(response.status).toBe(200);
+      expect(response.headers.get("Cache-Control")).toBe("no-store");
+      const loaded = await loadAdmin(local, bypass);
+      expect(loaded.init?.headers).toMatchObject({ "Cache-Control": "no-store" });
+    }
+  });
+
+  it("allows local POST and PUT without the production Origin gate", async () => {
+    for (const method of ["POST", "PUT"]) {
+      const local = new Request(localUrl, {
+        method, headers: { Origin: "http://localhost:5173", "Sec-Fetch-Site": "same-origin" },
+      });
+      const response = await guardAdminRequest(local, bypass, async () => new Response("saved"));
+      expect(response.status).toBe(200);
+      expect(response.headers.get("Cache-Control")).toBe("no-store");
+    }
+  });
+
+  it("fails closed on localhost without the exact bypass value", async () => {
+    for (const value of [undefined, "", "true", "0"]) {
+      const local = new Request(localUrl);
+      const localConfig = { ADMIN_DEV_BYPASS: value };
+      expect(isLocalAdminBypass(local, localConfig)).toBe(false);
+      expect(await rejectedStatus(() => requireAdmin(local, localConfig))).toBe(503);
+      expect(await rejectedStatus(() => guardAdminRequest(local, localConfig, async () => new Response("admin"))))
+        .toBe(503);
+    }
+  });
+
+  it("never bypasses other hostnames or a forged Host header", async () => {
+    for (const url of [
+      "https://vault.disign.me/admin", "https://other.example/admin", "http://localhost.evil.example/admin",
+      "http://127.0.0.2/admin", "http://[::2]/admin",
+    ]) {
+      const remote = new Request(url, { headers: { Host: "localhost" } });
+      expect(isLocalAdminBypass(remote, bypass)).toBe(false);
+      expect(await rejectedStatus(() => requireAdmin(remote, bypass))).toBe(503);
+    }
+  });
+
+  it("retains production JWT and write Origin checks when the flag is set", async () => {
+    const productionConfig = { ...config, ADMIN_DEV_BYPASS: "1" };
+    const token = await sign();
+    await expect(requireAdmin(request(token), productionConfig, localKeys)).resolves.toBeUndefined();
+    expect(await rejectedStatus(() => guardAdminRequest(
+      request(token, { method: "POST", headers: { Origin: "http://localhost:5173" } }),
+      productionConfig, async () => new Response("saved"), localKeys,
+    ))).toBe(403);
   });
 });
 

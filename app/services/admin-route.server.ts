@@ -2,6 +2,7 @@ import { data } from "react-router";
 import type { JWTVerifyGetKey } from "jose";
 import { readUiLocale } from "../lib/explore";
 import {
+  isLocalAdminBypass,
   requireAdmin,
   requireAdminWriteOrigin,
   type AdminSecurityConfig,
@@ -14,7 +15,7 @@ export async function guardAdminRequest(
   keySet?: JWTVerifyGetKey,
 ): Promise<Response> {
   await requireAdmin(request, config, keySet);
-  if (!["GET", "HEAD", "OPTIONS"].includes(request.method)) {
+  if (!["GET", "HEAD", "OPTIONS"].includes(request.method) && !isLocalAdminBypass(request, config)) {
     requireAdminWriteOrigin(request);
   }
   const response = await next();

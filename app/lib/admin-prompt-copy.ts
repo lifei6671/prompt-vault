@@ -2,6 +2,16 @@ import type { Locale } from "./localization";
 
 const copy = {
   "zh-CN": {
+    importDocument: "Prompt 原文", importHint: "粘贴完整 Markdown / Frontmatter",
+    importPlaceholder: "---\ntitle: 示例标题\ncategory: 分类\n---\n# 示例标题\n## Prompt\n在这里粘贴完整 Prompt…",
+    reparse: "重新解析", dropOrPaste: "也可拖拽图片到这里，或用 Ctrl+V / Command+V 粘贴。",
+    importSummary: "解析结果", summaryEmpty: "粘贴原文后显示解析结果。", willCreate: "将新建",
+    variableCount: "变量数", imageState: "图片状态", importErrors: "需要修正", importWarnings: "提示",
+    advancedEdit: "高级编辑", importIssue: { title: "缺少标题", prompt: "缺少 Prompt 正文",
+      category: "缺少分类", metadata: "元数据或原文过长", variables: "变量过多", frontmatter: "未找到 Frontmatter，已尝试解析正文",
+      created_at: "created_at 格式无法识别" },
+    basicInformation: "基础信息", coreMetadata: "标识与分类", sourceContent: "原文内容", translationHint: "可选译文", variableFormat: "JSON 编辑",
+    lifecycle: "生命周期", createdAt: "创建时间", neverPublished: "尚未发布", contentChecks: "已保存内容校验", checkSource: "原文必填内容", checkVariables: "变量与正文一致", checkTranslation: "译文变量一致", checkImage: "图片元数据完整", checkPassed: "通过", checkNeedsAttention: "需检查", checkSavedOnly: "校验基于已保存内容；修改后请先保存。", imageOriginalKey: "原图 key", imagePreviewKey: "预览图 key", imageMime: "原图 MIME", imageOriginalSize: "原图尺寸与字节", imagePreviewSize: "预览图尺寸与字节", imageGenerated: "原图及 WebP 预览会在创建前上传。", readOnly: "已删除内容仅供查看。",
     create: "新建 Prompt", createDraft: "创建草稿", sourceLanguage: "原文语言", chooseLanguage: "选择语言",
     chooseCategory: "选择分类", uploadImage: "上传图片", originalImage: "选择原图（JPEG、PNG、WebP，最大 20 MiB）",
     chooseImage: "请选择原图，系统将生成最长边不超过 768px 的 WebP 预览图。",
@@ -26,6 +36,16 @@ const copy = {
     failed: "保存失败，请稍后重试。",
   },
   "en-US": {
+    importDocument: "Prompt document", importHint: "Paste complete Markdown / Frontmatter",
+    importPlaceholder: "---\ntitle: Example title\ncategory: Category\n---\n# Example title\n## Prompt\nPaste the complete prompt here…",
+    reparse: "Parse again", dropOrPaste: "You can also drop an image here or paste it with Ctrl+V / Command+V.",
+    importSummary: "Parsed summary", summaryEmpty: "Paste a document to see the parsed result.", willCreate: "Will create",
+    variableCount: "Variables", imageState: "Image status", importErrors: "Fix these", importWarnings: "Notes",
+    advancedEdit: "Advanced edit", importIssue: { title: "Missing title", prompt: "Missing prompt body",
+      category: "Missing category", metadata: "Metadata or document is too long", variables: "Too many variables", frontmatter: "No Frontmatter; parsed the body",
+      created_at: "Could not parse created_at" },
+    basicInformation: "Basic Information", coreMetadata: "Identity & taxonomy", sourceContent: "Source Content", translationHint: "Optional translation", variableFormat: "JSON editor",
+    lifecycle: "Lifecycle", createdAt: "Created", neverPublished: "Not published", contentChecks: "Saved content checks", checkSource: "Required source content", checkVariables: "Variables match template", checkTranslation: "Translation keys match", checkImage: "Image metadata complete", checkPassed: "Pass", checkNeedsAttention: "Check", checkSavedOnly: "Checks use saved content. Save changes first.", imageOriginalKey: "Original key", imagePreviewKey: "Preview key", imageMime: "Original MIME", imageOriginalSize: "Original dimensions & bytes", imagePreviewSize: "Preview dimensions & bytes", imageGenerated: "Original and WebP preview upload before creation.", readOnly: "Deleted content is read only.",
     create: "New prompt", createDraft: "Create draft", sourceLanguage: "Source language", chooseLanguage: "Choose language",
     chooseCategory: "Choose category", uploadImage: "Upload image", originalImage: "Choose original (JPEG, PNG, WebP; up to 20 MiB)",
     chooseImage: "Choose an original image. A WebP preview up to 768px will be generated.",

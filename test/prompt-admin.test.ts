@@ -75,7 +75,7 @@ describe("Prompt admin", () => {
       status: "published", published_at: "2020-01-01T00:00:00.000Z",
     });
     expect(rows.find((row) => row.id === deleted)?.deleted_at).not.toBeNull();
-    expect((await listLoader()).init?.headers).toMatchObject({ "Cache-Control": "no-store" });
+    expect((await listLoader({ request: new Request("https://vault.disign.me/admin/prompts") } as Parameters<typeof listLoader>[0])).init?.headers).toMatchObject({ "Cache-Control": "no-store" });
   });
 
   it("allows slug edits before first publish, then freezes it after publish and withdraw", async () => {
@@ -236,12 +236,16 @@ describe("Prompt admin", () => {
       expect(editHtml).toContain(locale === "zh-CN" ? "Prompt 正文" : "Prompt body");
       expect(editHtml).toContain("original.png");
       expect(editHtml).toContain("variables_json");
+      expect(editHtml).toContain("admin-editor-layout");
+      expect(editHtml).toContain("admin-editor-side");
+      expect(editHtml).toContain('name="_intent" value="publish"');
+      expect(editHtml).toContain(locale === "zh-CN" ? "已保存内容校验" : "Saved content checks");
       expect(editHtml).toContain(`/admin/prompts/${id}/preview?ui_locale=${locale}`);
       expect(editHtml).toContain(locale === "zh-CN" ? ">预览</a>" : ">Preview</a>");
       expect(editHtml).toContain("en-US");
       const listRouter = createMemoryRouter([{ path: "/", element: createElement(Outlet, { context: locale }),
         children: [{ index: true, element: createElement(AdminPrompts, {
-          loaderData: { items: await listAdminPrompts(env.DB) },
+          loaderData: (await listLoader({ request: new Request("https://vault.disign.me/admin/prompts") } as Parameters<typeof listLoader>[0])).data,
         } as Parameters<typeof AdminPrompts>[0]) }] }]);
       const listHtml = renderToStaticMarkup(createElement(RouterProvider, { router: listRouter }));
       expect(listHtml).toContain("render-admin");
@@ -252,10 +256,26 @@ describe("Prompt admin", () => {
         loaderData: { prompt: await prompt(id), taxonomy: await listPromptTaxonomy(env.DB) },
         actionData: undefined,
       } as Parameters<typeof AdminPromptEdit>[0]) }] }]);
-    expect(renderToStaticMarkup(createElement(RouterProvider, { router: deletedRouter })))
-      .not.toContain(`/admin/prompts/${id}/preview`);
+    const deletedHtml = renderToStaticMarkup(createElement(RouterProvider, { router: deletedRouter }));
+    expect(deletedHtml).not.toContain(`/admin/prompts/${id}/preview`);
+    expect(deletedHtml).not.toContain('name="_intent" value="publish"');
+    expect(deletedHtml).not.toContain('name="_intent" value="replace_image"');
+    expect(deletedHtml).toContain('disabled=""');
   });
 
+  it("derives saved content checks from stored template keys", async () => {
+    const id = await create("check-real-data");
+    await env.DB.prepare("UPDATE prompts SET prompt_template = '{{missing}}' WHERE id = ?").bind(id).run();
+    const router = createMemoryRouter([{ path: "/", element: createElement(Outlet, { context: "en-US" }),
+      children: [{ index: true, element: createElement(AdminPromptEdit, {
+        loaderData: { prompt: await prompt(id), taxonomy: await listPromptTaxonomy(env.DB) },
+        actionData: undefined,
+      } as Parameters<typeof AdminPromptEdit>[0]) }] }]);
+    const html = renderToStaticMarkup(createElement(RouterProvider, { router }));
+    expect(html).toContain("Variables match template");
+    expect(html).toContain("Check</strong>");
+    expect(html).toContain("Pass</strong>");
+  });
   it("maps action errors to 400/404/409 with no-store under the admin parent", async () => {
     const id = await create("action-check");
     const admin = routes.find((route) => route.path === "admin");

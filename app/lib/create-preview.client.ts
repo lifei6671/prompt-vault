@@ -1,7 +1,7 @@
 import { PREVIEW_MAX_EDGE } from "../services/image-header";
 
 // createImageBitmap applies EXIF orientation before Canvas receives pixels.
-export async function createPreview(file: File): Promise<Blob> {
+export async function createPreview(file: File): Promise<{ blob: Blob; width: number; height: number }> {
   if (!("createImageBitmap" in window)) throw new Error("image_decoder_unavailable");
   const bitmap = await createImageBitmap(file, { imageOrientation: "from-image" });
   try {
@@ -16,7 +16,7 @@ export async function createPreview(file: File): Promise<Blob> {
     context.drawImage(bitmap, 0, 0, width, height);
     const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, "image/webp", 0.85));
     if (!blob || blob.type !== "image/webp") throw new Error("webp_unavailable");
-    return blob;
+    return { blob, width: bitmap.width, height: bitmap.height };
   } finally {
     bitmap.close();
   }

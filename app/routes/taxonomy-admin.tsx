@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { Fragment, useState, type ReactNode } from "react";
 import { Form, useOutletContext } from "react-router";
 import type { Locale } from "../lib/localization";
 import { adminTaxonomyCopy } from "../lib/ui-copy";
@@ -6,108 +6,92 @@ import type { TaxonomyKind, TaxonomyRow } from "../services/taxonomy-admin.serve
 
 type ErrorCode = "invalid" | "missing" | "duplicate" | "referenced" | "failed";
 type Props = { kind: TaxonomyKind; items: TaxonomyRow[]; error?: ErrorCode };
-
-const inputClass = "w-full min-w-0 rounded-md border border-border bg-white px-3 py-2 text-sm";
-const labelClass = "grid min-w-0 gap-1 text-sm font-medium";
-const cardClass = "rounded-md border border-border bg-white p-4";
-const gridClass = "grid gap-3 sm:grid-cols-2";
-
-function otherLocale(locale: Locale): Locale {
-  return locale === "zh-CN" ? "en-US" : "zh-CN";
-}
+const otherLocale = (locale: Locale): Locale => locale === "zh-CN" ? "en-US" : "zh-CN";
 
 export default function TaxonomyAdminPage({ kind, items, error }: Props) {
   const locale = useOutletContext<Locale>();
   const t = adminTaxonomyCopy(locale);
   const title = kind === "category" ? t.categories : t.tags;
   const [source, setSource] = useState<Locale | "">("");
+  const [editing, setEditing] = useState<number | null>(null);
   const target = source ? otherLocale(source) : "";
-  return (
-    <section aria-labelledby="taxonomy-admin-title" className="space-y-8">
-      <h1 id="taxonomy-admin-title" className="text-3xl font-semibold">{title}</h1>
-      {error && <p role="alert" className="rounded-md border border-red-300 bg-red-50 p-3 text-sm text-red-800">{t[error]}</p>}
-      <section aria-labelledby="taxonomy-create-title" className={cardClass}>
-        <h2 id="taxonomy-create-title" className="mb-4 text-lg font-semibold">{t.create} {title}</h2>
-        <Form method="post" className="space-y-4">
-          <input type="hidden" name="_intent" value="create" />
-          <div className={gridClass}>
-            <label className={labelClass}>{t.slug}<input className={inputClass} name="slug" required maxLength={80} pattern="[a-z0-9]+(-[a-z0-9]+)*" /></label>
-            <label className={labelClass}>{t.sourceLanguage}
-              <select className={inputClass} name="source_language" required value={source}
-                onChange={(event) => setSource(event.target.value as Locale)}>
-                <option value="">{t.chooseLanguage}</option>
-                <option value="zh-CN">zh-CN</option><option value="en-US">en-US</option>
-              </select>
-            </label>
-            <label className={labelClass}>{t.original} · {t.name} ({source || t.chooseLanguage})
-              <input className={inputClass} name="name" required maxLength={120} />
-            </label>
-            {kind === "category" && <>
-              <label className={labelClass}>{t.original} · {t.description} ({source || t.chooseLanguage})
-                <textarea className={inputClass} name="description" maxLength={1000} rows={2} />
-              </label>
-              <label className={labelClass}>{t.sortOrder}
-                <input className={inputClass} name="sort_order" type="number" min={-1000000} max={1000000} defaultValue={0} required />
-              </label>
-            </>}
-            <p className="text-sm font-medium">{t.translationLanguage}: {target || t.chooseLanguage}</p>
-            <label className={labelClass}>{t.translationName} ({target || t.chooseLanguage})
-              <input className={inputClass} name="translation_name" maxLength={120} />
-            </label>
-            {kind === "category" && <label className={labelClass}>{t.translationDescription} ({target || t.chooseLanguage})
-              <textarea className={inputClass} name="translation_description" maxLength={1000} rows={2} />
-            </label>}
-          </div>
-          <p className="text-sm text-muted-foreground">{t.optional}</p>
-          <button type="submit" className="rounded-md bg-primary px-4 py-2 text-sm font-semibold text-white">{t.create}</button>
-        </Form>
-      </section>
-      <section aria-label={title} className="space-y-4">
-        {items.length === 0 && <p className="text-sm text-muted-foreground">{t.empty}</p>}
-        {items.map((item) => {
-          const target = otherLocale(item.source_language);
-          return <article key={item.id} className={cardClass}>
-            <div className="mb-4 flex flex-wrap items-baseline justify-between gap-2">
-              <h2 className="font-semibold">{item.name} <span className="font-normal text-muted-foreground">/{item.slug}</span></h2>
-              <span className="text-xs text-muted-foreground">{t.original}: {item.source_language} · {t.translation}: {target}</span>
-            </div>
-            <Form method="post" className="space-y-4">
-              <input type="hidden" name="_intent" value="update" />
-              <input type="hidden" name="id" value={item.id} />
-              <input type="hidden" name="translation_locale" value={target} />
-              <div className={gridClass}>
-                <label className={labelClass}>{t.name} ({item.source_language})
-                  <input className={inputClass} name="name" defaultValue={item.name} required maxLength={120} />
-                </label>
-                {kind === "category" && <>
-                  <label className={labelClass}>{t.description} ({item.source_language})
-                    <textarea className={inputClass} name="description" defaultValue={item.description ?? ""} maxLength={1000} rows={2} />
-                  </label>
-                  <label className={labelClass}>{t.sortOrder}
-                    <input className={inputClass} name="sort_order" type="number" min={-1000000} max={1000000} defaultValue={item.sort_order} required />
-                  </label>
-                </>}
-                <label className={labelClass}>{t.translationName} ({target})
-                  <input className={inputClass} name="translation_name" defaultValue={item.translation_name ?? ""} maxLength={120} />
-                </label>
-                {kind === "category" && <label className={labelClass}>{t.translationDescription} ({target})
-                  <textarea className={inputClass} name="translation_description" defaultValue={item.translation_description ?? ""} maxLength={1000} rows={2} />
-                </label>}
-              </div>
-              <p className="text-sm text-muted-foreground">{t.optional}</p>
-              <button type="submit" className="rounded-md bg-primary px-4 py-2 text-sm font-semibold text-white">{t.save}</button>
-            </Form>
-            <Form method="post" className="mt-3">
-              <input type="hidden" name="_intent" value="delete" />
-              <input type="hidden" name="id" value={item.id} />
-              <button type="submit" className="rounded-md border border-border px-4 py-2 text-sm font-medium">{t.delete} {item.name}</button>
-            </Form>
-          </article>;
-        })}
-      </section>
+  const number = new Intl.NumberFormat(locale);
+  const date = new Intl.DateTimeFormat(locale, { year: "numeric", month: "short", day: "numeric", timeZone: "UTC" });
+  const formatDate = (value: string) => { const parsed = new Date(value); return Number.isNaN(parsed.getTime()) ? "—" : date.format(parsed); };
+  const toggle = (id: number) => setEditing(editing === id ? null : id);
+  const editForm = (item: TaxonomyRow, surface: "desktop" | "mobile") => {
+    const translationLocale = otherLocale(item.source_language);
+    return <div className="admin-taxonomy-edit-panel" id={`taxonomy-edit-${surface}-${item.id}`}>
+      <Form method="post" className="admin-taxonomy-form">
+        <input type="hidden" name="_intent" value="update" /><input type="hidden" name="id" value={item.id} />
+        <input type="hidden" name="translation_locale" value={translationLocale} />
+        <div className="admin-taxonomy-fields">
+          <label className="admin-field">{t.name} ({item.source_language})<input name="name" defaultValue={item.name} required maxLength={120} /></label>
+          {kind === "category" && <>
+            <label className="admin-field">{t.description} ({item.source_language})<textarea name="description" defaultValue={item.description ?? ""} maxLength={1000} rows={2} /></label>
+            <label className="admin-field">{t.sortOrder}<input name="sort_order" type="number" min={-1000000} max={1000000} defaultValue={item.sort_order} required /></label>
+          </>}
+          <label className="admin-field">{t.translationName} ({translationLocale})<input name="translation_name" defaultValue={item.translation_name ?? ""} maxLength={120} /></label>
+          {kind === "category" && <label className="admin-field">{t.translationDescription} ({translationLocale})<textarea name="translation_description" defaultValue={item.translation_description ?? ""} maxLength={1000} rows={2} /></label>}
+        </div>
+        <p className="admin-field-note">{t.optional}</p>
+        <button className="admin-primary-action" type="submit">{t.save}</button>
+      </Form>
+      <Form method="post"><input type="hidden" name="_intent" value="delete" /><input type="hidden" name="id" value={item.id} />
+        <button className="admin-danger-action" type="submit">{t.delete} {item.name}</button></Form>
+    </div>;
+  };
+  return <section aria-labelledby="taxonomy-admin-title" className="admin-taxonomy-page">
+    <header className="admin-page-heading"><div><h1 id="taxonomy-admin-title">{title}</h1><p>{t.manageDescription}</p></div></header>
+    {error && <p role="alert" className="admin-form-error">{t[error]}</p>}
+    <section aria-labelledby="taxonomy-create-title" className="admin-editor-panel admin-taxonomy-create">
+      <div className="admin-editor-panel-head"><h2 id="taxonomy-create-title">{t.create} {title}</h2><span>{t.createHint}</span></div>
+      <Form method="post" className="admin-taxonomy-form">
+        <input type="hidden" name="_intent" value="create" />
+        <div className="admin-taxonomy-fields">
+          <label className="admin-field">{t.slug}<input name="slug" required maxLength={80} pattern="[a-z0-9]+(-[a-z0-9]+)*" /></label>
+          <label className="admin-field">{t.sourceLanguage}<select name="source_language" required value={source}
+            onChange={(event) => setSource(event.target.value as Locale | "")}>
+            <option value="">{t.chooseLanguage}</option><option value="zh-CN">zh-CN</option><option value="en-US">en-US</option>
+          </select></label>
+          <label className="admin-field">{t.original} · {t.name} ({source || t.chooseLanguage})<input name="name" required maxLength={120} /></label>
+          {kind === "category" && <>
+            <label className="admin-field">{t.original} · {t.description} ({source || t.chooseLanguage})<textarea name="description" maxLength={1000} rows={2} /></label>
+            <label className="admin-field">{t.sortOrder}<input name="sort_order" type="number" min={-1000000} max={1000000} defaultValue={0} required /></label>
+          </>}
+          <label className="admin-field">{t.translationName} ({target || t.chooseLanguage})<input name="translation_name" maxLength={120} /></label>
+          {kind === "category" && <label className="admin-field">{t.translationDescription} ({target || t.chooseLanguage})<textarea name="translation_description" maxLength={1000} rows={2} /></label>}
+        </div>
+        <p className="admin-field-note">{t.optional}</p><button className="admin-primary-action" type="submit">{t.create}</button>
+      </Form>
     </section>
-  );
+    {items.length === 0 ? <div className="admin-empty"><p>{t.empty}</p></div> : <>
+      <div className="admin-table-wrap admin-taxonomy-table"><table className="admin-table"><thead><tr>
+        <th scope="col">{t.name}</th><th scope="col">{t.slug}</th><th scope="col">{t.translation}</th><th scope="col">{t.sourceLanguage}</th>
+        {kind === "category" && <th scope="col">{t.sortOrder}</th>}
+        <th scope="col">{t.promptCount}</th><th scope="col">{t.updatedAt}</th><th scope="col">{t.edit}</th>
+      </tr></thead><tbody>{items.map((item) => <FragmentRow key={item.id} item={item} kind={kind} t={t} number={number} formatDate={formatDate}
+        expanded={editing === item.id} onToggle={() => toggle(item.id)} editForm={editForm(item, "desktop")} />)}</tbody></table></div>
+      <div className="admin-compact-list admin-taxonomy-compact" aria-label={title}>{items.map((item) =>
+        <article className="admin-compact-row" key={item.id}><div className="admin-compact-content"><strong>{item.name}</strong>
+          <span className="admin-slug">/{item.slug}</span><span>{t.translation}: {item.translation_name || "—"}</span><span>{t.promptCount}: {number.format(item.prompt_count)} · {formatDate(item.updated_at)}</span>
+          {editing === item.id && editForm(item, "mobile")}</div>
+          <button className="admin-inline-button" type="button" aria-expanded={editing === item.id}
+            aria-controls={`taxonomy-edit-mobile-${item.id}`} onClick={() => toggle(item.id)}>{editing === item.id ? t.close : t.edit}</button>
+        </article>)}</div>
+    </>}
+  </section>;
 }
 
-
-
+function FragmentRow({ item, kind, t, number, formatDate, expanded, onToggle, editForm }: {
+  item: TaxonomyRow; kind: TaxonomyKind; t: ReturnType<typeof adminTaxonomyCopy>; number: Intl.NumberFormat;
+  formatDate: (value: string) => string; expanded: boolean; onToggle: () => void; editForm: ReactNode;
+}) {
+  return <Fragment><tr><td><strong className="admin-taxonomy-name">{item.name}</strong></td><td className="admin-slug">/{item.slug}</td><td>{item.translation_name || "—"}</td>
+    <td>{item.source_language}</td>{kind === "category" && <td>{item.sort_order}</td>}
+    <td>{number.format(item.prompt_count)}</td><td>{formatDate(item.updated_at)}</td>
+    <td><button className="admin-inline-button" type="button" aria-expanded={expanded}
+      aria-controls={`taxonomy-edit-desktop-${item.id}`} onClick={onToggle}>{expanded ? t.close : t.edit}</button></td></tr>
+    {expanded && <tr className="admin-taxonomy-expanded"><td colSpan={kind === "category" ? 8 : 7}>{editForm}</td></tr>}
+  </Fragment>;
+}

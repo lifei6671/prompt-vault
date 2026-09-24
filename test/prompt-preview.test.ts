@@ -61,6 +61,7 @@ describe("Admin Prompt Preview", () => {
       'alt="草稿图片"', 'width="800"', 'height="1200"', 'type="text"', "<select", "复古", "复制 Prompt"])
       expect(html).toContain(content);
     expect(html).toContain("https://vault-pic.disign.me/original/poster%201.png");
+    expect(html).toContain('class="admin-preview-page"');
     expect(html).toContain("/admin/prompts/1/edit?ui_locale=zh-CN");
     await expect(getPromptDetail(env.DB, "preview-draft", "zh-CN", null))
       .rejects.toMatchObject({ status: 404 });
