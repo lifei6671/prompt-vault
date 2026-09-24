@@ -10,6 +10,7 @@ import { getAdminNavCounts, getAdminPromptSummary, queryAdminPrompts,
   readAdminListFilters } from "../app/services/admin-list.server";
 import migration1 from "../migrations/0001_init.sql?raw";
 import migration2 from "../migrations/0002_i18n.sql?raw";
+import migration4 from "../migrations/0004_reference_image_requirement.sql?raw";
 
 async function migrate(sql: string) {
   for (const statement of sql.split(";").map((part) => part.replace(/^--.*$/gm, "").trim()).filter(Boolean))
@@ -19,6 +20,7 @@ async function migrate(sql: string) {
 beforeAll(async () => {
   await migrate(migration1);
   await migrate(migration2);
+  await migrate(migration4);
   await env.DB.prepare("INSERT INTO categories (id,name,slug,created_at,updated_at) VALUES (1,'摄影','photo','now','now'),(2,'设计','design','now','now')").run();
   await env.DB.prepare("INSERT INTO tags (id,name,slug,created_at,updated_at) VALUES (1,'风格','style','now','now')").run();
   for (let i = 1; i <= 26; i++) {
@@ -127,6 +129,10 @@ describe("Admin Phase A list", () => {
     expect(en).toContain("Showing");
     expect(en).toContain("Preview");
     expect(en).toContain("Category");
+    expect(en).toContain('name="status" value="published"');
+    expect(en).toContain('class="pv-select-trigger"');
+    expect(en).not.toContain("<select");
+
     expect(zh).toContain("admin-mobile-drawer");
     expect(zh).toContain("admin-mobile-create admin-primary-action");
   });

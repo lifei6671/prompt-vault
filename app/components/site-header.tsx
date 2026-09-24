@@ -1,5 +1,5 @@
 import type { Locale } from "../lib/localization";
-import { localeHref, readExploreFilters, type ExploreFilters } from "../lib/explore";
+import { exploreScope, localeHref, readExploreFilters, type ExploreFilters } from "../lib/explore";
 import { uiCopy } from "../lib/ui-copy";
 
 function Logo() {
@@ -13,22 +13,23 @@ function Logo() {
   );
 }
 
-function SearchForm({ filters, locale }: { filters: ExploreFilters; locale: Locale }) {
+function SearchForm({ filters, locale, url }: { filters: ExploreFilters; locale: Locale; url: URL }) {
   const t = uiCopy(locale);
   return (
-    <form action="/" method="get" role="search" className="site-search">
+    <form action={exploreScope(url.pathname) ? url.pathname : "/"} method="get" role="search" className="site-search">
       <input type="hidden" name="ui_locale" value={locale} />
-      {filters.category && <input type="hidden" name="category" value={filters.category} />}
-      {filters.tag && <input type="hidden" name="tag" value={filters.tag} />}
+      {filters.category && exploreScope(url.pathname)?.kind !== "category" && <input type="hidden" name="category" value={filters.category} />}
+      {filters.tag && exploreScope(url.pathname)?.kind !== "tag" && <input type="hidden" name="tag" value={filters.tag} />}
       {filters.model && <input type="hidden" name="model" value={filters.model} />}
       {filters.ratio && <input type="hidden" name="ratio" value={filters.ratio} />}
       {filters.sourceLanguage && <input type="hidden" name="source_language" value={filters.sourceLanguage} />}
+      {filters.contentType === "image" && <input type="hidden" name="content_type" value="image" />}
+      {filters.sort !== "latest" && <input type="hidden" name="sort" value={filters.sort} />}
       <svg viewBox="0 0 24 24" width="18" height="18" fill="none" aria-hidden="true">
         <circle cx="10.8" cy="10.8" r="6.6" stroke="currentColor" strokeWidth="1.8" />
         <path d="m16 16 4.5 4.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
       </svg>
       <input name="q" type="search" defaultValue={filters.q} placeholder={t.search} aria-label={t.search} />
-      <button type="submit">{t.searchButton}</button>
     </form>
   );
 }
@@ -40,6 +41,9 @@ export function SiteHeader({ locale, filters, url }: {
 }) {
   const t = uiCopy(locale);
   const searchFilters = filters ?? readExploreFilters(new URLSearchParams());
+  const categoryHref = url.pathname === "/" || exploreScope(url.pathname)
+    ? `${url.pathname}${url.search}#explore-filters`
+    : `/?ui_locale=${locale}#explore-filters`;
   return (
     <>
       <header className="site-header" lang={locale}>
@@ -48,10 +52,11 @@ export function SiteHeader({ locale, filters, url }: {
             <Logo />
             <span>Prompt<span className="brand-blue">Vault</span></span>
           </a>
-          <nav aria-label={t.explore} className="site-nav">
+          <nav aria-label={t.navigation} className="site-nav">
             <a href="/" aria-current={url.pathname === "/" ? "page" : undefined}>{t.explore}</a>
+            <a href={categoryHref}>{t.categoriesNav}</a>
           </nav>
-          <div className="desktop-search"><SearchForm filters={searchFilters} locale={locale} /></div>
+          <div className="desktop-search"><SearchForm filters={searchFilters} locale={locale} url={url} /></div>
           <nav className="locale-switch" aria-label={t.language}>
             <a href={localeHref(url, "zh-CN")} lang="zh-CN" aria-current={locale === "zh-CN" ? "true" : undefined}>中文</a>
             <span aria-hidden="true">/</span>
@@ -59,7 +64,7 @@ export function SiteHeader({ locale, filters, url }: {
           </nav>
         </div>
       </header>
-      <div className="mobile-search" lang={locale}><SearchForm filters={searchFilters} locale={locale} /></div>
+      <div className="mobile-search" lang={locale}><SearchForm filters={searchFilters} locale={locale} url={url} /></div>
     </>
   );
 }

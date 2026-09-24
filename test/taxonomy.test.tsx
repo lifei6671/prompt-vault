@@ -4,9 +4,10 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { beforeAll, describe, expect, it } from "vitest";
 import migration1 from "../migrations/0001_init.sql?raw";
 import migration2 from "../migrations/0002_i18n.sql?raw";
-import TaxonomyPage, { taxonomyMeta } from "../app/routes/taxonomy-page";
-import { loadTaxonomy } from "../app/routes/taxonomy-page.server";
-import { listTaxonomyPrompts } from "../app/services/prompt.server";
+import migration4 from "../migrations/0004_reference_image_requirement.sql?raw";
+import { ExplorePage, taxonomyMeta } from "../app/routes/explore-page";
+import { loadExplore } from "../app/routes/explore-page.server";
+import { exploreHref, pageHref } from "../app/lib/explore";
 
 async function applyMigration(sql: string) {
   for (const statement of sql.split(";").map((part) =>
@@ -15,14 +16,16 @@ async function applyMigration(sql: string) {
 }
 
 const request = (path: string) => new Request(`https://vault.disign.me${path}`);
-const category = (slug: string, locale: "zh-CN" | "en-US" = "zh-CN", page = 1) =>
-  listTaxonomyPrompts(env.DB, "category", slug, locale, page);
-const tag = (slug: string, locale: "zh-CN" | "en-US" = "zh-CN", page = 1) =>
-  listTaxonomyPrompts(env.DB, "tag", slug, locale, page);
+const scoped = (kind: "category" | "tag", slug: string, query = "") =>
+  loadExplore(request("/" + kind + "/" + slug + query), { kind, slug });
+const redirected = (path: string) => loadExplore(request(path)).catch((error: Response) => error);
+const htmlOf = async (kind: "category" | "tag", slug: string, query = "") =>
+  renderToStaticMarkup(createElement(ExplorePage, { loaderData: await scoped(kind, slug, query) }));
 
 beforeAll(async () => {
   await applyMigration(migration1);
   await applyMigration(migration2);
+  await applyMigration(migration4);
   await env.DB.prepare(`INSERT INTO categories
     (id, name, slug, description, created_at, updated_at) VALUES
     (1, '海报', 'poster', '中文分类说明', 'now', 'now'),
@@ -65,104 +68,99 @@ beforeAll(async () => {
     VALUES (1, 'en-US', 'Translated title', 'body', 'Translated alt')`).run();
 });
 
-describe("Category and Tag D1 listings", () => {
-  it("renders category SSR data with translated heading and source prompt cards", async () => {
-    const data = await loadTaxonomy(request("/category/poster?ui_locale=en-US"), "poster", "category");
-    const html = renderToStaticMarkup(createElement(TaxonomyPage, data));
-    expect(data).toMatchObject({ name: "Posters", description: "English category description",
-      contentLanguage: "en-US", total: 25, totalPages: 2 });
-    expect(data.cards).toHaveLength(24);
-    expect(data.cards.slice(0, 2).map((card) => card.slug)).toEqual(["prompt-2", "prompt-1"]);
-    expect(data.cards.find((card) => card.slug === "prompt-1")).toMatchObject({
-      title: "原文标题", category_name: "Posters", image_alt: "alt 1",
-      preview_width: 200, preview_height: 300,
-    });
-    expect(html).toContain("<h1 lang=\"en-US\">Posters</h1>");
-    expect(html).toContain("English category description");
-    expect(html).toContain("原文标题");
-    expect(html).not.toContain("Translated title");
-    expect(html).toContain('width="200" height="300"');
-    expect(html).toContain('href="/category/poster?ui_locale=en-US&amp;page=2"');
-    expect(html).toContain(env.IMAGE_BASE_URL);
-    expect(taxonomyMeta(data)).toContainEqual({
-      name: "description", content: "English category description",
-    });
-  });
-
-  it("renders tag SSR data with translated name and source fallback", async () => {
-    const translated = await loadTaxonomy(request("/tag/cinematic?ui_locale=en-US"),
-      "cinematic", "tag");
-    const html = renderToStaticMarkup(createElement(TaxonomyPage, translated));
-    expect(translated).toMatchObject({ name: "Cinematic", contentLanguage: "en-US", total: 25 });
-    expect(html).toContain("<h1 lang=\"en-US\">#Cinematic</h1>");
-    expect(html).toContain("原文标题");
-    expect(html).toContain('href="/tag/cinematic?ui_locale=en-US&amp;page=2"');
-    expect((await tag("travel", "en-US")).name).toBe("旅行");
-    expect((await tag("travel", "en-US")).contentLanguage).toBe("zh-CN");
-    expect(taxonomyMeta(translated)).toContainEqual({
-      name: "description", content: "Explore image prompts tagged Cinematic.",
-    });
-  });
-
-  it("falls back as a whole row and keeps known empty scopes valid", async () => {
-    expect(await category("photo", "en-US")).toMatchObject({
-      name: "摄影", description: "中文摄影说明", contentLanguage: "zh-CN",
-    });
-    expect(await category("empty", "en-US")).toMatchObject({
-      name: "Empty category", description: null, total: 0,
-    });
-    expect((await tag("empty")).cards).toHaveLength(0);
-  });
-
-  it("excludes draft and deleted prompts from both scopes", async () => {
-    for (const result of [await category("poster"), await tag("cinematic")]) {
-      expect(result.total).toBe(25);
-      expect(result.cards.every((card) => !["draft-prompt", "deleted-prompt"]
-        .includes(card.slug))).toBe(true);
+describe("Category and Tag Explore routes", () => {
+  it("redirects legacy query URLs to one path identity", async () => {
+    for (const [input, location] of [
+      ["/?category=poster", "/category/poster"],
+      ["/?tag=cinematic", "/tag/cinematic"],
+      ["/?category=poster&tag=cinematic&model=Flux", "/category/poster?tag=cinematic&model=Flux"],
+      ["/?category=POSTER", "/category/poster"],
+    ]) {
+      const response = await redirected(input);
+      expect(response).toBeInstanceOf(Response);
+      expect((response as Response).status).toBe(302);
+      expect((response as Response).headers.get("Location")).toBe(location);
     }
+    await expect(loadExplore(request("/?category=missing"))).rejects.toMatchObject({ status: 404 });
   });
 
-  it("rejects unknown slugs and invalid or out-of-range pages", async () => {
-    await expect(category("missing")).rejects.toMatchObject({ status: 404 });
-    await expect(tag("missing")).rejects.toMatchObject({ status: 404 });
-    await expect(category("poster", "zh-CN", 3)).rejects.toMatchObject({ status: 404 });
-    await expect(tag("cinematic", "zh-CN", 3)).rejects.toMatchObject({ status: 404 });
-    for (const kind of ["category", "tag"] as const) {
-      for (const page of ["0", "-1", "01", "abc", "999999999999999999999"]) {
-        await expect(loadTaxonomy(request(`/${kind}/poster?page=${page}`), "poster", kind))
-          .rejects.toMatchObject({ status: 404 });
-      }
-      const slug = kind === "category" ? "poster" : "cinematic";
-      const redirected = await loadTaxonomy(
-        request(`/${kind}/${slug}?page=1&ui_locale=en-US`), slug, kind,
-      ).catch((error: Response) => error);
-      expect(redirected).toBeInstanceOf(Response);
-      expect((redirected as Response).status).toBe(302);
-      expect((redirected as Response).headers.get("Location"))
-        .toBe(`/${kind}/${slug}?ui_locale=en-US`);
+  it("renders full Explore controls with selected taxonomy and localized metadata", async () => {
+    const category = await scoped("category", "poster", "?ui_locale=en-US");
+    const tag = await scoped("tag", "cinematic", "?ui_locale=en-US");
+    expect(category).toMatchObject({ taxonomy: { name: "Posters", description: "English category description" },
+      filters: { category: "poster" }, total: 25, totalPages: 2 });
+    expect(tag).toMatchObject({ taxonomy: { name: "Cinematic" }, filters: { tag: "cinematic" }, total: 25 });
+    for (const [data, selected] of [[category, "Style category: Posters"], [tag, "Tags: Cinematic"]] as const) {
+      const html = renderToStaticMarkup(createElement(ExplorePage, { loaderData: data }));
+      expect(html).toContain("explore-filters");
+      expect(html).toContain("sort-options");
+      expect(html).toContain("content-types");
+      expect(html).toContain("filter-menu");
+      expect(html).toContain("原文标题");
+      expect(html).toContain(selected);
+      expect(html).toContain("prompt-grid");
+      expect(html).not.toContain("<select");
     }
+    expect(taxonomyMeta(category)).toContainEqual({ name: "description", content: "English category description" });
+    expect(taxonomyMeta(tag)).toContainEqual({ name: "description", content: "Explore image prompts tagged Cinematic." });
+    expect((await scoped("category", "photo", "?ui_locale=en-US")).taxonomy)
+      .toMatchObject({ name: "摄影", description: "中文摄影说明", contentLanguage: "zh-CN" });
+    expect((await scoped("category", "empty")).cards).toHaveLength(0);
+    expect((await scoped("tag", "empty")).cards).toHaveLength(0);
   });
 
-  it("serves a stable second page and preserves locale in real pagination links", async () => {
-    for (const kind of ["category", "tag"] as const) {
-      const data = await loadTaxonomy(request(`/${kind}/${kind === "tag" ? "cinematic" : "poster"}?page=2&ui_locale=en-US`),
-        kind === "tag" ? "cinematic" : "poster", kind);
-      expect(data.cards).toHaveLength(1);
-      expect(data.cards[0].slug).toBe("prompt-3");
-      const html = renderToStaticMarkup(createElement(TaxonomyPage, data));
-      expect(html).toContain(`href="/${kind}/${kind === "tag" ? "cinematic" : "poster"}?ui_locale=en-US"`);
+  it("keeps path scope in links, search and pagination", async () => {
+    const categoryUrl = new URL("https://vault.disign.me/category/poster?ui_locale=en-US&model=Flux&tag=cinematic&page=2");
+    const tagUrl = new URL("https://vault.disign.me/tag/cinematic?ui_locale=en-US&category=poster&page=2");
+    expect(exploreHref(categoryUrl, "tag", "travel")).toBe("/category/poster?ui_locale=en-US&model=Flux&tag=travel");
+    expect(exploreHref(tagUrl, "category", "photo")).toBe("/tag/cinematic?ui_locale=en-US&category=photo");
+    expect(exploreHref(categoryUrl, "category", "")).toBe("/tag/cinematic?ui_locale=en-US&model=Flux");
+    expect(exploreHref(tagUrl, "tag", "")).toBe("/category/poster?ui_locale=en-US");
+    expect(exploreHref(categoryUrl, "category", "photo")).toBe("/category/photo?ui_locale=en-US&model=Flux&tag=cinematic");
+    expect(pageHref(categoryUrl, 3)).toContain("/category/poster?");
+    const categoryHtml = await htmlOf("category", "poster", "?ui_locale=en-US");
+    expect(categoryHtml).toContain('action="/category/poster"');
+    expect(categoryHtml).not.toContain('name="category" value="poster"');
+    expect(categoryHtml).toContain('href="/category/poster?ui_locale=en-US&amp;page=2"');
+    const tagHtml = await htmlOf("tag", "cinematic", "?ui_locale=en-US");
+    expect(tagHtml).toContain('action="/tag/cinematic"');
+    expect(tagHtml).not.toContain('name="tag" value="cinematic"');
+  });
+
+  it("normalizes path slug and duplicate query; rejects unknown and invalid pages", async () => {
+    for (const [path, location] of [
+      ["/category/POSTER?ui_locale=en-US", "/category/poster?ui_locale=en-US"],
+      ["/tag/CINEMATIC", "/tag/cinematic"],
+      ["/category/poster?category=poster", "/category/poster"],
+      ["/tag/cinematic?tag=cinematic", "/tag/cinematic"],
+      ["/category/poster?page=1", "/category/poster"],
+    ]) {
+      const response = await loadExplore(request(path), path.startsWith("/tag/") ?
+        { kind: "tag", slug: path.split("/")[2].split("?")[0] } :
+        { kind: "category", slug: path.split("/")[2].split("?")[0] }).catch((error: Response) => error);
+      expect((response as Response).headers.get("Location")).toBe(location);
     }
+    await expect(scoped("category", "missing")).rejects.toMatchObject({ status: 404 });
+    await expect(scoped("tag", "missing")).rejects.toMatchObject({ status: 404 });
+    await expect(scoped("category", "poster", "?page=0")).rejects.toMatchObject({ status: 404 });
+    await expect(scoped("category", "poster", "?page=3")).rejects.toMatchObject({ status: 404 });
   });
 
-  it("uses three D1 queries per page regardless of card count", async () => {
-    const queries: string[] = [];
-    const db = { prepare(sql: string) {
-      queries.push(sql);
-      return env.DB.prepare(sql);
-    } } as unknown as D1Database;
-    const result = await listTaxonomyPrompts(db, "tag", "cinematic", "en-US", 1);
-    expect(result.cards).toHaveLength(24);
-    expect(queries).toHaveLength(3);
-    expect(queries[2]).toContain("LEFT JOIN category_translations");
+  it("indexes base paths and sends filtered combinations to base canonical", async () => {
+    const base = await scoped("category", "poster", "?ui_locale=en-US");
+    const page2 = await scoped("category", "poster", "?page=2");
+    expect(page2.cards).toHaveLength(1);
+    expect(taxonomyMeta(base)).toContainEqual({ name: "robots", content: "index,follow" });
+    expect(taxonomyMeta(page2)).toContainEqual({ tagName: "link", rel: "canonical",
+      href: "https://vault.disign.me/category/poster?page=2" });
+    for (const query of ["?tag=cinematic", "?model=Flux", "?ratio=1%3A1", "?q=poster",
+      "?sort=popular", "?content_type=image", "?source_language=en-US", "?tag=cinematic&page=2"]) {
+      const data = await scoped("category", "poster", query);
+      expect(taxonomyMeta(data)).toContainEqual({ name: "robots", content: "noindex,follow" });
+      expect(taxonomyMeta(data)).toContainEqual({ tagName: "link", rel: "canonical",
+        href: "https://vault.disign.me/category/poster" });
+    }
+    const filteredTag = await scoped("tag", "cinematic", "?category=poster");
+    expect(taxonomyMeta(filteredTag)).toContainEqual({ name: "robots", content: "noindex,follow" });
   });
 });

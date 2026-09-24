@@ -1,15 +1,15 @@
 import type { Route } from "./+types/tag";
-import TaxonomyPage, { taxonomyMeta } from "./taxonomy-page";
-import { loadTaxonomy } from "./taxonomy-page.server";
+import { loadExplore } from "./explore-page.server";
+import { ExplorePage, taxonomyMeta } from "./explore-page";
 
 export function meta({ loaderData }: Route.MetaArgs) {
   return taxonomyMeta(loaderData);
 }
 
 export function loader({ request, params }: Route.LoaderArgs) {
-  return loadTaxonomy(request, params.slug, "tag");
+  return loadExplore(request, { kind: "tag", slug: params.slug });
 }
 
 export default function TagPage({ loaderData }: Route.ComponentProps) {
-  return <TaxonomyPage {...loaderData} />;
+  return <ExplorePage loaderData={loaderData} />;
 }

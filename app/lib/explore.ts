@@ -1,6 +1,8 @@
 import { parseLocale, type Locale } from "./localization";
 
 export const PAGE_SIZE = 24;
+export type ContentType = "all" | "image";
+export type ExploreSort = "recommended" | "popular" | "latest";
 
 export type ExploreFilters = {
   q: string;
@@ -9,6 +11,8 @@ export type ExploreFilters = {
   model: string;
   ratio: string;
   sourceLanguage: string;
+  contentType: ContentType;
+  sort: ExploreSort;
 };
 
 export function readExploreFilters(params: URLSearchParams): ExploreFilters {
@@ -19,7 +23,33 @@ export function readExploreFilters(params: URLSearchParams): ExploreFilters {
     model: params.get("model") ?? "",
     ratio: params.get("ratio") ?? "",
     sourceLanguage: params.get("source_language") ?? "",
+    contentType: params.get("content_type") === "image" ? "image" : "all",
+    sort: params.get("sort") === "recommended" || params.get("sort") === "popular"
+      ? params.get("sort") as ExploreSort : "latest",
   };
+}
+
+export function exploreHref(url: URL, key: string, value: string): string {
+  const next = new URL(url);
+  const scope = exploreScope(url.pathname);
+  if ((key === "category" || key === "tag") && (!scope || scope.kind === key)) {
+    next.searchParams.delete(key);
+    if (value) next.pathname = "/" + key + "/" + encodeURIComponent(value);
+    else {
+      const other = key === "category" ? "tag" : "category";
+      const promoted = next.searchParams.get(other);
+      next.searchParams.delete(other);
+      next.pathname = promoted ? "/" + other + "/" + encodeURIComponent(promoted) : "/";
+    }
+  } else if (value) next.searchParams.set(key, value);
+  else next.searchParams.delete(key);
+  next.searchParams.delete("page");
+  return next.pathname + next.search;
+}
+
+export function exploreScope(pathname: string): { kind: "category" | "tag"; slug: string } | null {
+  const match = /^\/(category|tag)\/([^/]+)$/.exec(pathname);
+  return match ? { kind: match[1] as "category" | "tag", slug: decodeURIComponent(match[2]) } : null;
 }
 
 export function readPage(params: URLSearchParams): number {

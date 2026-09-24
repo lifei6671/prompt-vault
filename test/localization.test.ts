@@ -2,6 +2,7 @@ import { env } from "cloudflare:test";
 import { describe, expect, it } from "vitest";
 import migration1 from "../migrations/0001_init.sql?raw";
 import migration2 from "../migrations/0002_i18n.sql?raw";
+import migration4 from "../migrations/0004_reference_image_requirement.sql?raw";
 import {
   parseLocale,
   parseSelectOptions,
@@ -68,7 +69,7 @@ describe("bilingual content contract", () => {
   });
 });
 
-describe("0001 + 0002 migration", () => {
+describe("0001 + 0002 + 0004 migration", () => {
   it("preserves legacy source data and enables locale-keyed translations", async () => {
     await applyMigration(migration1);
     await env.DB.prepare(
@@ -87,11 +88,13 @@ describe("0001 + 0002 migration", () => {
     ).bind(JSON.stringify(["复古", "现代"])).run();
 
     await applyMigration(migration2);
+    await applyMigration(migration4);
 
     const prompt = await env.DB.prepare(
-      "SELECT source_language, title, prompt_template FROM prompts WHERE id = 1",
-    ).first<{ source_language: string; title: string; prompt_template: string }>();
-    expect(prompt).toEqual({ source_language: "zh-CN", title: "海报", prompt_template: "生成 {{style}} 海报" });
+      "SELECT source_language, title, prompt_template, requires_reference_image FROM prompts WHERE id = 1",
+    ).first<{ source_language: string; title: string; prompt_template: string; requires_reference_image: number }>();
+    expect(prompt).toEqual({ source_language: "zh-CN", title: "海报", prompt_template: "生成 {{style}} 海报",
+      requires_reference_image: 0 });
     const variable = await env.DB.prepare(
       "SELECT options_json FROM prompt_variables WHERE id = 1",
     ).first<{ options_json: string }>();

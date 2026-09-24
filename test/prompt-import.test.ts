@@ -19,6 +19,16 @@ const standard = [
 ].join("\n");
 
 describe("Prompt import parser", () => {
+  it("honors explicit image requirements and detects only clear image inputs", () => {
+    const document = (field: string, body: string) =>
+      ["---", "title: Example", "category: Art", field, "---", "## Prompt", body].join("\n");
+    expect(parsePromptImport(document("requires_reference_image: true", "Generate an image")).requiresReferenceImage).toBe(true);
+    expect(parsePromptImport(document("requires_reference_image: false", "Use the uploaded image")).requiresReferenceImage).toBe(false);
+    expect(parsePromptImport(document("", "请用户上传图片，再调整构图")).requiresReferenceImage).toBe(true);
+    expect(parsePromptImport(document("", "Use the uploaded image as input")).requiresReferenceImage).toBe(true);
+    expect(parsePromptImport(document("", "生成一张图片")).requiresReferenceImage).toBe(false);
+    expect(parsePromptImport(document("", "Generate an image")).requiresReferenceImage).toBe(false);
+  });
   it("parses whiteboard Frontmatter and an unfenced Prompt without metadata leakage", () => {
     const result = parsePromptImport(whiteboard);
     expect(result.errors).toEqual([]);

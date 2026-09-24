@@ -30,6 +30,10 @@ export async function listExplorePrompts(
 ) {
   const conditions = ["p.status = 'published'", "p.deleted_at IS NULL"];
   const values: string[] = [];
+  if (filters.contentType === "image") conditions.push("p.original_content_type LIKE 'image/%'");
+  const orderBy = filters.sort === "recommended"
+    ? "c.sort_order ASC, p.published_at DESC, p.id DESC"
+    : "p.published_at DESC, p.id DESC";
 
   if (filters.category) {
     conditions.push("c.slug = ?");
@@ -82,7 +86,7 @@ export async function listExplorePrompts(
       LEFT JOIN category_translations ct ON ct.category_id = c.id
         AND ct.locale = ? AND c.source_language <> ?
       ${where}
-      ORDER BY p.published_at DESC, p.id DESC LIMIT ? OFFSET ?`)
+      ORDER BY ${orderBy} LIMIT ? OFFSET ?`)
       .bind(locale, locale, ...values, PAGE_SIZE, (page - 1) * PAGE_SIZE)
       .all<PromptCardData>(),
     db.prepare(`SELECT c.slug, COALESCE(ct.name, c.name) AS name
@@ -119,54 +123,34 @@ export async function listExplorePrompts(
   };
 }
 
-export async function listTaxonomyPrompts(
-  db: D1Database, kind: TaxonomyKind, slug: string, locale: Locale, page: number,
+export async function getTaxonomyIdentity(
+  db: D1Database, kind: TaxonomyKind, slug: string, locale: Locale,
 ) {
   const identity = kind === "category"
-    ? await db.prepare(`SELECT c.id, c.slug, c.source_language, c.name AS source_name,
+    ? await db.prepare(`SELECT c.slug, c.source_language, c.name AS source_name,
         c.description AS source_description, ct.name AS translated_name,
         ct.description AS translated_description
       FROM categories c LEFT JOIN category_translations ct
         ON ct.category_id = c.id AND ct.locale = ? AND ct.locale <> c.source_language
       WHERE c.slug = ?`).bind(locale, slug).first<{
-        id: number; slug: string; source_language: Locale; source_name: string; source_description: string | null;
+        slug: string; source_language: Locale; source_name: string; source_description: string | null;
         translated_name: string | null; translated_description: string | null;
       }>()
-    : await db.prepare(`SELECT t.id, t.slug, t.source_language, t.name AS source_name,
+    : await db.prepare(`SELECT t.slug, t.source_language, t.name AS source_name,
         NULL AS source_description, tt.name AS translated_name,
         NULL AS translated_description
       FROM tags t LEFT JOIN tag_translations tt
         ON tt.tag_id = t.id AND tt.locale = ? AND tt.locale <> t.source_language
       WHERE t.slug = ?`).bind(locale, slug).first<{
-        id: number; slug: string; source_language: Locale; source_name: string; source_description: null;
+        slug: string; source_language: Locale; source_name: string; source_description: null;
         translated_name: string | null; translated_description: null;
       }>();
   if (!identity) throw new Response("Not Found", { status: 404 });
-
   const translated = identity.translated_name !== null;
-  const name = translated ? identity.translated_name! : identity.source_name;
-  const description = translated ? identity.translated_description : identity.source_description;
-  const scopeJoin = kind === "tag" ? "JOIN prompt_tags ptag ON ptag.prompt_id = p.id" : "";
-  const scopeWhere = kind === "tag" ? "ptag.tag_id = ?" : "p.category_id = ?";
-  const from = `FROM prompts p ${scopeJoin}`;
-  const where = `WHERE ${scopeWhere} AND p.status = 'published' AND p.deleted_at IS NULL`;
-  const count = await db.prepare(`SELECT COUNT(*) AS total ${from} ${where}`)
-    .bind(identity.id).first<{ total: number }>();
-  const total = count?.total ?? 0;
-  const totalPages = Math.ceil(total / PAGE_SIZE);
-  if (page > 1 && page > totalPages) throw new Response("Not Found", { status: 404 });
-
-  const cards = await db.prepare(`SELECT ${cardColumns}
-    ${from} JOIN categories c ON c.id = p.category_id
-    LEFT JOIN category_translations ct ON ct.category_id = c.id
-      AND ct.locale = ? AND ct.locale <> c.source_language
-    ${where}
-    ORDER BY p.published_at DESC, p.id DESC LIMIT ? OFFSET ?`)
-    .bind(locale, identity.id, PAGE_SIZE, (page - 1) * PAGE_SIZE)
-    .all<PromptCardData>();
-
   return {
-    slug: identity.slug, name, description, contentLanguage: translated ? locale : identity.source_language,
-    cards: cards.results, total, totalPages,
+    slug: identity.slug,
+    name: translated ? identity.translated_name! : identity.source_name,
+    description: translated ? identity.translated_description : identity.source_description,
+    contentLanguage: translated ? locale : identity.source_language,
   };
 }

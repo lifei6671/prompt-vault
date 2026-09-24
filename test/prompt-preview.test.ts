@@ -8,6 +8,7 @@ import { documentLanguage } from "../app/root";
 import { getPromptDetail } from "../app/services/prompt-detail.server";
 import migration1 from "../migrations/0001_init.sql?raw";
 import migration2 from "../migrations/0002_i18n.sql?raw";
+import migration4 from "../migrations/0004_reference_image_requirement.sql?raw";
 
 async function migrate(sql: string) {
   for (const statement of sql.split(";").map((part) => part.replace(/^--.*$/gm, "").trim()).filter(Boolean))
@@ -23,6 +24,7 @@ const load = (id: number | string, query = "") => loader({
 beforeAll(async () => {
   await migrate(migration1);
   await migrate(migration2);
+  await migrate(migration4);
   await env.DB.prepare("INSERT INTO categories (id,name,slug,created_at,updated_at) VALUES (1,'海报','poster','now','now')").run();
   const insert = env.DB.prepare(`INSERT INTO prompts
     (id,slug,title,description,prompt_template,category_id,
@@ -37,6 +39,7 @@ beforeAll(async () => {
     "直接复制正文", "已发布图片", "published").run();
   await insert.bind(3, "preview-deleted", "已删除标题", null,
     "不能预览正文", "已删除图片", "published").run();
+  await env.DB.prepare("UPDATE prompts SET requires_reference_image = 1 WHERE id = 1").run();
   await env.DB.prepare("UPDATE prompts SET deleted_at='now' WHERE id=3").run();
   await env.DB.prepare(`INSERT INTO prompt_translations
     (prompt_id,locale,title,description,prompt_template,image_alt)
@@ -58,8 +61,10 @@ describe("Admin Prompt Preview", () => {
       loaderData: result.data,
     } as Parameters<typeof AdminPromptPreview>[0]));
     for (const content of ["<h1 lang=\"zh-CN\">草稿标题</h1>", "画{{city}}，{{city}}，{{style}}",
-      'alt="草稿图片"', 'width="800"', 'height="1200"', 'type="text"', "<select", "复古", "复制 Prompt"])
+      'alt="草稿图片"', 'width="800"', 'height="1200"', 'type="text"', 'class="pv-select-trigger"', "风格", "复制 Prompt"])
       expect(html).toContain(content);
+    expect(result.data.prompt.requiresReferenceImage).toBe(true);
+    expect(html).toContain("需要参考图片");
     expect(html).toContain("https://vault-pic.disign.me/original/poster%201.png");
     expect(html).toContain('class="admin-preview-page"');
     expect(html).toContain("/admin/prompts/1/edit?ui_locale=zh-CN");
@@ -102,8 +107,8 @@ describe("Admin Prompt Preview", () => {
     } as Parameters<typeof AdminPromptPreview>[0]));
     expect(html).toContain('alt="Draft image"');
     expect(html).toContain("Paint {{city}}, {{city}}, {{style}}");
-    expect(html).toContain('value="retro"');
-    expect(html).toContain("Retro");
+    expect(html).toContain('id="variable-style"');
+    expect(translated.prompt.variables[1].options).toContainEqual({ value: "retro", label: "Retro" });
     expect(html).toContain("ui_locale=zh-CN&amp;prompt_locale=en-US");
     for (const language of ["bad", "fr-FR", "zh-CN"]) {
       const result = await load(1, `?ui_locale=en-US&prompt_locale=${language}`);

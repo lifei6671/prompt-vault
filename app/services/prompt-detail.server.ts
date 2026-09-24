@@ -7,6 +7,7 @@ type PromptRow = {
   translated_title: string | null; translated_description: string | null;
   translated_template: string | null; translated_alt: string | null;
   model: string | null; ratio: string | null; category_name: string;
+  requires_reference_image: number;
   original_image_key: string; original_width: number; original_height: number;
   preview_image_key: string; preview_width: number; preview_height: number;
 };
@@ -20,6 +21,7 @@ export type PromptDetail = {
   imageAlt: string; imageKey: string; imageWidth: number; imageHeight: number;
   previewImageKey: string; previewWidth: number; previewHeight: number;
   model: string | null; ratio: string | null; categoryName: string;
+  requiresReferenceImage: boolean;
   tags: { slug: string; name: string }[];
   sourceLanguage: Locale; contentLanguage: Locale; languages: Locale[];
   variables: {
@@ -52,7 +54,7 @@ async function loadPromptDetail(
       p.title, p.description, p.prompt_template, p.image_alt,
       pt.title AS translated_title, pt.description AS translated_description,
       pt.prompt_template AS translated_template, pt.image_alt AS translated_alt,
-      p.model, p.ratio, COALESCE(ct.name, c.name) AS category_name,
+      p.model, p.ratio, p.requires_reference_image, COALESCE(ct.name, c.name) AS category_name,
       p.original_image_key, p.original_width, p.original_height,
       p.preview_image_key, p.preview_width, p.preview_height
     FROM prompts p JOIN categories c ON c.id = p.category_id
@@ -100,6 +102,7 @@ async function loadPromptDetail(
     previewImageKey: row.preview_image_key, previewWidth: row.preview_width,
     previewHeight: row.preview_height,
     model: row.model, ratio: row.ratio, categoryName: row.category_name,
+    requiresReferenceImage: row.requires_reference_image === 1,
     tags: tags.results, sourceLanguage: row.source_language, contentLanguage,
     languages: [row.source_language, ...languages.results.map((item) => item.locale)],
     variables: variables.results.map((variable) => ({

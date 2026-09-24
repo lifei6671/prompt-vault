@@ -3,6 +3,7 @@ import { adminPromptCopy } from "../lib/admin-prompt-copy";
 import { scanPromptKeys } from "../lib/prompt-template";
 import type { AdminPrompt } from "../services/prompt-admin.server";
 import type { PromptImport } from "../lib/prompt-import";
+import { Select } from "./ui/select";
 
 type Taxonomy = { categories: { id: number; name: string }[]; tags: { id: number; name: string }[] };
 type Props = {
@@ -20,20 +21,22 @@ export function AdminPromptFields({ locale, source, onSourceChange, taxonomy, pr
     <section className="admin-editor-panel" aria-labelledby="admin-basic-title">
       <div className="admin-editor-panel-head"><h2 id="admin-basic-title">{t.basicInformation}</h2><span>{t.coreMetadata}</span></div>
       <div className="admin-editor-fields">
-        {!prompt && <label className="admin-field">{t.sourceLanguage}<select name="source_language" required value={source}
-          onChange={(event) => onSourceChange?.(event.target.value as Locale | "")}>
-          <option value="">{t.chooseLanguage}</option><option value="zh-CN">zh-CN</option><option value="en-US">en-US</option>
-        </select></label>}
+        {!prompt && <label className="admin-field">{t.sourceLanguage}<Select name="source_language" required value={source}
+          onValueChange={(value) => onSourceChange?.(value as Locale | "")} ariaLabel={t.sourceLanguage}
+          options={[{ value: "", label: t.chooseLanguage }, { value: "zh-CN", label: "zh-CN" },
+            { value: "en-US", label: "en-US" }]} /></label>}
         <label className="admin-field">{t.slug}<input name="slug" defaultValue={prompt?.slug ?? draft?.slug} required maxLength={80}
           pattern="[a-z0-9]+(-[a-z0-9]+)*" readOnly={!!prompt?.published_at || disabled} /></label>
         {importTaxonomy
           ? <label className="admin-field">{t.category}<input name="category_name" required defaultValue={draft?.category} maxLength={120} /></label>
-          : <label className="admin-field">{t.category}<select name="category_id" required defaultValue={prompt?.category_id ?? ""} disabled={disabled}>
-            <option value="">{t.chooseCategory}</option>
-            {taxonomy.categories.map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}
-          </select></label>}
+          : <label className="admin-field">{t.category}<Select name="category_id" required defaultValue={String(prompt?.category_id ?? "")} disabled={disabled}
+            ariaLabel={t.category} options={[{ value: "", label: t.chooseCategory },
+              ...taxonomy.categories.map((item) => ({ value: String(item.id), label: item.name }))]} /></label>}
         <label className="admin-field">{t.model}<input name="model" defaultValue={prompt?.model ?? draft?.model ?? ""} maxLength={120} disabled={disabled} /></label>
         <label className="admin-field">{t.ratio}<input name="ratio" defaultValue={prompt?.ratio ?? draft?.ratio ?? ""} maxLength={60} disabled={disabled} /></label>
+        <label className="admin-reference-field"><input type="checkbox" name="requires_reference_image" value="1"
+          defaultChecked={prompt ? prompt.requires_reference_image === 1 : draft?.requiresReferenceImage ?? false}
+          disabled={disabled} />{t.referenceImageRequired}</label>
       </div>
       {!!prompt?.published_at && <p className="admin-field-note">{t.slugFrozen}</p>}
       {importTaxonomy
@@ -56,9 +59,9 @@ export function AdminPromptFields({ locale, source, onSourceChange, taxonomy, pr
       <div className="admin-editor-panel-head"><h2 id="admin-translation-title">{t.translation} · {target || t.chooseLanguage}</h2><span>{t.translationHint}</span></div>
       <input type="hidden" name="translation_locale" value={target} />
       <div className="admin-editor-stack">
-        <label className="admin-field">{t.translationMode}<select name="translation_mode" defaultValue={translated ? "present" : "remove"} disabled={disabled}>
-          <option value="present">{t.present}</option><option value="remove">{t.remove}</option>
-        </select></label>
+        <label className="admin-field">{t.translationMode}<Select name="translation_mode" defaultValue={translated ? "present" : "remove"} disabled={disabled}
+          ariaLabel={t.translationMode} options={[{ value: "present", label: t.present },
+            { value: "remove", label: t.remove }]} /></label>
         <label className="admin-field">{t.title}<input name="translation_title" defaultValue={translated?.title ?? ""} maxLength={200} disabled={disabled} /></label>
         <label className="admin-field">{t.description}<textarea name="translation_description" defaultValue={translated?.description ?? ""} rows={3} maxLength={2000} disabled={disabled} /></label>
         <label className="admin-field">{t.template}<textarea name="translation_prompt_template" defaultValue={translated?.prompt_template ?? ""} rows={8} maxLength={50000} disabled={disabled} dir="auto" /></label>

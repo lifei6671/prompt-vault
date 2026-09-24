@@ -31,13 +31,13 @@ export async function createAdminPrompt(db: D1Database, bucket: R2Bucket, form: 
     ) AND NOT EXISTS (SELECT 1 FROM retired_image_keys WHERE original_image_key = ?)
     THEN 1 ELSE json('invalid') END`).bind(images.keys.original, images.keys.original),
     db.prepare(`INSERT INTO prompts
-      (id, slug, source_language, title, description, prompt_template, image_alt, model, ratio,
+      (id, slug, source_language, title, description, prompt_template, image_alt, model, ratio, requires_reference_image,
        category_id, original_image_key, preview_image_key, original_content_type,
        original_width, original_height, preview_width, preview_height,
        original_size_bytes, preview_size_bytes, status, published_at, created_at, updated_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'draft', NULL, ?, ?)`)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'draft', NULL, ?, ?)`)
       .bind(id, fields.slug, source, fields.title, fields.description, fields.template, fields.imageAlt,
-        fields.model, fields.ratio, fields.categoryId, images.keys.original, images.keys.preview,
+        fields.model, fields.ratio, Number(fields.requiresReferenceImage), fields.categoryId, images.keys.original, images.keys.preview,
         images.mime, images.original.width, images.original.height, images.preview.width,
         images.preview.height, images.original.size, images.preview.size, now, now),
     ...relatedPromptStatements(db, id, now, fields),

@@ -6,7 +6,7 @@ import { checkReleaseConfig, parseJsonc } from "./release-check.mjs";
 const config = parseJsonc(readFileSync(new URL("../wrangler.jsonc", import.meta.url), "utf8"), "wrangler.jsonc");
 const schema = JSON.parse(readFileSync(new URL("../node_modules/wrangler/config-schema.json", import.meta.url), "utf8"));
 const clone = () => structuredClone(config);
-const migrations = new Set(["0001_init.sql", "0002_i18n.sql", "0003_retired_image_keys.sql"]);
+const migrations = new Set(["0001_init.sql", "0002_i18n.sql", "0003_retired_image_keys.sql", "0004_reference_image_requirement.sql"]);
 const hasFile = (path) => migrations.has(path.split(/[\\/]/).at(-1));
 const valid = () => {
   const copy = clone();

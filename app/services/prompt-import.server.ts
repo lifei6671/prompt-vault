@@ -1,6 +1,6 @@
 import type { Locale } from "../lib/localization";
 import { detectRatio, parsePromptImport, stableHash, stableSlug } from "../lib/prompt-import";
-import { parseVariables, validateTokens, PromptAdminError } from "./prompt-admin.server";
+import { parseReferenceImageRequirement, parseVariables, validateTokens, PromptAdminError } from "./prompt-admin.server";
 import { headImages } from "./image-upload.server";
 import { createAdminPrompt } from "./prompt-create.server";
 
@@ -75,6 +75,8 @@ export async function createImportedPrompt(db: D1Database, bucket: R2Bucket, inp
     };
     form.set(key, advanced ? value(input, key, key === "prompt_template" ? 50_000 : 2000) : defaults[key]);
   }
+  if (advanced ? parseReferenceImageRequirement(input) : parsed.requiresReferenceImage)
+    form.set("requires_reference_image", "1");
   form.set("category_id", String(categoryId));
   tagIds.forEach((id) => form.append("tag_ids", String(id)));
   form.set("translation_locale", source === "zh-CN" ? "en-US" : "zh-CN");

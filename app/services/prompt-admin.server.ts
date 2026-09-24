@@ -8,6 +8,7 @@ export type Variable = { key: string; type: "text" | "select"; label: string; pl
 export type AdminPrompt = {
   id: number; slug: string; source_language: Locale; title: string; description: string | null;
   prompt_template: string; image_alt: string; model: string | null; ratio: string | null;
+  requires_reference_image: number;
   category_id: number; status: "draft" | "published"; published_at: string | null;
   deleted_at: string | null; created_at: string; updated_at: string; original_image_key: string; preview_image_key: string;
   original_content_type: string; original_width: number; original_height: number;
@@ -86,6 +87,11 @@ export function validateTokens(source: string, translation: string | null, varia
     if (translated.size !== keys.size || [...keys].some((key) => !translated.has(key))) invalid("tokens");
   }
 }
+export function parseReferenceImageRequirement(form: FormData): boolean {
+  const values = form.getAll("requires_reference_image");
+  if (values.length > 1 || (values.length === 1 && values[0] !== "1")) invalid();
+  return values.length === 1;
+}
 export async function parsePromptFields(db: D1Database, form: FormData, source: Locale) {
   const slug = field(form, "slug", 80, true);
   if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)) invalid();
@@ -95,6 +101,7 @@ export async function parsePromptFields(db: D1Database, form: FormData, source: 
   const imageAlt = field(form, "image_alt", 500, true);
   const model = field(form, "model", 120) || null;
   const ratio = field(form, "ratio", 60) || null;
+  const requiresReferenceImage = parseReferenceImageRequirement(form);
   const categoryId = parsePromptId(field(form, "category_id", 30, true));
   if (!await db.prepare("SELECT 1 FROM categories WHERE id = ?").bind(categoryId).first())
     throw new PromptAdminError(409, "conflict");
@@ -119,7 +126,8 @@ export async function parsePromptFields(db: D1Database, form: FormData, source: 
 
   const variables = parseVariables(field(form, "variables_json", 100_000), source);
   validateTokens(template, mode === "present" ? translatedTemplate : null, variables);
-  return { slug, title, description, template, imageAlt, model, ratio, categoryId, tagIds, target, mode, translatedTitle, translatedDescription, translatedTemplate, translatedAlt, variables };
+  return { slug, title, description, template, imageAlt, model, ratio, requiresReferenceImage,
+    categoryId, tagIds, target, mode, translatedTitle, translatedDescription, translatedTemplate, translatedAlt, variables };
 }
 export function relatedPromptStatements(db: D1Database, id: number, now: string,
   fields: Awaited<ReturnType<typeof parsePromptFields>>): D1PreparedStatement[] {
@@ -165,7 +173,7 @@ export async function listPromptTaxonomy(db: D1Database) {
 }
 async function row(db: D1Database, id: number) {
   const prompt = await db.prepare(`SELECT id, slug, source_language, title, description, prompt_template,
-    image_alt, model, ratio, category_id, status, published_at, deleted_at, created_at, updated_at,
+    image_alt, model, ratio, requires_reference_image, category_id, status, published_at, deleted_at, created_at, updated_at,
     original_image_key, preview_image_key, original_content_type, original_width, original_height,
     preview_width, preview_height, original_size_bytes, preview_size_bytes FROM prompts WHERE id = ?`)
     .bind(id).first<Omit<AdminPrompt, "translation" | "variables" | "tagIds">>();
@@ -257,7 +265,7 @@ export async function mutateAdminPrompt(db: D1Database, id: number, form: FormDa
   if (prompt.published_at && field(form, "slug", 80, true) !== prompt.slug)
     throw new PromptAdminError(409, "slugFrozen");
   const fields = await parsePromptFields(db, form, prompt.source_language);
-  const { slug, title, description, template, imageAlt, model, ratio, categoryId } = fields;
+  const { slug, title, description, template, imageAlt, model, ratio, requiresReferenceImage, categoryId } = fields;
   const statements: D1PreparedStatement[] = [
     // A failed assertion aborts the D1 batch before any related row changes.
     db.prepare(`SELECT CASE WHEN EXISTS (
@@ -265,9 +273,9 @@ export async function mutateAdminPrompt(db: D1Database, id: number, form: FormDa
         AND published_at IS ? AND deleted_at IS NULL
     ) THEN 1 ELSE json('invalid') END`).bind(id, prompt.slug, prompt.status, prompt.published_at),
     db.prepare(`UPDATE prompts SET slug = ?, title = ?, description = ?, prompt_template = ?,
-      image_alt = ?, model = ?, ratio = ?, category_id = ?, updated_at = ?
+      image_alt = ?, model = ?, ratio = ?, requires_reference_image = ?, category_id = ?, updated_at = ?
       WHERE id = ? AND deleted_at IS NULL`)
-      .bind(slug, title, description, template, imageAlt, model, ratio, categoryId, now, id),
+      .bind(slug, title, description, template, imageAlt, model, ratio, Number(requiresReferenceImage), categoryId, now, id),
     db.prepare("DELETE FROM prompt_variables WHERE prompt_id = ?").bind(id),
     db.prepare("DELETE FROM prompt_tags WHERE prompt_id = ?").bind(id),
   ];

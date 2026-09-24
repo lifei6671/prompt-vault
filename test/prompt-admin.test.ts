@@ -10,6 +10,7 @@ import { getPromptDetail } from "../app/services/prompt-detail.server";
 import { getAdminPrompt, listAdminPrompts, listPromptTaxonomy, mutateAdminPrompt, parseVariables } from "../app/services/prompt-admin.server";
 import migration1 from "../migrations/0001_init.sql?raw";
 import migration2 from "../migrations/0002_i18n.sql?raw";
+import migration4 from "../migrations/0004_reference_image_requirement.sql?raw";
 
 async function migrate(sql: string) {
   for (const statement of sql.split(";").map((part) => part.replace(/^--.*$/gm, "").trim()).filter(Boolean))
@@ -18,6 +19,7 @@ async function migrate(sql: string) {
 beforeAll(async () => {
   await migrate(migration1);
   await migrate(migration2);
+  await migrate(migration4);
   await env.DB.prepare("INSERT INTO categories (id,name,slug,created_at,updated_at) VALUES (1,'分类','category','now','now')")
     .run();
   await env.DB.prepare("INSERT INTO tags (id,name,slug,created_at,updated_at) VALUES (1,'标签一','tag-one','now','now'),(2,'标签二','tag-two','now','now')")
@@ -92,6 +94,24 @@ describe("Prompt admin", () => {
     await mutateAdminPrompt(env.DB, id, intent("publish"));
     expect((await prompt(id)).published_at).toBe(first);
     expect((await prompt(id)).status).toBe("published");
+  });
+
+  it("saves and echoes the reference-image requirement in the edit form", async () => {
+    const id = await create("reference-edit");
+    expect((await prompt(id)).requires_reference_image).toBe(0);
+    await mutateAdminPrompt(env.DB, id, form("reference-edit", { requires_reference_image: "1" }));
+    const saved = await prompt(id);
+    expect(saved.requires_reference_image).toBe(1);
+    const router = createMemoryRouter([{ path: "/", element: createElement(Outlet, { context: "en-US" }),
+      children: [{ index: true, element: createElement(AdminPromptEdit, {
+        loaderData: { prompt: saved, taxonomy: await listPromptTaxonomy(env.DB) }, actionData: undefined,
+      } as Parameters<typeof AdminPromptEdit>[0]) }] }]);
+    const html = renderToStaticMarkup(createElement(RouterProvider, { router }));
+    expect(html).toMatch(/type="checkbox" name="requires_reference_image" checked="" value="1"/);
+    expect(html).toContain("Reference image required");
+    await mutateAdminPrompt(env.DB, id, form("reference-edit"));
+    expect((await prompt(id)).requires_reference_image).toBe(0);
+    await reject(id, form("reference-edit", { requires_reference_image: "true" }), 400);
   });
 
   it("rejects source language and image identity edits", async () => {

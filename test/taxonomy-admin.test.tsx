@@ -11,6 +11,7 @@ import { taxonomyAdminAction } from "../app/routes/taxonomy-admin.server";
 import { listTaxonomyAdmin, mutateTaxonomyAdmin, type TaxonomyKind } from "../app/services/taxonomy-admin.server";
 import migration1 from "../migrations/0001_init.sql?raw";
 import migration2 from "../migrations/0002_i18n.sql?raw";
+import migration4 from "../migrations/0004_reference_image_requirement.sql?raw";
 
 async function applyMigration(sql: string) {
   for (const statement of sql.split(";").map((part) =>
@@ -21,6 +22,7 @@ async function applyMigration(sql: string) {
 beforeAll(async () => {
   await applyMigration(migration1);
   await applyMigration(migration2);
+  await applyMigration(migration4);
 });
 
 function form(fields: Record<string, string>): FormData {

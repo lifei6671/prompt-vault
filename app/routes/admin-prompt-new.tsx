@@ -7,6 +7,7 @@ import { parsePromptImport, stableHash } from "../lib/prompt-import";
 import { usePromptImageUpload } from "../lib/use-prompt-image-upload";
 import { adminPromptCopy } from "../lib/admin-prompt-copy";
 import { AdminPromptFields } from "../components/admin-prompt-fields";
+import { AdminImageDropzone, handleImagePaste } from "../components/admin-image-dropzone";
 import { listPromptTaxonomy, PromptAdminError } from "../services/prompt-admin.server";
 import { createAdminPrompt } from "../services/prompt-create.server";
 import { createImportedPrompt } from "../services/prompt-import.server";
@@ -63,10 +64,7 @@ export default function AdminPromptNew({ loaderData, actionData }: Route.Compone
     if (file) void onImage(file);
   }
   return <section className="admin-editor-page admin-editor-new" aria-labelledby="admin-editor-title"
-    onPaste={(event) => {
-      const image = [...event.clipboardData.files].find((file) => file.type.startsWith("image/"));
-      if (image) { event.preventDefault(); acceptImage(image); }
-    }}>
+    onPaste={(event) => handleImagePaste(event, acceptImage)}>
     <header className="admin-editor-header">
       <div className="admin-editor-heading"><a className="admin-back-link" href="/admin/prompts">← {t.back}</a>
         <h1 id="admin-editor-title">{t.create}</h1><span className="admin-status admin-status-draft">{t.draft}</span></div>
@@ -78,6 +76,21 @@ export default function AdminPromptNew({ loaderData, actionData }: Route.Compone
     <Form id="admin-prompt-form" method="post" className="admin-editor-main">
       <input type="hidden" name="_mode" value={mode} />
       <input type="hidden" name="upload_reference" value={reference} />
+      <section className="admin-editor-panel" aria-labelledby="admin-image-title">
+        <div className="admin-editor-panel-head"><h2 id="admin-image-title">{t.uploadImage}</h2><span>{t.imageGenerated}</span></div>
+        <div className="admin-new-upload-layout">
+          <div className="admin-new-upload-preview">
+            {previewUrl ? <img src={previewUrl} alt={t.previewImage} /> : <span>{t.previewEmpty}</span>}
+          </div>
+          <AdminImageDropzone onImage={acceptImage} inputLabel={t.originalImage} buttonLabel={t.selectImage}>
+            <p className="admin-field-note">{t.dropOrPaste}</p>
+            <p className="admin-field-note">{t.originalImage}</p>
+            <p aria-live="polite" className="admin-field-note">{imageStatus}</p>
+            {fileName && <p className="admin-field-note">{fileName}
+              {originalWidth > 0 && " · " + originalWidth + " × " + originalHeight + " · " + detectedRatio}</p>}
+          </AdminImageDropzone>
+        </div>
+      </section>
       <section className="admin-editor-panel" aria-labelledby="admin-import-title">
         <div className="admin-editor-panel-head"><h2 id="admin-import-title">{t.importDocument}</h2><span>{t.importHint}</span></div>
         <label className="admin-field">{t.importDocument}
@@ -90,19 +103,6 @@ export default function AdminPromptNew({ loaderData, actionData }: Route.Compone
         </label>
         <button type="button" className="admin-secondary-action admin-reparse" onClick={() => setRevision((value) => value + 1)}
           disabled={!document.trim()}>{t.reparse}</button>
-      </section>
-      <section className="admin-editor-panel" aria-labelledby="admin-image-title">
-        <div className="admin-editor-panel-head"><h2 id="admin-image-title">{t.uploadImage}</h2><span>{t.imageGenerated}</span></div>
-        <div className="admin-import-dropzone" onDragOver={(event) => event.preventDefault()}
-          onDrop={(event) => { event.preventDefault(); acceptImage(event.dataTransfer.files[0]); }}>
-          <label className="admin-field">{t.originalImage}<input type="file" accept="image/jpeg,image/png,image/webp"
-            onChange={(event) => { acceptImage(event.currentTarget.files?.[0]); event.currentTarget.value = ""; }} /></label>
-          <p className="admin-field-note">{t.dropOrPaste}</p>
-        </div>
-        <p aria-live="polite" className="admin-field-note">{imageStatus}</p>
-        {previewUrl && <img className="admin-upload-preview" src={previewUrl} alt={t.previewImage} />}
-        {fileName && <p className="admin-field-note">{fileName}
-          {originalWidth > 0 && " · " + originalWidth + " × " + originalHeight + " · " + detectedRatio}</p>}
       </section>
       <section className="admin-editor-panel" aria-labelledby="admin-import-summary-title" aria-live="polite">
         <div className="admin-editor-panel-head"><h2 id="admin-import-summary-title">{t.importSummary}</h2></div>
@@ -117,6 +117,7 @@ export default function AdminPromptNew({ loaderData, actionData }: Route.Compone
             <div><dt>{t.ratio}</dt><dd>{parsed.ratio || "—"}</dd></div>
             <div><dt>{t.sourceLanguage}</dt><dd>{parsed.sourceLanguage}</dd></div>
             <div><dt>{t.variableCount}</dt><dd>{parsed.variables.length}</dd></div>
+            <div><dt>{t.referenceImageRequired}</dt><dd>{parsed.requiresReferenceImage ? t.requirementYes : t.requirementNo}</dd></div>
             <div><dt>{t.imageState}</dt><dd>{imageStatus}</dd></div>
           </dl>
           {parsed.errors.length > 0 && <p className="admin-form-error" role="alert">{t.importErrors}: {parsed.errors.map((key) =>

@@ -1,3 +1,4 @@
+import { Select } from "../components/ui/select";
 import { Fragment, useState, type ReactNode } from "react";
 import { Form, useOutletContext } from "react-router";
 import type { Locale } from "../lib/localization";
@@ -50,10 +51,10 @@ export default function TaxonomyAdminPage({ kind, items, error }: Props) {
         <input type="hidden" name="_intent" value="create" />
         <div className="admin-taxonomy-fields">
           <label className="admin-field">{t.slug}<input name="slug" required maxLength={80} pattern="[a-z0-9]+(-[a-z0-9]+)*" /></label>
-          <label className="admin-field">{t.sourceLanguage}<select name="source_language" required value={source}
-            onChange={(event) => setSource(event.target.value as Locale | "")}>
-            <option value="">{t.chooseLanguage}</option><option value="zh-CN">zh-CN</option><option value="en-US">en-US</option>
-          </select></label>
+          <label className="admin-field">{t.sourceLanguage}<Select name="source_language" required value={source}
+            onValueChange={(value) => setSource(value as Locale | "")} ariaLabel={t.sourceLanguage}
+            options={[{ value: "", label: t.chooseLanguage }, { value: "zh-CN", label: "zh-CN" },
+              { value: "en-US", label: "en-US" }]} /></label>
           <label className="admin-field">{t.original} · {t.name} ({source || t.chooseLanguage})<input name="name" required maxLength={120} /></label>
           {kind === "category" && <>
             <label className="admin-field">{t.original} · {t.description} ({source || t.chooseLanguage})<textarea name="description" maxLength={1000} rows={2} /></label>

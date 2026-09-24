@@ -7,6 +7,7 @@ import routes from "../app/routes";
 import { action as uploadAction } from "../app/routes/admin-prompt-upload";
 import { loader as editLoader } from "../app/routes/admin-prompt-edit";
 import AdminPromptNew, { action as createAction, loader as createLoader } from "../app/routes/admin-prompt-new";
+import { handleImageDrop, handleImagePaste } from "../app/components/admin-image-dropzone";
 import { parseImageHeader, ORIGINAL_MAX_BYTES, PREVIEW_MAX_BYTES } from "../app/services/image-header";
 import { headImages, imageKeys, uploadOriginal, uploadPreview, UploadError } from "../app/services/image-upload.server";
 import { createAdminPrompt } from "../app/services/prompt-create.server";
@@ -15,6 +16,7 @@ import { getAdminPrompt } from "../app/services/prompt-admin.server";
 import migration1 from "../migrations/0001_init.sql?raw";
 import migration2 from "../migrations/0002_i18n.sql?raw";
 import migration3 from "../migrations/0003_retired_image_keys.sql?raw";
+import migration4 from "../migrations/0004_reference_image_requirement.sql?raw";
 
 async function migrate(sql: string) {
   for (const statement of sql.split(";").map((part) => part.replace(/^--.*$/gm, "").trim()).filter(Boolean))
@@ -24,6 +26,7 @@ beforeAll(async () => {
   await migrate(migration1);
   await migrate(migration2);
   await migrate(migration3);
+  await migrate(migration4);
   await env.DB.prepare("INSERT INTO categories (id,name,slug,created_at,updated_at) VALUES (1,'分类','category','now','now')").run();
   await env.DB.prepare("INSERT INTO tags (id,name,slug,created_at,updated_at) VALUES (1,'标签','tag','now','now')").run();
 });
@@ -157,6 +160,32 @@ describe("Phase 4D image create", () => {
       .rejects.toMatchObject({ status: 409 });
     expect(await env.IMAGES.head(imageKeys(reference).original)).not.toBeNull();
   });
+  it("persists the reference-image requirement on create and import", async () => {
+    const reference = await uploadPair();
+    const id = await createAdminPrompt(env.DB, env.IMAGES, form(reference, "reference-create", {
+      requires_reference_image: "1",
+    }));
+    expect((await getAdminPrompt(env.DB, id)).requires_reference_image).toBe(1);
+    expect((await env.DB.prepare("SELECT requires_reference_image FROM prompts WHERE id = ?")
+      .bind(id).first<{ requires_reference_image: number }>())?.requires_reference_image).toBe(1);
+    const bad = form(await uploadPair(), "bad-reference", { requires_reference_image: "true" });
+    await expect(createAdminPrompt(env.DB, env.IMAGES, bad)).rejects.toMatchObject({ status: 400 });
+
+    const imported = new FormData();
+    imported.set("_mode", "import");
+    imported.set("upload_reference", await uploadPair());
+    imported.set("import_document", "---\ntitle: Reference import\ncategory: 分类\n---\n## Prompt\nUse the uploaded image");
+    const importedId = await createImportedPrompt(env.DB, env.IMAGES, imported);
+    expect((await getAdminPrompt(env.DB, importedId)).requires_reference_image).toBe(1);
+
+    const advanced = form(await uploadPair(), "advanced-reference-override");
+    advanced.set("_mode", "import_advanced");
+    advanced.set("import_document", "---\ntitle: Override\ncategory: 分类\n---\n## Prompt\nUse the uploaded image");
+    advanced.set("category_name", "分类");
+    advanced.set("tag_names", "");
+    const advancedId = await createImportedPrompt(env.DB, env.IMAGES, advanced);
+    expect((await getAdminPrompt(env.DB, advancedId)).requires_reference_image).toBe(0);
+  });
   it("rejects missing or tampered R2 objects without D1 writes", async () => {
     const reference = await uploadPair();
     const keys = imageKeys(reference);
@@ -257,12 +286,50 @@ describe("Phase 4D image create", () => {
       expect(html).toContain("source_language");
       expect(html).toContain("upload_reference");
       expect(html).toContain("admin-import-textarea");
+      expect(html.indexOf('id="admin-image-title"')).toBeLessThan(html.indexOf('id="admin-import-title"'));
       expect(html).toContain('type="file"');
+      expect(html).toContain('accept="image/jpeg,image/png,image/webp"');
+      expect(html).toContain('class="admin-new-upload-input"');
+      expect(html).toContain(locale === "zh-CN" ? "选择图片" : "Choose image");
+      expect(html).toContain("admin-new-upload-preview");
       expect(html).toContain("admin-import-dropzone");
       expect(html).toContain("<details");
       expect(html).not.toContain("<details open");
       expect(html).toContain('disabled=""');
     }
+  });
+  it("uploads pasted images from clipboard items or files without blocking text paste", () => {
+    const image = new File(["image"], "sample.png", { type: "image/png" });
+    const onImage = vi.fn();
+    const itemEvent = { clipboardData: {
+      items: [{ kind: "file", type: "image/png", getAsFile: () => image }], files: [],
+    }, preventDefault: vi.fn() } as unknown as Parameters<typeof handleImagePaste>[0];
+    handleImagePaste(itemEvent, onImage);
+    expect(itemEvent.preventDefault).toHaveBeenCalledOnce();
+    expect(onImage).toHaveBeenCalledWith(image);
+
+    const fileEvent = { clipboardData: { files: [image] },
+      preventDefault: vi.fn() } as unknown as Parameters<typeof handleImagePaste>[0];
+    handleImagePaste(fileEvent, onImage);
+    expect(fileEvent.preventDefault).toHaveBeenCalledOnce();
+    expect(onImage).toHaveBeenCalledTimes(2);
+
+    const textEvent = { clipboardData: {
+      items: [{ kind: "string", type: "text/plain", getAsFile: () => null }], files: [],
+    }, preventDefault: vi.fn() } as unknown as Parameters<typeof handleImagePaste>[0];
+    handleImagePaste(textEvent, onImage);
+    expect(textEvent.preventDefault).not.toHaveBeenCalled();
+    expect(onImage).toHaveBeenCalledTimes(2);
+  });
+  it("uploads dropped images through the same image handler", () => {
+    const image = new File(["image"], "sample.webp", { type: "image/webp" });
+    const onImage = vi.fn();
+    const event = { dataTransfer: { files: [
+      new File(["text"], "notes.txt", { type: "text/plain" }), image,
+    ] }, preventDefault: vi.fn() } as unknown as Parameters<typeof handleImageDrop>[0];
+    handleImageDrop(event, onImage);
+    expect(event.preventDefault).toHaveBeenCalledOnce();
+    expect(onImage).toHaveBeenCalledExactlyOnceWith(image);
   });
   it("registers both routes under the admin security boundary", () => {
     const admin = routes.find((route) => route.path === "admin");

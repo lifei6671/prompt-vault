@@ -4,6 +4,7 @@ import type { Route } from "./+types/admin-prompt-edit";
 import type { Locale } from "../lib/localization";
 import { adminPromptCopy } from "../lib/admin-prompt-copy";
 import { AdminPromptChecks, AdminPromptFields } from "../components/admin-prompt-fields";
+import { AdminImageDropzone, handleImagePaste } from "../components/admin-image-dropzone";
 import { usePromptImageUpload } from "../lib/use-prompt-image-upload";
 import { UploadError } from "../services/image-upload.server";
 import { replacePromptImage } from "../services/prompt-image.server";
@@ -56,7 +57,8 @@ export default function AdminPromptEdit({ loaderData, actionData }: Route.Compon
     const parsed = new Date(value);
     return Number.isNaN(parsed.getTime()) ? "—" : date.format(parsed);
   };
-  return <section className="admin-editor-page" aria-labelledby="admin-editor-title">
+  return <section className="admin-editor-page" aria-labelledby="admin-editor-title"
+    onPaste={editable ? (event) => handleImagePaste(event, (file) => void onImage(file)) : undefined}>
     <header className="admin-editor-header">
       <div className="admin-editor-heading"><a className="admin-back-link" href="/admin/prompts">← {t.back}</a>
         <h1 id="admin-editor-title">{prompt.title}</h1><span className={`admin-status admin-status-${statusKey}`}>{status}</span></div>
@@ -79,27 +81,35 @@ export default function AdminPromptEdit({ loaderData, actionData }: Route.Compon
         </Form>
         <section className="admin-editor-panel" aria-labelledby="admin-image-title">
           <div className="admin-editor-panel-head"><h2 id="admin-image-title">{t.imageMetadata}</h2></div>
-          <dl className="admin-image-meta">
-            <div><dt>{t.imageOriginalKey}</dt><dd className="admin-mono">{prompt.original_image_key}</dd></div>
-            <div><dt>{t.imagePreviewKey}</dt><dd className="admin-mono">{prompt.preview_image_key}</dd></div>
-            <div><dt>{t.imageMime}</dt><dd>{prompt.original_content_type}</dd></div>
-            <div><dt>{t.imageOriginalSize}</dt><dd>{prompt.original_width} × {prompt.original_height} · {new Intl.NumberFormat(locale).format(prompt.original_size_bytes)} B</dd></div>
-            <div><dt>{t.imagePreviewSize}</dt><dd>{prompt.preview_width} × {prompt.preview_height} · {new Intl.NumberFormat(locale).format(prompt.preview_size_bytes)} B</dd></div>
-          </dl>
-          {editable && <div className="admin-image-replace">
-            <h3>{t.replaceImage}</h3>
-            <label className="admin-field">{t.originalImage}<input type="file" accept="image/jpeg,image/png,image/webp"
-              onChange={(event) => void onImage(event.currentTarget.files?.[0])} /></label>
-            <p aria-live="polite" className="admin-field-note">
-              {uploadState === "idle" ? t.chooseImage : uploadState === "uploading" ? t.uploading :
-                uploadState === "ready" ? t.replaceReady : t.uploadFailed}
-            </p>
-            {previewUrl && <img className="admin-upload-preview" src={previewUrl} alt={t.previewImage} />}
-            <Form method="post"><input type="hidden" name="_intent" value="replace_image" />
-              <input type="hidden" name="upload_reference" value={reference} />
-              <button className="admin-secondary-action" type="submit" disabled={uploadState !== "ready"}>{t.replaceImage}</button>
-            </Form>
-          </div>}
+          <div className="admin-new-upload-layout">
+            <div className="admin-new-upload-preview">
+              <img src={previewUrl || `/admin/prompts/${prompt.id}/image`} alt={t.previewImage} />
+            </div>
+            <div className="admin-image-details">
+              <dl className="admin-image-meta">
+                <div><dt>{t.imageOriginalKey}</dt><dd className="admin-mono">{prompt.original_image_key}</dd></div>
+                <div><dt>{t.imagePreviewKey}</dt><dd className="admin-mono">{prompt.preview_image_key}</dd></div>
+                <div><dt>{t.imageMime}</dt><dd>{prompt.original_content_type}</dd></div>
+                <div><dt>{t.imageOriginalSize}</dt><dd>{prompt.original_width} × {prompt.original_height} · {new Intl.NumberFormat(locale).format(prompt.original_size_bytes)} B</dd></div>
+                <div><dt>{t.imagePreviewSize}</dt><dd>{prompt.preview_width} × {prompt.preview_height} · {new Intl.NumberFormat(locale).format(prompt.preview_size_bytes)} B</dd></div>
+              </dl>
+              {editable && <div className="admin-image-replace">
+                <h3>{t.replaceImage}</h3>
+                <AdminImageDropzone onImage={(file) => void onImage(file)} inputLabel={t.originalImage} buttonLabel={t.selectImage}>
+                  <p className="admin-field-note">{t.dropOrPaste}</p>
+                  <p className="admin-field-note">{t.originalImage}</p>
+                  <p aria-live="polite" className="admin-field-note">
+                    {uploadState === "idle" ? t.chooseImage : uploadState === "uploading" ? t.uploading :
+                      uploadState === "ready" ? t.replaceReady : t.uploadFailed}
+                  </p>
+                </AdminImageDropzone>
+                <Form method="post"><input type="hidden" name="_intent" value="replace_image" />
+                  <input type="hidden" name="upload_reference" value={reference} />
+                  <button className="admin-secondary-action" type="submit" disabled={uploadState !== "ready"}>{t.replaceImage}</button>
+                </Form>
+              </div>}
+            </div>
+          </div>
         </section>
       </div>
       <aside className="admin-editor-side" aria-label={t.lifecycle}>

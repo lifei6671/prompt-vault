@@ -4,6 +4,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { beforeAll, describe, expect, it } from "vitest";
 import migration1 from "../migrations/0001_init.sql?raw";
 import migration2 from "../migrations/0002_i18n.sql?raw";
+import migration4 from "../migrations/0004_reference_image_requirement.sql?raw";
 import { PromptInteraction } from "../app/components/prompt-interaction";
 import { SiteHeader } from "../app/components/site-header";
 import PromptDetailPage from "../app/routes/prompt-detail";
@@ -22,6 +23,7 @@ const detail = (slug: string, uiLocale: "zh-CN" | "en-US" = "zh-CN", language: s
 beforeAll(async () => {
   await applyMigration(migration1);
   await applyMigration(migration2);
+  await applyMigration(migration4);
   await env.DB.prepare("INSERT INTO categories (id,name,slug,created_at,updated_at) VALUES (1,'海报','poster','now','now'),(2,'摄影','photo','now','now')").run();
   await env.DB.prepare("INSERT INTO category_translations (category_id,locale,name) VALUES (1,'en-US','Poster Design')").run();
   await env.DB.prepare("INSERT INTO tags (id,name,slug,created_at,updated_at) VALUES (1,'旅行','travel','now','now'),(2,'复古','vintage','now','now')").run();
@@ -37,6 +39,9 @@ beforeAll(async () => {
   await insert.bind(2,"plain","无变量","描述","直接复制正文","无变量图","published").run();
   await insert.bind(3,"draft","草稿",null,"body","草稿图","draft").run();
   await insert.bind(4,"deleted","删除",null,"body","删除图","published").run();
+  await insert.bind(5,"reference-only","参考图",null,"请处理参考图片","参考图","published").run();
+  await insert.bind(6,"reference-variable","参考图变量",null,"处理{{city}}参考图片","参考图变量","published").run();
+  await env.DB.prepare("UPDATE prompts SET requires_reference_image = 1 WHERE id IN (5, 6)").run();
   await env.DB.prepare("UPDATE prompts SET deleted_at='now' WHERE id=4").run();
   await env.DB.prepare(`INSERT INTO prompt_translations
     (prompt_id,locale,title,description,prompt_template,image_alt)
@@ -47,6 +52,7 @@ beforeAll(async () => {
     (id,prompt_id,variable_key,label,input_type,input_placeholder,options_json,created_at,updated_at)
     VALUES (?,?,?,?,?,?,?,'now','now')`);
   await variable.bind(1,1,"city","城市","text","输入城市",null).run();
+  await variable.bind(3,6,"city","城市","text",null,null).run();
   await variable.bind(2,1,"style","风格","select","选择风格",
     JSON.stringify([{ value: "retro", labels: { "zh-CN": "复古", "en-US": "Vintage" } },
       { value: "modern", labels: { "zh-CN": "现代" } }])).run();
@@ -119,6 +125,56 @@ describe("Prompt Detail D1", () => {
     expect(page).toContain('class="mobile-search"');
     expect(page.match(/role="search"/g)).toHaveLength(2);
     expect(page).toContain('href="/prompt/plain?ui_locale=en-US"');
+  });
+  it("SSR renders all variable and reference-image combinations before one copy action", async () => {
+    for (const [slug, hasVariables, requiresImage] of [
+      ["plain", false, false], ["poster", true, false],
+      ["reference-only", false, true], ["reference-variable", true, true],
+    ] as const) {
+      const prompt = await detail(slug);
+      expect(prompt.requiresReferenceImage).toBe(requiresImage);
+      const html = renderToStaticMarkup(createElement(PromptDetailPage, {
+        loaderData: { prompt, locale: "zh-CN", pageUrl: "/prompt/" + slug,
+          imageUrl: previewImageUrl("https://vault-pic.disign.me", prompt.imageKey) },
+      } as Parameters<typeof PromptDetailPage>[0]));
+      expect(html.includes("自定义 Prompt 变量")).toBe(hasVariables);
+      expect(html.includes("需要参考图片")).toBe(requiresImage);
+      expect(html.includes("detail-requirement")).toBe(requiresImage);
+      expect(html.match(/class="copy-prompt"/g)).toHaveLength(1);
+      expect(html).not.toContain('type="file"');
+      const requirement = html.indexOf("detail-requirement");
+      const variables = html.indexOf("variable-group");
+      const toolbar = html.indexOf("prompt-toolbar");
+      const button = html.indexOf('class="copy-prompt"');
+      const body = html.indexOf("resolved-prompt");
+      if (requiresImage) expect(requirement).toBeLessThan(hasVariables ? variables : toolbar);
+      if (hasVariables) expect(variables).toBeLessThan(toolbar);
+      expect(toolbar).toBeLessThan(button);
+      expect(button).toBeLessThan(body);
+    }
+    const english = await detail("reference-only", "en-US");
+    const html = renderToStaticMarkup(createElement(PromptInteraction, {
+      prompt: english, locale: "en-US", pageUrl: "/prompt/reference-only",
+    }));
+    expect(html).toContain("Reference image required");
+    expect(html).not.toContain("variable-group");
+  });
+  it("renders one copy action above the resolved prompt with or without language tabs", async () => {
+    for (const slug of ["poster", "plain"]) {
+      const html = renderToStaticMarkup(createElement(PromptInteraction, {
+        prompt: await detail(slug), locale: "zh-CN", pageUrl: `/prompt/${slug}`,
+      }));
+      const toolbar = html.indexOf('class="prompt-toolbar"');
+      const button = html.indexOf('class="copy-prompt"');
+      const body = html.indexOf('class="resolved-prompt"');
+      expect(toolbar).toBeGreaterThan(-1);
+      expect(button).toBeGreaterThan(toolbar);
+      expect(button).toBeLessThan(body);
+      expect(html.match(/class="copy-prompt"/g)).toHaveLength(1);
+      expect(html).not.toContain("detail-copy-area");
+      expect(html).toContain('role="status" aria-live="polite"');
+      expect(html.includes('class="prompt-languages"')).toBe(slug === "poster");
+    }
   });
 });
 

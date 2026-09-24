@@ -5,6 +5,8 @@ import { createMemoryRouter, Outlet, RouterProvider } from "react-router";
 import { beforeAll, describe, expect, it, vi } from "vitest";
 import routes from "../app/routes";
 import AdminPromptEdit, { action, loader } from "../app/routes/admin-prompt-edit";
+import { loader as imageLoader } from "../app/routes/admin-prompt-image";
+import * as imageUploadHook from "../app/lib/use-prompt-image-upload";
 import { getAdminPrompt, listPromptTaxonomy, mutateAdminPrompt } from "../app/services/prompt-admin.server";
 import { getPromptDetail } from "../app/services/prompt-detail.server";
 import { imageKeys, uploadOriginal, uploadPreview } from "../app/services/image-upload.server";
@@ -13,6 +15,7 @@ import { replacePromptImage } from "../app/services/prompt-image.server";
 import migration1 from "../migrations/0001_init.sql?raw";
 import migration2 from "../migrations/0002_i18n.sql?raw";
 import migration3 from "../migrations/0003_retired_image_keys.sql?raw";
+import migration4 from "../migrations/0004_reference_image_requirement.sql?raw";
 
 async function migrate(sql: string) {
   for (const statement of sql.split(";").map((part) => part.replace(/^--.*$/gm, "").trim()).filter(Boolean))
@@ -22,6 +25,7 @@ beforeAll(async () => {
   await migrate(migration1);
   await migrate(migration2);
   await migrate(migration3);
+  await migrate(migration4);
   await env.DB.prepare("INSERT INTO categories (id,name,slug,created_at,updated_at) VALUES (1,'分类','category','now','now')").run();
 });
 function png(width = 1200, height = 800) {
@@ -285,10 +289,44 @@ describe("Phase 4E image lifecycle", () => {
           } as Parameters<typeof AdminPromptEdit>[0]) }] }]);
         return renderToStaticMarkup(createElement(RouterProvider, { router }));
       };
-      expect(render(await getAdminPrompt(env.DB, fresh.id))).toContain(locale === "zh-CN" ? "替换图片" : "Replace image");
-      expect(render(await getAdminPrompt(env.DB, old.id))).not.toContain('name="_intent" value="replace_image"');
+      const editableHtml = render(await getAdminPrompt(env.DB, fresh.id));
+      expect(editableHtml).toContain(locale === "zh-CN" ? "替换图片" : "Replace image");
+      expect(editableHtml).toContain('class="admin-new-upload-layout"');
+      expect(editableHtml).toContain('class="admin-new-upload-preview"');
+      expect(editableHtml).toContain(`src="/admin/prompts/${fresh.id}/image"`);
+      expect(editableHtml).toContain('class="admin-new-upload-input"');
+      expect(editableHtml).toContain('accept="image/jpeg,image/png,image/webp"');
+      expect(editableHtml).toContain('class="admin-import-dropzone"');
+      expect(editableHtml).toContain(locale === "zh-CN" ? "选择图片" : "Choose image");
+      const deletedHtml = render(await getAdminPrompt(env.DB, old.id));
+      expect(deletedHtml).not.toContain('name="_intent" value="replace_image"');
+      expect(deletedHtml).not.toContain('class="admin-import-dropzone"');
     }
+    const previewSpy = vi.spyOn(imageUploadHook, "usePromptImageUpload").mockReturnValue({
+      reference: "", state: "uploading", previewUrl: "blob:local-webp-preview", fileName: "next.png",
+      originalWidth: 1200, originalHeight: 800, detectedRatio: "3:2", onImage: vi.fn(),
+    });
+    try {
+      const locale = "en-US";
+      const prompt = await getAdminPrompt(env.DB, fresh.id);
+      const router = createMemoryRouter([{ path: "/", element: createElement(Outlet, { context: locale }),
+        children: [{ index: true, element: createElement(AdminPromptEdit, {
+          loaderData: { prompt, taxonomy: { categories: [], tags: [] } }, actionData: undefined,
+        } as Parameters<typeof AdminPromptEdit>[0]) }] }]);
+      const html = renderToStaticMarkup(createElement(RouterProvider, { router }));
+      expect(html).toContain('src="blob:local-webp-preview"');
+      expect(html).not.toContain(`src="/admin/prompts/${fresh.id}/image"`);
+    } finally { previewSpy.mockRestore(); }
     const admin = routes.find((route) => route.path === "admin");
     expect(admin?.children?.some((route) => route.path === "prompts/new/image/:kind")).toBe(true);
+    expect(admin?.children?.some((route) => route.path === "prompts/:id/image")).toBe(true);
+    const image = await imageLoader({ params: { id: String(fresh.id) } } as Parameters<typeof imageLoader>[0]);
+    expect(image.headers.get("Content-Type")).toBe("image/webp");
+    expect(image.headers.get("Cache-Control")).toBe("no-store");
+    expect(new Uint8Array(await image.arrayBuffer())).toEqual(webp());
+    await expect(imageLoader({ params: { id: "999999" } } as Parameters<typeof imageLoader>[0]))
+      .rejects.toMatchObject({ status: 404 });
+    await expect(imageLoader({ params: { id: "invalid" } } as Parameters<typeof imageLoader>[0]))
+      .rejects.toMatchObject({ status: 400 });
   });
 });

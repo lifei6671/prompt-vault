@@ -4,7 +4,8 @@ import type { Variable } from "../services/prompt-admin.server";
 export type PromptImport = {
   slug: string; title: string; category: string; tags: string[]; model: string;
   ratio: string; createdAt: string | null; sourceLanguage: Locale; imageAlt: string;
-  promptTemplate: string; variables: Variable[]; errors: string[]; warnings: string[];
+  promptTemplate: string; variables: Variable[]; requiresReferenceImage: boolean;
+  errors: string[]; warnings: string[];
 };
 
 export function stableHash(value: string): string {
@@ -164,8 +165,14 @@ export function parsePromptImport(document: string, imageRatio = ""): PromptImpo
   const rawTemplate = extractBody(body);
   const sourceLanguage: Locale = /[\u3400-\u9fff]/u.test(title + "\n" + rawTemplate) ? "zh-CN" : "en-US";
   const normalized = normalizeLegacyVariables(rawTemplate, sourceLanguage);
+  const explicitRequirement = fields.requires_reference_image;
+  const requiresReferenceImage = explicitRequirement === undefined
+    ? /用户(?:上传|提供)(?:的|一张|一幅)?(?:参考)?(?:图片|图像)|上传的(?:图片|图像)|参考(?:图片|图像)|\b(?:uploaded|user-provided|reference|input)\s+image\b/i.test(rawTemplate)
+    : explicitRequirement === "true";
   const errors: string[] = [];
   const warnings: string[] = [];
+  if (explicitRequirement !== undefined && explicitRequirement !== "true" && explicitRequirement !== "false")
+    errors.push("metadata");
   if (!title) errors.push("title");
   if (!normalized.template) errors.push("prompt");
   if (!fields.category) errors.push("category");
@@ -182,5 +189,6 @@ export function parsePromptImport(document: string, imageRatio = ""): PromptImpo
   const slug = stableSlug(fields.id || title, "prompt");
   return { slug, title, category: fields.category || "", tags, model: fields.model || "",
     ratio: fields.ratio || fields.aspect_ratio || imageRatio, createdAt, sourceLanguage,
-    imageAlt: title, promptTemplate: normalized.template, variables: normalized.variables, errors, warnings };
+    imageAlt: title, promptTemplate: normalized.template, variables: normalized.variables,
+    requiresReferenceImage, errors, warnings };
 }

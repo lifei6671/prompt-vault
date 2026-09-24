@@ -4,7 +4,7 @@ import { dirname, join } from "node:path";
 import ts from "typescript";
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
-const migrations = ["0001_init.sql", "0002_i18n.sql", "0003_retired_image_keys.sql"];
+const migrations = ["0001_init.sql", "0002_i18n.sql", "0003_retired_image_keys.sql", "0004_reference_image_requirement.sql"];
 
 export function checkReleaseConfig(config, schema, hasFile) {
   const errors = [];

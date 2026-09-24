@@ -5,6 +5,7 @@ import type { Locale } from "../lib/localization";
 import { adminPromptCopy } from "../lib/admin-prompt-copy";
 import { adminListCopy } from "../lib/admin-list-copy";
 import { pageHref, previewImageUrl } from "../lib/explore";
+import { Select } from "../components/ui/select";
 import {
   ADMIN_PAGE_SIZE, getAdminListOptions, getAdminPromptSummary, queryAdminPrompts,
   readAdminListFilters, type AdminListItem,
@@ -71,23 +72,19 @@ export default function AdminPrompts({ loaderData }: Route.ComponentProps) {
       <label className="admin-search"><span className="admin-visually-hidden">{a.searchLabel}</span>
         <input name="q" type="search" maxLength={100} defaultValue={filters.q} placeholder={a.search} />
       </label>
-      <label><span className="admin-visually-hidden">{t.status}</span><select name="status" defaultValue={filters.status}>
-        <option value="">{t.status}: {a.all}</option>
-        <option value="draft">{t.draft}</option><option value="published">{t.published}</option>
-        <option value="deleted">{t.deleted}</option>
-      </select></label>
-      <label><span className="admin-visually-hidden">{t.category}</span><select name="category" defaultValue={filters.category}>
-        <option value="">{t.category}: {a.all}</option>
-        {options.categories.map((item) => <option key={item.slug} value={item.slug}>{item.name}</option>)}
-      </select></label>
-      <label><span className="admin-visually-hidden">{t.model}</span><select name="model" defaultValue={filters.model}>
-        <option value="">{t.model}: {a.all}</option>
-        {options.models.map((item) => <option key={item} value={item}>{item}</option>)}
-      </select></label>
-      <label><span className="admin-visually-hidden">{t.ratio}</span><select name="ratio" defaultValue={filters.ratio}>
-        <option value="">{t.ratio}: {a.all}</option>
-        {options.ratios.map((item) => <option key={item} value={item}>{item}</option>)}
-      </select></label>
+      <label><span className="admin-visually-hidden">{t.status}</span><Select name="status" defaultValue={filters.status === "all" ? "" : filters.status}
+        ariaLabel={t.status} options={[{ value: "", label: t.status + ": " + a.all },
+          { value: "draft", label: t.draft }, { value: "published", label: t.published },
+          { value: "deleted", label: t.deleted }]} /></label>
+      <label><span className="admin-visually-hidden">{t.category}</span><Select name="category" defaultValue={filters.category} ariaLabel={t.category}
+        options={[{ value: "", label: t.category + ": " + a.all },
+          ...options.categories.map((item) => ({ value: item.slug, label: item.name }))]} /></label>
+      <label><span className="admin-visually-hidden">{t.model}</span><Select name="model" defaultValue={filters.model} ariaLabel={t.model}
+        options={[{ value: "", label: t.model + ": " + a.all },
+          ...options.models.map((item) => ({ value: item, label: item }))]} /></label>
+      <label><span className="admin-visually-hidden">{t.ratio}</span><Select name="ratio" defaultValue={filters.ratio} ariaLabel={t.ratio}
+        options={[{ value: "", label: t.ratio + ": " + a.all },
+          ...options.ratios.map((item) => ({ value: item, label: item }))]} /></label>
       <button type="submit">{a.apply}</button>
       <a href="/admin/prompts">{a.reset}</a>
     </form>

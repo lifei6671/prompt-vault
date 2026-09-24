@@ -3,6 +3,7 @@ import type { Locale } from "../lib/localization";
 import { resolvePrompt } from "../lib/prompt-template";
 import { uiCopy } from "../lib/ui-copy";
 import type { PromptDetail } from "../services/prompt-detail.server";
+import { Select } from "./ui/select";
 
 export function PromptInteraction({ prompt, locale, pageUrl }: {
   prompt: PromptDetail; locale: Locale; pageUrl: string;
@@ -45,6 +46,10 @@ export function PromptInteraction({ prompt, locale, pageUrl }: {
 
   return (
     <div className="detail-interaction" lang={locale}>
+      {prompt.requiresReferenceImage && <aside className="detail-requirement">
+        <strong>{t.referenceImageRequired}</strong>
+        <p>{t.referenceImageHelp}</p>
+      </aside>}
       {prompt.variables.length > 0 && (
         <section className="variable-group" aria-labelledby="variable-heading">
           <div className="detail-section-heading">
@@ -60,39 +65,39 @@ export function PromptInteraction({ prompt, locale, pageUrl }: {
                       placeholder={variable.placeholder ?? undefined}
                       value={Object.hasOwn(values, variable.key) ? values[variable.key] : ""}
                       onChange={(event) => setValues({ ...values, [variable.key]: event.target.value })} />
-                  : <select id={`variable-${variable.key}`} value={Object.hasOwn(values, variable.key) ? values[variable.key] : ""}
-                      onChange={(event) => setValues({ ...values, [variable.key]: event.target.value })}>
-                      <option value="">{t.selectPlaceholder}</option>
-                      {variable.options.map((option) =>
-                        <option key={option.value} value={option.value}>{option.label}</option>)}
-                    </select>}
+                  : <Select triggerId={`variable-${variable.key}`} value={Object.hasOwn(values, variable.key) ? values[variable.key] : ""}
+                      onValueChange={(value) => setValues({ ...values, [variable.key]: value })}
+                      ariaLabel={variable.label} placeholder={t.selectPlaceholder}
+                      options={[{ value: "", label: t.selectPlaceholder }, ...variable.options]} />}
               </div>
             ))}
           </div>
         </section>
       )}
       <section className="prompt-panel" aria-label={t.promptBody}>
-        {prompt.languages.length > 1 && (
-          <nav className="prompt-languages" aria-label={t.promptLanguage}>
-            {prompt.languages.map((language) => (
-              <a key={language} href={languageHref(language)}
-                lang={language} aria-current={language === prompt.contentLanguage ? "page" : undefined}>
-                {language === "zh-CN" ? "中文" : "English"}
-                {language === prompt.sourceLanguage ? ` · ${t.original}` : ""}
-              </a>
-            ))}
-          </nav>
-        )}
+        <div className="prompt-toolbar">
+          {prompt.languages.length > 1 && (
+            <nav className="prompt-languages" aria-label={t.promptLanguage}>
+              {prompt.languages.map((language) => (
+                <a key={language} href={languageHref(language)}
+                  lang={language} aria-current={language === prompt.contentLanguage ? "page" : undefined}>
+                  {language === "zh-CN" ? "中文" : "English"}
+                  {language === prompt.sourceLanguage ? ` · ${t.original}` : ""}
+                </a>
+              ))}
+            </nav>
+          )}
+          <div className="prompt-copy-controls">
+            <button type="button" className="copy-prompt" onClick={copy}>
+              {copyState === "copied" ? t.copied : copyState === "failed" ? t.copyFailed : t.copyPrompt}
+            </button>
+            <span role="status" aria-live="polite" className="copy-status">
+              {copyState === "copied" ? t.copied : copyState === "failed" ? t.copyFailed : ""}
+            </span>
+          </div>
+        </div>
         <div className="resolved-prompt" lang={prompt.contentLanguage}>{resolved}</div>
       </section>
-      <div className="detail-copy-area">
-        <button type="button" className="copy-prompt" onClick={copy}>
-          {copyState === "copied" ? t.copied : copyState === "failed" ? t.copyFailed : t.copyPrompt}
-        </button>
-        <span role="status" aria-live="polite" className="copy-status">
-          {copyState === "copied" ? t.copied : copyState === "failed" ? t.copyFailed : ""}
-        </span>
-      </div>
     </div>
   );
 }
