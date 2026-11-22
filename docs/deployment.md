@@ -36,6 +36,7 @@ pnpm verify:release
 - 响应头：匿名默认首页、详情、分类、标签及 `/image`、`/image/category/:slug`、`/image/tag/:slug` 为 `public, max-age=60, s-maxage=300, stale-while-revalidate=60`；普通 `page=2` 同样可缓存；locale 变体、后台和错误页为 `no-store`；静态资源保留原缓存头。
 - 公共分类、标签、模型与比例筛选项由 Cache API 按 UI 语言缓存 300 秒，同一边缘节点上的列表、分页与筛选组合共用。缓存未命中时查询 D1；缓存读写失败不阻断列表，D1 查询失败仍正常报错。后台继续直读 D1，公开筛选项在到期后刷新；叠加整页缓存及 stale 窗口，旧筛选项可能保留约 11 分钟。本次不增加主动全局 purge。
 - `/robots.txt` 禁止抓取搜索、模型、比例、原文语言、分类/标签 query、排序和旧 content_type 参数 URL；首页、详情、独立分类/标签路径及普通分页仍可抓取。这只约束遵守 robots 的爬虫，不是请求拦截规则。
+- `/.ansible/vault_pass.txt`、`/.git/config`、`/.env`、WordPress 探测路径及 `.php/.jsp/.aspx` 文件请求在 Worker 入口直接返回纯文本 404、`Cache-Control: no-store`，HEAD 不返回正文；不进入 SSR、不读取 D1、不打印路由异常堆栈，仍保留脱敏请求摘要。检查忽略 query、大小写不敏感并解码一次；仅拦截已列明的扫描路径，普通未知路由继续由 React Router 处理。WAF 仍负责边缘拦截，Worker 过滤不能消除已发生的 Worker 调用。
 - 如有真实验收样例，可由管理员人工走草稿 → 预览 → 发布链路；不要为 smoke 创建无意义生产内容。
 - Smoke 完成后，在 Search Console 人工提交 `https://vault.disign.me/sitemap.xml`。
 

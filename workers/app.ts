@@ -1,5 +1,5 @@
 import { createRequestHandler } from "react-router";
-import { applyResponseCachePolicy } from "./response-policy";
+import { handleFilteredRequest } from "./request-filter";
 import { observeRequest } from "./request-log";
 
 const requestHandler = createRequestHandler(
@@ -10,6 +10,6 @@ const requestHandler = createRequestHandler(
 export default {
   async fetch(request, bindings) {
     return observeRequest(request, bindings.DB, async (input) =>
-      applyResponseCachePolicy(input, await requestHandler(input)));
+      handleFilteredRequest(input, requestHandler));
   },
 } satisfies ExportedHandler<Env>;

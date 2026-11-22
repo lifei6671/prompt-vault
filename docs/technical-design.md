@@ -280,6 +280,10 @@ route 负责请求边界、SSR 数据装配和 action；*.server.ts 负责 D1/R2
 
 ## 15. 可观测性
 
+Worker 在进入 React Router 前拦截明显的路径扫描，直接返回纯文本 404，沿用 no-store 策略，HEAD 不返回正文。范围包括根路径的 `.ansible/.env/.git/.svn/.aws/.ssh/.vscode`、WordPress 路径、`application.*`、`@fs/`，以及嵌套 `.env`、wlwmanifest.xml 和 PHP/JSP/ASPX 文件；只检查 pathname，大小写不敏感并解码一次，编码异常时检查原始路径。不按 query 内容、User-Agent 或普通未知路径扩大拦截，保留公开路由、后台鉴权、静态资源和 `.well-known` 的现有处理。
+
+被拦截请求仍通过观测入口输出一条脱敏 404 摘要，D1 查询与读取行数均为 0；不调用 SSR，因此不生成路由未匹配的异常堆栈。其他 SSR 错误继续按原机制处理，不全局压制错误日志。此过滤运行于 Worker 内，不能代替 Cloudflare WAF 在边缘节省 Worker 调用。
+
 启用 Cloudflare Workers Observability，隐藏自动日志中的 query string，并关闭 invocation logs；Worker 每个执行请求输出一条结构化摘要：requestId（仅格式合法的 cf-ray，否则 UUID）、method（标准方法或 OTHER）、pathname（路由模板，不含 slug、ID 或 query）、status、durationMs、admin，以及以下请求统计：
 
 - `d1Queries`：提交的语句执行次数，包含失败尝试；batch 按语句数计，自动内部重试不另计。
