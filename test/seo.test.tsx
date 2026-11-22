@@ -193,6 +193,22 @@ describe("crawler resources", () => {
     expect(body).toContain("Allow: /");
     expect(body).toContain("Disallow: /admin/");
     expect(body).toContain("Sitemap: https://vault.disign.me/sitemap.xml");
+    const blocked = body.split("\n").filter((line) => line.startsWith("Disallow: "))
+      .map((line) => new RegExp("^" + line.slice("Disallow: ".length).trim()
+        .split("*").map((part) => part.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join(".*")));
+    for (const query of ["q=poster", "model=Flux", "ratio=1%3A1", "source_language=en-US",
+      "category=poster", "tag=cinematic", "sort=popular", "content_type=image"]) {
+      for (const path of ["/", "/image", "/category/poster", "/image/tag/cinematic"]) {
+        expect(blocked.some((rule) => rule.test(`${path}?${query}`))).toBe(true);
+        expect(blocked.some((rule) => rule.test(`${path}?page=2&${query}`))).toBe(true);
+      }
+    }
+    for (const path of ["/", "/image", "/category/poster", "/tag/cinematic",
+      "/image/category/poster", "/image/tag/cinematic", "/prompt/poster",
+      "/?page=2", "/image?page=2", "/image/category/poster?ui_locale=en-US&page=2",
+      "/prompt/poster?prompt_locale=en-US"]) {
+      expect(blocked.some((rule) => rule.test(path))).toBe(false);
+    }
   });
 
   it("serves a clean sitemap with public URLs, lastmod, XML escaping, and three SQL queries", async () => {

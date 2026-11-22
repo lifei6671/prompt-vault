@@ -26,7 +26,8 @@ export function responseCachePolicy(request: Request, response: Response): strin
 
   if (crawler) return url.search ? NO_STORE : PUBLIC_CRAWLER_CACHE;
 
-  const listPage = pathname === "/" || /^\/(category|tag)\/[^/]+\/?$/.test(pathname);
+  const listPage = pathname === "/" || pathname === "/image"
+    || /^\/(?:image\/)?(category|tag)\/[^/]+\/?$/.test(pathname);
   const detailPage = /^\/prompt\/[^/]+\/?$/.test(pathname);
   if (!listPage && !detailPage) return NO_STORE;
   if ([...url.searchParams.keys()].some((key) => key !== "page" || !listPage)) return NO_STORE;

@@ -1,5 +1,6 @@
 import type { Locale } from "../lib/localization";
 import { PAGE_SIZE, type ExploreFilters } from "../lib/explore";
+import { loadExploreOptions } from "./explore-options.server";
 
 export type PromptCardData = {
   slug: string;
@@ -14,8 +15,6 @@ export type PromptCardData = {
   image_alt: string;
 };
 
-type CategoryOption = { slug: string; name: string };
-type TagOption = { slug: string; name: string };
 export type TaxonomyKind = "category" | "tag";
 
 const cardColumns = `p.slug, p.title, p.source_language, p.model, p.ratio,
@@ -80,7 +79,7 @@ export async function listExplorePrompts(
   const totalPages = Math.ceil(total / PAGE_SIZE);
   if (page > 1 && page > totalPages) throw new Response("Not Found", { status: 404 });
 
-  const [cards, categories, tags, models, ratios] = await Promise.all([
+  const [cards, options] = await Promise.all([
     db.prepare(`SELECT ${cardColumns}
       ${from}
       LEFT JOIN category_translations ct ON ct.category_id = c.id
@@ -89,37 +88,14 @@ export async function listExplorePrompts(
       ORDER BY ${orderBy} LIMIT ? OFFSET ?`)
       .bind(locale, locale, ...values, PAGE_SIZE, (page - 1) * PAGE_SIZE)
       .all<PromptCardData>(),
-    db.prepare(`SELECT c.slug, COALESCE(ct.name, c.name) AS name
-      FROM categories c JOIN prompts p ON p.category_id = c.id
-      LEFT JOIN category_translations ct ON ct.category_id = c.id
-        AND ct.locale = ? AND c.source_language <> ?
-      WHERE p.status = 'published' AND p.deleted_at IS NULL
-      GROUP BY c.id ORDER BY c.sort_order, c.name`)
-      .bind(locale, locale).all<CategoryOption>(),
-    db.prepare(`SELECT t.slug, COALESCE(tt.name, t.name) AS name
-      FROM tags t JOIN prompt_tags ptag ON ptag.tag_id = t.id
-      JOIN prompts p ON p.id = ptag.prompt_id
-      LEFT JOIN tag_translations tt ON tt.tag_id = t.id
-        AND tt.locale = ? AND tt.locale <> t.source_language
-      WHERE p.status = 'published' AND p.deleted_at IS NULL
-      GROUP BY t.id ORDER BY t.name`)
-      .bind(locale).all<TagOption>(),
-    db.prepare(`SELECT DISTINCT model FROM prompts
-      WHERE status = 'published' AND deleted_at IS NULL AND model IS NOT NULL
-      ORDER BY model`).all<{ model: string }>(),
-    db.prepare(`SELECT DISTINCT ratio FROM prompts
-      WHERE status = 'published' AND deleted_at IS NULL AND ratio IS NOT NULL
-      ORDER BY ratio`).all<{ ratio: string }>(),
+    loadExploreOptions(db, locale),
   ]);
 
   return {
     cards: cards.results,
     total,
     totalPages,
-    categories: categories.results,
-    tags: tags.results,
-    models: models.results.map((row) => row.model),
-    ratios: ratios.results.map((row) => row.ratio),
+    ...options,
   };
 }
 

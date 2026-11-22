@@ -1,5 +1,5 @@
 import { env } from "cloudflare:test";
-import { beforeAll, describe, expect, it } from "vitest";
+import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { ExploreFiltersBar } from "../app/components/explore-filters";
@@ -12,6 +12,7 @@ import {
   readUiLocale, uiLocaleCookie,
 } from "../app/lib/explore";
 import { listExplorePrompts } from "../app/services/prompt.server";
+import { loadExploreOptions } from "../app/services/explore-options.server";
 
 async function applyMigration(sql: string) {
   for (const statement of sql.split(";").map((part) =>
@@ -131,6 +132,136 @@ describe("Explore D1 listing", () => {
     expect(result.cards.map((card) => card.slug)).toEqual(["prompt-7", "prompt-6"]);
     await expect(list("", "zh-CN", 3)).rejects.toMatchObject({ status: 404 });
     await expect(list("model=Flux", "zh-CN", 2)).rejects.toMatchObject({ status: 404 });
+  });
+});
+
+describe("shared public Explore options", () => {
+  let cache: Cache;
+  const key = (locale = "zh-CN") => `https://vault.disign.me/__internal-cache/explore-options/${locale}`;
+  const queries: string[] = [];
+  const db = { prepare(sql: string) { queries.push(sql); return env.DB.prepare(sql); } } as D1Database;
+
+  beforeEach(async () => {
+    cache = await caches.open("explore-options-v1");
+    await Promise.all([cache.delete(key()), cache.delete(key("en-US"))]);
+    vi.spyOn(caches, "open").mockResolvedValue(cache);
+    queries.length = 0;
+  });
+  afterEach(async () => {
+    vi.restoreAllMocks();
+    await Promise.all([cache.delete(key()), cache.delete(key("en-US"))]);
+  });
+
+  it("runs six queries cold and only count/cards across warm filtered and image pages", async () => {
+    const cold = await listExplorePrompts(db, filters(), "zh-CN", 1);
+    expect(queries).toHaveLength(6);
+    for (const [query, path, page] of [["model=Flux", "/", 1], ["", "/image", 2]] as const) {
+      queries.length = 0;
+      const warm = await listExplorePrompts(db, filters(query, path), "zh-CN", page);
+      expect(queries).toHaveLength(2);
+      expect(warm.categories).toEqual(cold.categories);
+      expect(warm.tags).toEqual(cold.tags);
+      expect(warm.models).toEqual(cold.models);
+      expect(warm.ratios).toEqual(cold.ratios);
+      expect(warm.cards.length).toBe(query ? 1 : 2);
+    }
+  });
+
+  it("isolates language caches and sets a five-minute lifetime", async () => {
+    const zh = await loadExploreOptions(db, "zh-CN");
+    const en = await loadExploreOptions(db, "en-US");
+    expect(queries).toHaveLength(8);
+    expect(zh.tags).toEqual([{ slug: "cinematic", name: "电影感" }]);
+    expect(en.tags).toEqual([{ slug: "cinematic", name: "Cinematic" }]);
+    expect(en.categories).toContainEqual({ slug: "poster", name: "Poster Design" });
+    expect(en.categories).toContainEqual({ slug: "photo", name: "摄影" });
+    const stored = await cache.match(key());
+    expect(stored?.headers.get("Cache-Control")).toBe("public, max-age=300");
+    queries.length = 0;
+    expect(await loadExploreOptions(db, "zh-CN")).toEqual(zh);
+    expect(await loadExploreOptions(db, "en-US")).toEqual(en);
+    expect(queries).toHaveLength(0);
+  });
+
+  it("refreshes public options after cache expiry or eviction", async () => {
+    const before = await loadExploreOptions(db, "zh-CN");
+    await env.DB.prepare("UPDATE tags SET name = '新标签' WHERE id = 1").run();
+    try {
+      expect(await loadExploreOptions(db, "zh-CN")).toEqual(before);
+      // An expired entry is a miss, just like an evicted entry.
+      await cache.delete(key());
+      expect((await loadExploreOptions(db, "zh-CN")).tags)
+        .toEqual([{ slug: "cinematic", name: "新标签" }]);
+    } finally {
+      await env.DB.prepare("UPDATE tags SET name = '电影感' WHERE id = 1").run();
+    }
+  });
+
+  it("keeps serving D1 data when cache reads or writes fail", async () => {
+    const warning = vi.spyOn(console, "warn").mockImplementation(() => {});
+    vi.spyOn(cache, "match").mockRejectedValue(new Error("cache unavailable"));
+    vi.spyOn(cache, "put").mockRejectedValue(new Error("cache unavailable"));
+    expect((await loadExploreOptions(db, "zh-CN")).tags)
+      .toEqual([{ slug: "cinematic", name: "电影感" }]);
+    expect(queries).toHaveLength(4);
+    expect(warning).toHaveBeenCalledTimes(2);
+  });
+
+  it("propagates database failures and never stores a failed result", async () => {
+    const put = vi.spyOn(cache, "put");
+    const broken = { prepare() { throw new Error("D1 unavailable"); } } as unknown as D1Database;
+    await expect(loadExploreOptions(broken, "zh-CN")).rejects.toThrow("D1 unavailable");
+    expect(put).not.toHaveBeenCalled();
+  });
+
+  it("returns and caches a valid empty result without exposing drafts or deleted content", async () => {
+    await env.DB.prepare("UPDATE prompts SET status = 'draft' WHERE status = 'published' AND deleted_at IS NULL").run();
+    try {
+      expect(await loadExploreOptions(db, "zh-CN"))
+        .toEqual({ categories: [], tags: [], models: [], ratios: [] });
+      queries.length = 0;
+      expect(await loadExploreOptions(db, "zh-CN"))
+        .toEqual({ categories: [], tags: [], models: [], ratios: [] });
+      expect(queries).toHaveLength(0);
+    } finally {
+      await env.DB.prepare("UPDATE prompts SET status = 'published' WHERE id <> 4 AND deleted_at IS NULL").run();
+    }
+  });
+
+  it("preserves taxonomy results while reading fewer rows for repeated associations", async () => {
+    await env.DB.prepare(`INSERT OR IGNORE INTO prompt_tags (prompt_id, tag_id)
+      SELECT id, 1 FROM prompts WHERE status = 'published' AND deleted_at IS NULL`).run();
+    try {
+      const oldTags = await env.DB.prepare(`SELECT t.slug, COALESCE(tt.name, t.name) AS name
+        FROM tags t JOIN prompt_tags ptag ON ptag.tag_id = t.id
+        JOIN prompts p ON p.id = ptag.prompt_id
+        LEFT JOIN tag_translations tt ON tt.tag_id = t.id AND tt.locale = ? AND tt.locale <> t.source_language
+        WHERE p.status = 'published' AND p.deleted_at IS NULL GROUP BY t.id ORDER BY t.name`)
+        .bind("en-US").all();
+      const oldCategories = await env.DB.prepare(`SELECT c.slug, COALESCE(ct.name, c.name) AS name
+        FROM categories c JOIN prompts p ON p.category_id = c.id
+        LEFT JOIN category_translations ct ON ct.category_id = c.id AND ct.locale = ? AND c.source_language <> ?
+        WHERE p.status = 'published' AND p.deleted_at IS NULL GROUP BY c.id ORDER BY c.sort_order, c.name`)
+        .bind("en-US", "en-US").all();
+      const reads: number[] = [];
+      const measured = { prepare(sql: string) {
+        const statement = env.DB.prepare(sql);
+        return { bind(...values: unknown[]) {
+          return { async all() {
+            const result = await statement.bind(...values).all();
+            reads.push(result.meta.rows_read);
+            return result;
+          } };
+        }, all: () => statement.all() };
+      } } as unknown as D1Database;
+      const result = await loadExploreOptions(measured, "en-US");
+      expect(result.tags).toEqual(oldTags.results);
+      expect(result.categories).toEqual(oldCategories.results);
+      expect(reads.reduce((sum, value) => sum + value, 0))
+        .toBeLessThan(oldTags.meta.rows_read + oldCategories.meta.rows_read);
+    } finally {
+      await env.DB.prepare("DELETE FROM prompt_tags WHERE prompt_id <> 1").run();
+    }
   });
 });
 

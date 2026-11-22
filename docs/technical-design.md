@@ -177,14 +177,18 @@ R2 与 D1 没有跨服务事务。设计目标是最多留下可回收的孤儿�
 
 | 响应 | 策略 |
 | --- | --- |
-| 匿名默认语言的首页、分类、标签、详情 GET/HEAD HTML | Cache-Control: public, max-age=60, s-maxage=300, stale-while-revalidate=60；普通列表 page>=2 也适用 |
+| 匿名默认语言的首页、分类、标签、详情及 /image 系列列表 GET/HEAD HTML | Cache-Control: public, max-age=60, s-maxage=300, stale-while-revalidate=60；普通列表 page>=2 也适用 |
 | /robots.txt、/sitemap.xml | Cache-Control: public, max-age=300, s-maxage=300 |
 | 管理员预览及 /admin、/admin/* | Cache-Control: no-store；后台立即读取 D1 最新内容 |
 | 非 GET/HEAD、错误页（含 410）、Set-Cookie、任何 Cookie、ui_locale/prompt_locale query、发现筛选及未知 query | Cache-Control: no-store；locale 变体不依赖 Vary: Cookie 缓存 |
 | Vite/static asset | 保留已有缓存头，不套用 HTML 策略 |
 | R2 图片 | vault-pic.disign.me 直出，对象 immutable 一年；key 不可变，替换生成新 key |
 
-接受公开页面最长约 5 分钟内容延迟。暂不实现主动 purge、cache tag 或 Redis/Cache API 手工缓存；有真实需要后再引入。
+公开页面继续使用约 5 分钟的缓存与 60 秒 stale 窗口。公共分类、标签、模型和比例选项单独使用 Cloudflare Cache API 缓存 300 秒，按 UI locale 隔离，所有列表、分页及筛选组合复用；只读取 published 且未删除内容的元数据，不缓存 Prompt 正文、草稿或后台响应。分类与标签通过 EXISTS 判断是否包含公开 Prompt，避免展开所有关联再 GROUP BY 去重。
+
+选项缓存按边缘数据中心存储；未命中或过期后从 D1 重建，缓存读写失败时直接使用 D1，D1 失败继续向上传播。后台仍立即读取最新数据。内容修改后，公开筛选项缓存最多保留约 5 分钟；叠加整页缓存与 stale 窗口时可能约 11 分钟。暂不实现主动全局 purge、cache tag 或 Redis。
+
+robots.txt 禁止抓取带 q、model、ratio、source_language、category、tag、sort、content_type 查询参数的 URL，减少组合筛选抓取；保持独立分类/标签路径、详情和普通分页可抓取。筛选 URL 的 noindex 与 canonical 继续保留，但它们不能替代抓取限制；robots 仅约束遵守规则的爬虫。
 
 ## 11. 后台 Access 纵深防御
 
@@ -276,7 +280,18 @@ route 负责请求边界、SSR 数据装配和 action；*.server.ts 负责 D1/R2
 
 ## 15. 可观测性
 
-启用 Cloudflare Workers Observability，隐藏自动日志中的 query string，并关闭 invocation logs；Worker 每个请求输出一条结构化摘要：requestId（优先 cf-ray，否则 UUID）、method、pathname（不含 query）、status、durationMs、admin。已有 D1/R2 清理错误日志可以保留。禁止记录完整 Prompt 正文、最终变量值、Access Token、Cookie、query 值、表单/body 或其他认证信息。不引入独立日志平台或 APM。
+启用 Cloudflare Workers Observability，隐藏自动日志中的 query string，并关闭 invocation logs；Worker 每个执行请求输出一条结构化摘要：requestId（仅格式合法的 cf-ray，否则 UUID）、method（标准方法或 OTHER）、pathname（路由模板，不含 slug、ID 或 query）、status、durationMs、admin，以及以下请求统计：
+
+- `d1Queries`：提交的语句执行次数，包含失败尝试；batch 按语句数计，自动内部重试不另计。
+- `d1RowsRead`：D1 metadata 中 rows_read 的合计，失败缺少 metadata 或原生 raw/exec 不提供 metadata 时为 null，不虚报为 0。
+- `d1Errors`：失败的 D1 API 执行次数，batch 失败只计一次。
+- `exploreOptionsCacheHits`、`exploreOptionsCacheMisses`、`exploreOptionsCacheReadErrors`、`exploreOptionsCacheWriteErrors`：公共筛选项缓存命中、未命中、读/解码失败和写失败次数；未使用缓存时全部为 0。
+
+使用 Cloudflare 原生 withEnv 注入每请求独立 D1 包装，不修改全局 env、不增加 Node.js 兼容层或额外查询；并发请求独立计数，batch 维持原有事务。first 通过相同 SQL 的一次 all 执行读取 metadata，再转换首行/指定列，保留空结果和错误语义。失败请求输出摘要前会等待已启动的并行查询完成。统计只写服务器日志，不进入客户端响应。
+
+禁止观测日志记录 SQL、绑定参数、完整 Prompt 正文、最终变量值、Access Token、Cookie、搜索词、query 值、表单/body、认证信息、IP、User-Agent 或异常原文；缓存失败只附加固定文字。已有 D1/R2 清理错误日志沿现有机制保留。不引入独立日志平台或 APM。
+
+整页 Workers Cache 命中会跳过 Worker，因此应用摘要仅覆盖实际执行的请求；整页命中率使用 Cloudflare 缓存统计，不能从缺失的应用日志推断。字段口径、缓存命中率和发布后检查方式见部署文档“请求观测”。
 
 ## 16. 验收标准
 

@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { loader as rootLoader } from "../app/root";
 import { applyResponseCachePolicy, PUBLIC_CRAWLER_CACHE, PUBLIC_HTML_CACHE } from "../workers/response-policy";
 import { requestSummary } from "../workers/request-log";
+import { createRequestMetrics } from "../workers/request-metrics";
 
 const request = (path: string, init?: RequestInit) =>
   new Request(`https://vault.disign.me${path}`, init);
@@ -13,7 +14,9 @@ const policy = (path: string, init?: RequestInit, response = html()) =>
 describe("final response cache policy", () => {
   it("caches only anonymous default public documents, including ordinary pagination", () => {
     for (const path of ["/", "/prompt/poster", "/category/art", "/tag/cinematic",
-      "/?page=2", "/category/art?page=2", "/tag/cinematic?page=2"]) {
+      "/?page=2", "/category/art?page=2", "/tag/cinematic?page=2",
+      "/image", "/image/category/art", "/image/tag/cinematic",
+      "/image?page=2", "/image/category/art?page=2", "/image/tag/cinematic?page=2"]) {
       expect(policy(path)).toBe(PUBLIC_HTML_CACHE);
     }
   });
@@ -22,11 +25,14 @@ describe("final response cache policy", () => {
     for (const path of ["/?ui_locale=en-US", "/prompt/poster?prompt_locale=en-US",
       "/?prompt_locale=zh-CN", "/?q=cat", "/?model=x", "/?ratio=1:1",
       "/?source_language=en-US", "/?unknown=1", "/category/art?tag=x",
-      "/tag/cinematic?unknown=1", "/prompt/poster?page=2"]) {
+      "/tag/cinematic?unknown=1", "/prompt/poster?page=2",
+      "/image?model=x", "/image?ui_locale=en-US", "/image?unknown=1",
+      "/image/category/art?tag=x", "/image/tag/cinematic?category=art"]) {
       expect(policy(path)).toBe("no-store");
     }
     expect(policy("/", { headers: { Cookie: "ui_locale=en-US" } })).toBe("no-store");
     expect(policy("/prompt/poster", { headers: { Cookie: "session=secret" } })).toBe("no-store");
+    expect(policy("/image", { headers: { Cookie: "ui_locale=en-US" } })).toBe("no-store");
   });
 
   it("never caches admin, errors, writes or Set-Cookie responses", () => {
@@ -73,13 +79,13 @@ describe("root locale cookie", () => {
 describe("request summary", () => {
   it("logs a fixed field set without query, credentials or body", () => {
     const input = request("/admin?token=secret", {
-      method: "POST", headers: { "cf-ray": "ray-1", Cookie: "private=1",
+      method: "POST", headers: { "cf-ray": "0123456789abcdef-SJC", Cookie: "private=1",
         Authorization: "Bearer secret", "Cf-Access-Jwt-Assertion": "jwt-secret" },
       body: "prompt body and variable value",
     });
     const summary = requestSummary(input, 403, 17);
-    expect(summary).toEqual({ requestId: "ray-1", method: "POST", pathname: "/admin",
-      status: 403, durationMs: 17, admin: true });
+    expect(summary).toEqual({ requestId: "0123456789abcdef-SJC", method: "POST", pathname: "/admin",
+      status: 403, durationMs: 17, admin: true, ...createRequestMetrics() });
     expect(JSON.stringify(summary)).not.toMatch(/secret|private|prompt body|jwt-secret/);
     expect(requestSummary(request("/"), 200, 1).requestId).toMatch(/^[0-9a-f-]{36}$/);
   });
